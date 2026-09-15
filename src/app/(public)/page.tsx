@@ -166,26 +166,28 @@ export default async function HomePage() {
           action={{ label: "View All Services", href: "/services" }}
         />
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 lg:gap-6">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 lg:gap-5">
           {displayServices.map((service, idx) => (
             <Reveal key={service.slug || idx} delayMs={(idx % 3) * 80} className="group">
               <Link
                 href={`/services/${service.slug}`}
-                className="relative flex h-full flex-col justify-between overflow-hidden rounded-3xl border border-[var(--marketing-line)] bg-white p-6 transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_22px_50px_rgba(224,27,36,0.16)] sm:p-8"
+                className="relative flex h-full flex-col justify-between overflow-hidden rounded-3xl border border-[var(--marketing-line)] bg-white p-5 transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_22px_50px_rgba(224,27,36,0.16)] sm:p-6"
               >
                 <div className="border-beam" aria-hidden />
                 <div>
-                  <div className="mb-6 flex size-14 items-center justify-center rounded-2xl bg-brand-500/10 text-brand-500 transition-all group-hover:scale-110 group-hover:-rotate-6 group-hover:bg-brand-500 group-hover:text-white">
-                    <span className="font-tech text-lg font-bold">{String(idx + 1).padStart(2, "0")}</span>
+                  <div className="flex items-center gap-3">
+                    <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-500/10 text-brand-500 transition-all group-hover:scale-110 group-hover:-rotate-6 group-hover:bg-brand-500 group-hover:text-white">
+                      <span className="font-tech text-sm font-bold">{String(idx + 1).padStart(2, "0")}</span>
+                    </div>
+                    <h3 className="font-tech text-base font-bold uppercase tracking-wide text-navy-900 transition-colors group-hover:text-brand-500 sm:text-lg">
+                      {service.title}
+                    </h3>
                   </div>
-                  <h3 className="font-tech text-lg font-bold uppercase tracking-wide text-navy-900 transition-colors group-hover:text-brand-500 sm:text-xl">
-                    {service.title}
-                  </h3>
                   <p className="mt-3 text-sm leading-relaxed text-ink/62">
                     {service.summary || "Complete engineering design, testing and certified installation compliant with Dubai Civil Defence."}
                   </p>
                 </div>
-                <div className="mt-8 flex items-center justify-between border-t border-[var(--marketing-line)] pt-4 text-xs font-semibold text-ink/50 group-hover:text-brand-500">
+                <div className="mt-5 flex items-center justify-between border-t border-[var(--marketing-line)] pt-3 text-xs font-semibold text-ink/50 group-hover:text-brand-500">
                   <span>Explore Service Details</span>
                   <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
                 </div>

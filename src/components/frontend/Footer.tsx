@@ -18,15 +18,15 @@ export function Footer({ settings }: { settings: Partial<ISettings> }) {
     .join(", ");
 
   return (
-    <footer className="relative overflow-hidden border-t border-gray-800/80 bg-ink pb-12 pt-14 text-gray-300 sm:pt-16">
+    <footer className="relative overflow-hidden border-t border-gray-800/80 bg-ink pb-8 pt-10 text-gray-300 sm:pt-12">
       {/* Background blueprint grid overlay */}
       <div className="blueprint-grid-dark pointer-events-none absolute inset-0 opacity-20" />
 
       <div className="wrap relative z-10">
         {/* Main footer content - one column on mobile, building up to 5 on desktop */}
-        <div className="grid grid-cols-1 gap-10 border-b border-gray-800 pb-12 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid grid-cols-1 gap-8 border-b border-gray-800 pb-8 sm:grid-cols-2 lg:grid-cols-5">
           {/* Brand & Approval info */}
-          <div className="space-y-4 sm:col-span-2 lg:col-span-2">
+          <div className="space-y-3 sm:col-span-2 lg:col-span-2">
             <Link href="/" className="group inline-flex items-center gap-2.5">
               <Image
                 src="/assets/images/logo-lockshield.webp"
@@ -56,35 +56,35 @@ export function Footer({ settings }: { settings: Partial<ISettings> }) {
 
           {/* Quick Services Links */}
           <div>
-            <h3 className="font-tech mb-4 text-sm font-bold uppercase tracking-wider text-white">Core Services</h3>
+            <h3 className="font-tech mb-3 text-sm font-bold uppercase tracking-wider text-white">Core Services</h3>
             <ul className="space-y-1">
               <li>
-                <Link href="/services/annual-maintenance-contract" className="flex min-h-9 items-center text-sm transition-colors hover:text-white">
+                <Link href="/services/annual-maintenance-contract" className="flex min-h-8 items-center text-sm transition-colors hover:text-white">
                   Annual Maintenance (AMC)
                 </Link>
               </li>
               <li>
-                <Link href="/services/designing-drawing-civil-defence-approval" className="flex min-h-9 items-center text-sm transition-colors hover:text-white">
+                <Link href="/services/designing-drawing-civil-defence-approval" className="flex min-h-8 items-center text-sm transition-colors hover:text-white">
                   Civil Defence Approvals
                 </Link>
               </li>
               <li>
-                <Link href="/services/fm-200-special-systems" className="flex min-h-9 items-center text-sm transition-colors hover:text-white">
+                <Link href="/services/fm-200-special-systems" className="flex min-h-8 items-center text-sm transition-colors hover:text-white">
                   FM-200 Special Systems
                 </Link>
               </li>
               <li>
-                <Link href="/services/kitchen-fire-suppression-systems" className="flex min-h-9 items-center text-sm transition-colors hover:text-white">
+                <Link href="/services/kitchen-fire-suppression-systems" className="flex min-h-8 items-center text-sm transition-colors hover:text-white">
                   Kitchen Fire Suppression
                 </Link>
               </li>
               <li>
-                <Link href="/services/fire-extinguisher-refilling" className="flex min-h-9 items-center text-sm transition-colors hover:text-white">
+                <Link href="/services/fire-extinguisher-refilling" className="flex min-h-8 items-center text-sm transition-colors hover:text-white">
                   Extinguisher Refilling
                 </Link>
               </li>
               <li>
-                <Link href="/services/fire-system-products-supply" className="flex min-h-9 items-center text-sm transition-colors hover:text-white">
+                <Link href="/services/fire-system-products-supply" className="flex min-h-8 items-center text-sm transition-colors hover:text-white">
                   Fire Products Supply
                 </Link>
               </li>
@@ -93,30 +93,30 @@ export function Footer({ settings }: { settings: Partial<ISettings> }) {
 
           {/* Company Links */}
           <div>
-            <h3 className="font-tech mb-4 text-sm font-bold uppercase tracking-wider text-white">Company</h3>
+            <h3 className="font-tech mb-3 text-sm font-bold uppercase tracking-wider text-white">Company</h3>
             <ul className="space-y-1">
               <li>
-                <Link href="/about" className="flex min-h-9 items-center text-sm transition-colors hover:text-white">
+                <Link href="/about" className="flex min-h-8 items-center text-sm transition-colors hover:text-white">
                   About Lock Shield
                 </Link>
               </li>
               <li>
-                <Link href="/projects" className="flex min-h-9 items-center text-sm transition-colors hover:text-white">
+                <Link href="/projects" className="flex min-h-8 items-center text-sm transition-colors hover:text-white">
                   Featured Projects
                 </Link>
               </li>
               <li>
-                <Link href="/blog" className="flex min-h-9 items-center text-sm transition-colors hover:text-white">
+                <Link href="/blog" className="flex min-h-8 items-center text-sm transition-colors hover:text-white">
                   Safety News &amp; Guides
                 </Link>
               </li>
               <li>
-                <Link href="/career" className="flex min-h-9 items-center text-sm transition-colors hover:text-white">
+                <Link href="/career" className="flex min-h-8 items-center text-sm transition-colors hover:text-white">
                   Careers &amp; Jobs
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="flex min-h-9 items-center text-sm transition-colors hover:text-white">
+                <Link href="/contact" className="flex min-h-8 items-center text-sm transition-colors hover:text-white">
                   Contact Us
                 </Link>
               </li>
@@ -125,7 +125,7 @@ export function Footer({ settings }: { settings: Partial<ISettings> }) {
                   href="/assets/images/company-profile.pdf"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex min-h-9 items-center gap-1 text-sm font-medium text-brand-500 hover:underline"
+                  className="flex min-h-8 items-center gap-1 text-sm font-medium text-brand-500 hover:underline"
                 >
                   Download Profile (PDF)
                   <ExternalLink className="size-3" />
@@ -136,21 +136,21 @@ export function Footer({ settings }: { settings: Partial<ISettings> }) {
 
           {/* Contact Details & NAP */}
           <div>
-            <h3 className="font-tech mb-4 text-sm font-bold uppercase tracking-wider text-white">Get in Touch</h3>
-            <ul className="space-y-3 text-sm">
+            <h3 className="font-tech mb-3 text-sm font-bold uppercase tracking-wider text-white">Get in Touch</h3>
+            <ul className="space-y-2 text-sm">
               <li className="flex items-start gap-3">
                 <MapPin className="mt-1 size-4 shrink-0 text-brand-500" />
                 <span className="text-gray-400">{fullAddress}</span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="size-4 shrink-0 text-brand-500" />
-                <a href={`tel:${phone.replace(/\s+/g, "")}`} className="min-h-9 py-1.5 transition-colors hover:text-white">
+                <a href={`tel:${phone.replace(/\s+/g, "")}`} className="min-h-8 py-1.5 transition-colors hover:text-white">
                   {phone}
                 </a>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="size-4 shrink-0 text-brand-500" />
-                <a href={`mailto:${email}`} className="min-h-9 py-1.5 transition-colors hover:text-white">
+                <a href={`mailto:${email}`} className="min-h-8 py-1.5 transition-colors hover:text-white">
                   {email}
                 </a>
               </li>
@@ -160,7 +160,7 @@ export function Footer({ settings }: { settings: Partial<ISettings> }) {
                   href={`https://wa.me/${whatsappNumber}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="min-h-9 py-1.5 font-medium text-emerald-400 hover:underline"
+                  className="min-h-8 py-1.5 font-medium text-emerald-400 hover:underline"
                 >
                   Chat on WhatsApp
                 </a>
