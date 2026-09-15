@@ -2,29 +2,40 @@ import NextAuth from "next-auth";
 import { NextResponse, type NextRequest } from "next/server";
 import { authConfig } from "@/lib/auth.config";
 
-// WHY NextAuth(authConfig) here instead of importing auth from lib/auth.ts:
-// this file runs on the Edge runtime, and lib/auth.ts's Credentials
-// provider imports Mongoose (Node-only) — see auth.config.ts's doc comment.
-// authConfig has zero DB imports, so this stays Edge-safe.
 const { auth } = NextAuth(authConfig);
 
-// WHY edge-safe and auth-only here: checks the session cookie only (JWT
-// strategy needs no DB round-trip) and redirects unauthenticated /admin/*
-// visits to the login page. Per-resource role checks (EDITOR vs ADMIN)
-// still happen in each route handler via requireRole() — this is a UX
-// redirect, not the security boundary.
-//
-// Legacy-URL 301 redirects (lib/redirects.ts, DB-backed) are deliberately
-// NOT wired in here yet — that needs the public frontend routes to exist
-// first so there's something to redirect *to*, and a DB-backed lookup on
-// every request would itself need the Node runtime. Tracked for the
-// frontend-wiring phase.
+const LEGACY_HTML_REDIRECTS: Record<string, string> = {
+  "/index.html": "/",
+  "/about.html": "/about",
+  "/contact.html": "/contact",
+  "/blog.html": "/blog",
+  "/career.html": "/career",
+  "/annual-maintenance-contract.html": "/services/annual-maintenance-contract",
+  "/designing-drawing-civil-defence-approval.html": "/services/designing-drawing-civil-defence-approval",
+  "/fire-extinguisher-refilling.html": "/services/fire-extinguisher-refilling",
+  "/fire-system-products-supply.html": "/services/fire-system-products-supply",
+  "/fm-200-special-systems.html": "/services/fm-200-special-systems",
+  "/kitchen-fire-suppression-systems.html": "/services/kitchen-fire-suppression-systems",
+  "/projects-and-fit-outs.html": "/projects",
+  "/vismaya-madathil.html": "/about",
+};
+
 export default auth((req: NextRequest & { auth: unknown }) => {
-  const isAdminRoute = req.nextUrl.pathname.startsWith("/admin") && req.nextUrl.pathname !== "/admin/login";
+  const pathname = req.nextUrl.pathname;
+
+  // 1. Handle legacy .html URLs -> 301 Permanent Redirect to preserve SEO equity
+  if (pathname.endsWith(".html")) {
+    const target = LEGACY_HTML_REDIRECTS[pathname] || pathname.replace(/\.html$/, "") || "/";
+    const redirectUrl = new URL(target, req.nextUrl.origin);
+    return NextResponse.redirect(redirectUrl, { status: 301 });
+  }
+
+  // 2. Protect /admin/* routes
+  const isAdminRoute = pathname.startsWith("/admin") && pathname !== "/admin/login";
 
   if (isAdminRoute && !req.auth) {
     const loginUrl = new URL("/admin/login", req.nextUrl.origin);
-    loginUrl.searchParams.set("callbackUrl", req.nextUrl.pathname);
+    loginUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
@@ -32,5 +43,5 @@ export default auth((req: NextRequest & { auth: unknown }) => {
 });
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/admin/:path*", "/:path*.html"],
 };

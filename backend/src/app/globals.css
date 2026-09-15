@@ -1,32 +1,39 @@
 @import "tailwindcss";
 
-/* Design tokens.
-   Brand red #e52629 is kept, but darkened for text/small elements so it
-   clears WCAG AA on white (the raw brand red is ~3.4:1 on white, which
-   fails for body-size text — it stays as-is for large fills only). */
 @theme {
   --color-brand-50: #fff1f1;
   --color-brand-100: #ffdfdf;
   --color-brand-200: #ffc5c5;
   --color-brand-300: #ff9d9d;
   --color-brand-400: #fb6565;
-  --color-brand-500: #e52629;
-  --color-brand-600: #c81f22;
-  --color-brand-700: #a8181b;
-  --color-brand-800: #8b1719;
-  --color-brand-900: #741a1c;
+  --color-brand-500: #e01b24;
+  --color-brand-600: #b3121a;
+  --color-brand-700: #8c0c12;
+  --color-brand-800: #690a0f;
+  --color-brand-900: #4a060a;
 
-  --font-sans: var(--font-app-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --color-navy-900: #0d1220;
+  --color-navy-800: #131b2e;
+  --color-navy-700: #1a243d;
+
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-tech: var(--font-chakra), ui-monospace, monospace;
 }
 
 :root {
   --bg: #f7f8fa;
   --surface: #ffffff;
   --surface-2: #f2f4f7;
+  --surface-3: #e8ecf1;
   --border: #e3e6ea;
-  --text: #10141a;
+  --text: #0d1220;
   --text-muted: #5c6673;
-  --ring: #e52629;
+  --ring: #e01b24;
+
+  --brand-red: #e01b24;
+  --brand-red-dark: #b3121a;
+  --navy: #131b2e;
+  --ink: #0d1220;
 
   --success: #15803d;
   --success-bg: #f0fdf4;
@@ -40,6 +47,7 @@
   --bg: #0c0f14;
   --surface: #141922;
   --surface-2: #1b212c;
+  --surface-3: #242c3b;
   --border: #262e3b;
   --text: #e9edf3;
   --text-muted: #939eae;
@@ -59,8 +67,7 @@
   }
 
   html {
-    /* WHY: the admin is dense; 15px base reads better than 16 on desktop
-       while staying comfortable on mobile. */
+    scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
   }
 
@@ -71,19 +78,22 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* Never remove focus visibility — replace it with something better. */
   :focus-visible {
     outline: 2px solid var(--ring);
     outline-offset: 2px;
   }
 
   ::selection {
-    background: var(--color-brand-500);
+    background: var(--brand-red);
     color: white;
   }
 }
 
 @layer utilities {
+  .font-tech {
+    font-family: var(--font-tech);
+  }
+
   .bg-app {
     background: var(--bg);
   }
@@ -103,8 +113,37 @@
     border-color: var(--border);
   }
 
-  /* Respect users who ask for less motion — applies to every transition
-     and animation in the admin at once. */
+  /* Blueprint Grid Pattern matching static HTML */
+  .blueprint-grid {
+    background-image:
+      linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  .blueprint-grid-dark {
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  /* Glassmorphic floating pill header */
+  .glass-pill {
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(227, 230, 234, 0.8);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08);
+  }
+
+  /* Pill button */
+  .btn-pill {
+    border-radius: 9999px;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
