@@ -79,13 +79,9 @@ export function Footer({ settings }: { settings: Partial<ISettings> }) {
                 </Link>
               </li>
               <li>
-                <Link href="/services/fire-extinguisher-refilling" className="flex min-h-8 items-center text-sm transition-colors hover:text-white">
-                  Extinguisher Refilling
-                </Link>
-              </li>
-              <li>
-                <Link href="/services/fire-system-products-supply" className="flex min-h-8 items-center text-sm transition-colors hover:text-white">
-                  Fire Products Supply
+                <Link href="/services" className="flex min-h-8 items-center gap-1 text-sm font-medium text-brand-500 hover:underline">
+                  View All Services
+                  <ExternalLink className="size-3" />
                 </Link>
               </li>
             </ul>
