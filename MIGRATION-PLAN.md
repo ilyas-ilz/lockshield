@@ -499,6 +499,46 @@ sample — and look at each one. Per width, confirm:
 If I cannot render a page, the final message says **"not visually verified"** for
 that page. No claim of a responsive check without the screenshot behind it.
 
+## Header requirement (added mid-Phase-9, DONE)
+
+Explicit requirement from review feedback on the live site: preserve the
+existing Lock Shield floating-header-over-hero concept, but refine its
+proportions, logo presentation, navigation spacing, phone number and CTA —
+and build a dedicated mobile header rather than shrinking the desktop one.
+Test at 375px, 768px, and desktop widths.
+
+Implemented in `src/components/frontend/Navbar.tsx`:
+
+- Container: exaggerated `rounded-full` pill → `rounded-[26px]`/`rounded-[30px]`
+  (sm), a touch less vertical padding. The `.wrap` max-width (1240px) and the
+  `.glass-pill` border/shadow were already in place.
+- Logo: `size-9`/`size-11` (sm) up from `size-8`/`size-9`; site name bumped
+  to `text-base`/`text-xl` (sm) up from `text-sm`/`text-lg`.
+- Phone number: found the real cause of "visually weak" — the production
+  `Settings.phones` value is a bare digit string (`+971528434801`, zero
+  spaces), not a formatting/CSS issue. Added `formatPhoneDisplay()`, which
+  groups the two shapes UAE numbers actually come in (9-digit mobile,
+  8-digit landline+area-code) and falls back to the raw string for anything
+  else — safer than guessing at an arbitrary admin-entered format.
+- Per a follow-up instruction, the phone number was then removed from the
+  header entirely (top bar and the `xl:flex` breakpoint gate it used to
+  live behind are both gone); `formatPhoneDisplay()` is still used in the
+  mobile drawer's "Call ..." row, which was kept.
+- CTA: "Get a Quote" narrowed slightly (`sm:px-5` → `sm:px-4`) and is now
+  `hidden ... lg:inline-flex` — desktop-only, on purpose (see mobile header
+  below).
+- Mobile header: below `lg`, the top bar is now just the logo/wordmark and
+  the hamburger — no CTA, no phone crammed in. The existing mobile drawer
+  already matched the requested shape (nav links, then a full-width
+  "Request Free Quote" button, then the phone) and was reordered to put the
+  CTA before the phone, matching the requested layout exactly.
+
+Verified live at 375 / 768 / 1024 / 1280 / 1920: zero `document.documentElement`
+horizontal overflow at every width (programmatic check, not eyeballed), and
+the `lg` breakpoint (1024-1279px) — the exact range the earlier "not proper"
+navbar bug lived in — now has *more* headroom than before, since the phone
+link that used to gate in at `xl` is gone entirely.
+
 ---
 
 ## Sequencing

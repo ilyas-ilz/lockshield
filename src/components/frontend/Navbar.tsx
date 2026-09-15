@@ -12,6 +12,20 @@ export interface NavbarProps {
   siteName?: string;
 }
 
+// WHY: the real Settings.phones value in production is a bare digit string
+// ("+971528434801", no spaces) - visually illegible in a header. Groups the
+// two shapes UAE numbers actually come in (9-digit mobile, 8-digit
+// landline+area-code); anything else is left exactly as entered rather than
+// risk mangling a format we don't recognize.
+function formatPhoneDisplay(phone: string): string {
+  const digits = phone.replace(/\D/g, "");
+  if (!digits.startsWith("971")) return phone;
+  const rest = digits.slice(3);
+  if (rest.length === 9) return `+971 ${rest.slice(0, 2)} ${rest.slice(2, 5)} ${rest.slice(5)}`;
+  if (rest.length === 8) return `+971 ${rest.slice(0, 1)} ${rest.slice(1, 4)} ${rest.slice(4)}`;
+  return phone;
+}
+
 const NAV_LINKS = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About Us" },
@@ -48,22 +62,22 @@ export function Navbar({ phone = "+971 4 272 7333", siteName = "Lock Shield" }: 
         }`}
       >
         <div className="wrap">
-          <div className="glass-pill flex items-center justify-between gap-2 rounded-full px-3 py-2 transition-all sm:px-6 sm:py-3">
+          <div className="glass-pill flex items-center justify-between gap-2 rounded-[26px] px-3 py-2 transition-all sm:rounded-[30px] sm:px-6 sm:py-2.5">
             {/* Logo - the real lockup, not a placeholder icon */}
-            <Link href="/" className="group flex shrink-0 items-center gap-2 sm:gap-2.5">
+            <Link href="/" className="group flex shrink-0 items-center gap-2.5 sm:gap-3">
               <Image
                 src="/assets/images/logo-shield.webp"
                 alt=""
-                width={38}
-                height={39}
+                width={44}
+                height={45}
                 priority
-                className="size-8 shrink-0 transition-transform group-hover:scale-105 sm:size-9"
+                className="size-9 shrink-0 transition-transform group-hover:scale-105 sm:size-11"
               />
               <div className="flex min-w-0 flex-col">
-                <span className="font-tech truncate text-sm font-bold uppercase leading-none tracking-tight text-ink sm:text-lg">
+                <span className="font-tech truncate text-base font-bold uppercase leading-none tracking-tight text-ink sm:text-xl">
                   {siteName}
                 </span>
-                <span className="mt-0.5 hidden text-[10px] font-medium uppercase leading-tight tracking-wider text-navy/75 sm:inline">
+                <span className="mt-1 hidden text-[10px] font-medium uppercase leading-tight tracking-wider text-navy/75 sm:inline">
                   Firefighting &amp; Safety Equipment Installation LLC
                 </span>
               </div>
@@ -87,24 +101,15 @@ export function Navbar({ phone = "+971 4 272 7333", siteName = "Lock Shield" }: 
               })}
             </nav>
 
-            {/* Call Action & Quote CTA */}
+            {/* Quote CTA */}
             <div className="flex items-center gap-1.5 sm:gap-3">
-              {phone && (
-                <a
-                  href={`tel:${phone.replace(/\s+/g, "")}`}
-                  className="hidden items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold text-gray-800 transition-colors hover:bg-gray-100 hover:text-brand-500 xl:flex"
-                >
-                  <div className="flex size-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
-                    <Phone className="size-3" />
-                  </div>
-                  <span>{phone}</span>
-                </a>
-              )}
-
+              {/* Desktop-only CTA - the mobile drawer has its own full-width
+                  "Request Free Quote" button, so the top bar stays just
+                  logo + hamburger below `lg` instead of cramming this in too. */}
               <button
                 type="button"
                 onClick={() => setQuoteOpen(true)}
-                className="inline-flex min-h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-md shadow-brand-500/20 transition-all hover:bg-brand-600 active:scale-95 sm:min-h-10 sm:px-5 sm:text-sm cursor-pointer"
+                className="hidden min-h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-md shadow-brand-500/20 transition-all hover:bg-brand-600 active:scale-95 sm:min-h-10 sm:px-4 sm:text-sm lg:inline-flex cursor-pointer"
               >
                 <span>Get a Quote</span>
                 <ArrowRight className="size-3.5" />
@@ -149,15 +154,6 @@ export function Navbar({ phone = "+971 4 272 7333", siteName = "Lock Shield" }: 
             </nav>
 
             <div className="mt-5 flex flex-col gap-3 border-t border-gray-100 pt-5">
-              {phone && (
-                <a
-                  href={`tel:${phone.replace(/\s+/g, "")}`}
-                  className="flex min-h-11 items-center justify-center gap-2 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700 transition-colors hover:bg-emerald-100"
-                >
-                  <Phone className="size-4" />
-                  <span>Call {phone}</span>
-                </a>
-              )}
               <button
                 type="button"
                 onClick={() => {
@@ -169,6 +165,15 @@ export function Navbar({ phone = "+971 4 272 7333", siteName = "Lock Shield" }: 
                 <span>Request Free Quote</span>
                 <ArrowRight className="size-4" />
               </button>
+              {phone && (
+                <a
+                  href={`tel:${phone.replace(/\s+/g, "")}`}
+                  className="flex min-h-11 items-center justify-center gap-2 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700 transition-colors hover:bg-emerald-100"
+                >
+                  <Phone className="size-4" />
+                  <span>Call {formatPhoneDisplay(phone)}</span>
+                </a>
+              )}
             </div>
           </div>
         </div>
