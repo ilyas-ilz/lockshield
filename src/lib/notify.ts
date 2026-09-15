@@ -29,6 +29,19 @@ function getTransporter() {
   return transporter;
 }
 
+// WHY escape: every value here is public, unauthenticated visitor input
+// (the leads form has no auth) rendered as HTML in a real email client -
+// without this, a lead's name or message becomes a stored-XSS/HTML
+// injection vector against whoever reads the notification inbox.
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function renderLeadEmail(lead: LeadNotification): string {
   const rows: [string, string | undefined][] = [
     ["Source", lead.source],
@@ -39,7 +52,10 @@ function renderLeadEmail(lead: LeadNotification): string {
   ];
   const rowsHtml = rows
     .filter(([, value]) => Boolean(value))
-    .map(([label, value]) => `<tr><td style="padding:6px 12px;font-weight:600;color:#333">${label}</td><td style="padding:6px 12px;color:#333">${value}</td></tr>`)
+    .map(
+      ([label, value]) =>
+        `<tr><td style="padding:6px 12px;font-weight:600;color:#333">${escapeHtml(label)}</td><td style="padding:6px 12px;color:#333">${escapeHtml(value!)}</td></tr>`
+    )
     .join("");
   return `<table style="border-collapse:collapse;font-family:sans-serif;font-size:14px">${rowsHtml}</table>`;
 }
@@ -64,7 +80,7 @@ export async function notifyNewLead(lead: LeadNotification): Promise<void> {
     await getTransporter().sendMail({
       from: env.SMTP_FROM || env.SMTP_USER,
       to: recipients.join(", "),
-      subject: `New ${lead.source} lead: ${lead.name}`,
+      subject: `New ${lead.source} lead: ${lead.name.replace(/[\r\n]+/g, " ")}`,
       html: renderLeadEmail(lead),
     });
   } catch (err) {
