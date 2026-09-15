@@ -16,7 +16,7 @@ const CLIENTS = [
  * prefers-reduced-motion via the shared reduced-motion rule in globals.css. */
 export function ClientsMarquee() {
   return (
-    <section className="overflow-hidden bg-white py-12 sm:py-16">
+    <section className="overflow-hidden bg-white py-14 sm:py-20 lg:py-24">
       <Reveal className="wrap mb-0">
         <span className="eyebrow">Our Clients</span>
         <h2 className="font-tech mt-2 text-[clamp(1.4rem,4vw,2rem)] font-bold uppercase leading-tight tracking-tight text-navy-900">

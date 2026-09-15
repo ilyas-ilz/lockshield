@@ -13,7 +13,7 @@ const STATS = [
  * port replaced these count-up figures entirely. */
 export function StatsSection() {
   return (
-    <section className="bg-paper-soft py-14 sm:py-20">
+    <section className="bg-paper-soft py-14 sm:py-20 lg:py-24">
       <div className="wrap">
         <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 lg:gap-6">
           {STATS.map((stat, i) => (
