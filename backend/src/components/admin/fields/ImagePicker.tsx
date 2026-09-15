@@ -4,6 +4,7 @@ import * as React from "react";
 import { ImagePlus, Trash2, AlertTriangle, Loader2, FolderOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { MediaModal } from "./MediaModal";
 
 export interface PickedImage {
   url: string;
@@ -27,7 +28,10 @@ export function ImagePicker({
   const [progress, setProgress] = React.useState<number>(0);
   const [dragActive, setDragActive] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [libraryOpen, setLibraryOpen] = React.useState(false);
   const fileInput = React.useRef<HTMLInputElement>(null);
+
+  const openLibrary = onOpenMediaModal || (() => setLibraryOpen(true));
 
   function uploadWithProgress(file: File): Promise<PickedImage> {
     return new Promise((resolve, reject) => {
@@ -159,21 +163,19 @@ export function ImagePicker({
                   SVG, PNG, JPG, WebP, or GIF (max 10MB)
                 </p>
               </div>
-              {onOpenMediaModal && (
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="sm"
-                  className="mt-2 text-xs"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onOpenMediaModal();
-                  }}
-                >
-                  <FolderOpen className="size-3.5 mr-1" />
-                  Select from Library
-                </Button>
-              )}
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                className="mt-2 text-xs"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openLibrary();
+                }}
+              >
+                <FolderOpen className="size-3.5 mr-1" />
+                Select from Library
+              </Button>
             </>
           )}
         </div>
@@ -190,6 +192,12 @@ export function ImagePicker({
           }}
         />
         {error && <p className="text-xs text-[var(--danger)]">{error}</p>}
+
+        <MediaModal
+          open={libraryOpen}
+          onOpenChange={setLibraryOpen}
+          onSelect={(img) => onChange(img)}
+        />
       </div>
     );
   }
@@ -220,18 +228,16 @@ export function ImagePicker({
               <Trash2 className="size-3.5 mr-1" aria-hidden />
               Remove
             </Button>
-            {onOpenMediaModal && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="text-xs text-muted"
-                onClick={onOpenMediaModal}
-              >
-                <FolderOpen className="size-3.5 mr-1" />
-                Change image
-              </Button>
-            )}
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="text-xs text-muted"
+              onClick={openLibrary}
+            >
+              <FolderOpen className="size-3.5 mr-1" />
+              Change image
+            </Button>
           </div>
         </div>
       </div>
@@ -242,6 +248,12 @@ export function ImagePicker({
         </p>
       )}
       {error && <p className="text-xs text-[var(--danger)]">{error}</p>}
+
+      <MediaModal
+        open={libraryOpen}
+        onOpenChange={setLibraryOpen}
+        onSelect={(img) => onChange(img)}
+      />
     </div>
   );
 }

@@ -148,6 +148,22 @@ export const RESOURCE_CONFIGS: Record<string, ResourceConfig> = {
       { name: "statusCode", label: "Status Code", type: "select", options: ["301", "302"] },
     ],
   },
+  media: {
+    key: "media",
+    label: "Media Library",
+    description: "Manage uploaded images, logos, diagrams, and assets.",
+    apiPath: "/api/media",
+    searchable: true,
+    columns: [
+      { key: "url", label: "Thumbnail" },
+      { key: "alt", label: "Alt Text" },
+      { key: "storage", label: "Storage" },
+      { key: "createdAt", label: "Uploaded" },
+    ],
+    fields: [
+      { name: "alt", label: "Alt Text", type: "text", required: true },
+    ],
+  },
 };
 
 export function getResourceConfig(key: string): ResourceConfig | undefined {

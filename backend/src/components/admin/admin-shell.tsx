@@ -22,6 +22,7 @@ import {
   Moon,
   Sun,
   ShieldCheck,
+  ExternalLink,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -49,6 +50,7 @@ const NAV_GROUPS: { heading: string; items: NavItem[] }[] = [
       { href: "/admin/services", label: "Services", icon: Wrench },
       { href: "/admin/projects", label: "Projects", icon: Building2 },
       { href: "/admin/jobs", label: "Careers", icon: Briefcase },
+      { href: "/admin/media", label: "Media Library", icon: FolderTree },
     ],
   },
   {
@@ -137,7 +139,16 @@ export function AdminShell({
   );
 
   const userBlock = (
-    <div className="border-t border-app p-3 shrink-0">
+    <div className="border-t border-app p-3 shrink-0 space-y-1">
+      <Link
+        href="/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 text-xs text-muted hover:text-foreground hover:bg-surface-2 transition-colors"
+      >
+        <span className="font-medium">View live site</span>
+        <ExternalLink className="size-3" />
+      </Link>
       <div className="flex items-center gap-2.5 px-2 py-2">
         <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-surface-2 text-xs font-semibold uppercase">
           {(user.name ?? user.email ?? "?").slice(0, 2)}

@@ -2,6 +2,7 @@
 
 import type { FieldConfig } from "@/lib/admin/field-types";
 import { ImagePicker, type PickedImage } from "./ImagePicker";
+import { RichTextEditor } from "./RichTextEditor";
 import { StringArrayField, StatsArrayField, ImageArrayField } from "./ArrayFields";
 import { ObjectArrayField } from "./ObjectArrayField";
 import { ObjectField } from "./ObjectField";
@@ -40,27 +41,11 @@ export function FieldInput({
     case "textarea":
       return <Textarea id={id} rows={4} value={(value as string) ?? ""} onChange={(e) => onChange(e.target.value)} />;
     case "richtext":
-      // WHY a JSON textarea for now, not a Tiptap editor: the WYSIWYG is
-      // frontend/design-phase surface area. The *data contract* is already
-      // correct — this stores the same Tiptap-shaped JSON the schema
-      // expects, so dropping in the real editor later changes nothing
-      // about the model, validation, or this field's position.
       return (
-        <Textarea
+        <RichTextEditor
           id={id}
-          className="font-mono text-xs min-h-40"
-          placeholder='Tiptap JSON, e.g. {"type":"doc","content":[…]} — rich editor lands with the frontend build'
-          value={value ? JSON.stringify(value, null, 2) : ""}
-          onChange={(e) => {
-            try {
-              onChange(e.target.value ? JSON.parse(e.target.value) : undefined);
-            } catch {
-              // WHY swallowed: this fires on every keystroke while the JSON
-              // is mid-edit and necessarily invalid. Surfacing that would
-              // fight the user on every character. The server's Zod
-              // validation still blocks a bad payload on submit.
-            }
-          }}
+          value={value as any}
+          onChange={(val) => onChange(val)}
         />
       );
     case "number":
