@@ -1,16 +1,17 @@
 # Lock Shield — Migration & Cleanup Plan
 
-Status: Phases 0-5 done and committed (verified: typecheck/lint/tests/build
-green, screenshotted at 375/768/1280 after each phase). Phase 4 fixed a real
-navbar overflow bug at the lg breakpoint (1024-1279px), found via manual
-review - not caught by the automated document-level overflow check because
-the header is `position: fixed`. Phase 5 fixed a more serious bug in the
-same family: the shared `useInView` hook's default 0.15 threshold is a
-fraction of the *target's own height*, which is unsatisfiable (and silently
-leaves content at `opacity: 0` forever) for any Reveal-wrapped block taller
-than viewport-height / 0.15 - a long blog article body is a routine example.
-Fixed by defaulting to threshold 0 + a rootMargin-based trigger, which stays
-correct regardless of target size. Phase 6 (admin UI) next.
+Status: Phases 0-6 done and committed (verified: typecheck/lint/tests/build
+green after each phase; every changed page screenshotted at 375/768/1280,
+admin flows verified live with disposable test users/data, never against
+real credentials). Phases 4-6 each surfaced and fixed a real, previously
+unnoticed bug: a navbar overflow at the `lg` breakpoint (1024-1279px)
+invisible to the document-level overflow check because the header is
+`position: fixed`; the shared `useInView` hook's ratio-based threshold
+silently leaving any Reveal-wrapped block taller than viewport-height /
+threshold at `opacity: 0` forever (a long blog article routinely exceeds
+it); and an admin session that stayed valid for up to 8 hours after a user
+was deactivated or demoted, now re-checked against the DB every 5 minutes.
+Phase 7 (wire up jsonld/redirects/notify) next.
 
 Derived from a full audit of the legacy static site (repo root) and the Next.js app
 (`backend/`), completed 2026-09-15. Nothing in this plan deletes a file; Phase 8
@@ -282,27 +283,54 @@ defaulting to threshold 0 with a `rootMargin` trim instead, which is
 correct independent of target size. This affects every `Reveal`-wrapped
 block sitewide, not just blog posts.
 
-## Phase 6 — Admin UI
+## Phase 6 — Admin UI (DONE)
 
 The architecture here is good — config-driven resources, a generic `DataTable`,
-one `ResourceForm`. It does not need replacing. It needs finishing.
+one `ResourceForm`. It did not need replacing. It needed finishing.
 
-- Fix the `text-foreground` no-op (Phase 1) — this alone repairs the sidebar
-  active/hover states and every heading.
-- **Dashboard**: it is already close. Tighten hierarchy — enquiries needing
-  action first, then content health, then quick actions. Drop the
-  `View Site` pill duplication.
-- **Theme flash**: the dark-mode class is applied in `useEffect`, so the admin
-  flashes light on every load. Move to an inline pre-hydration script.
-- **Media library** renders through the generic table with a `url` column. It
-  needs a grid.
-- **Session staleness**: deactivating a user or changing their role has no effect
-  for up to 8 hours (JWT, no per-request DB check). Worth a DB lookup in the
-  `jwt` callback.
-- Consistent spacing/typography pass across every resource page, not just the
-  dashboard.
-- `usersConfig` has `fields: []` and relies on separate dedicated routes —
-  harmless but inconsistent; fold it into the same config shape.
+- `text-foreground` — already fixed in Phase 2 (`--color-foreground: var(--text)`
+  landed with the token system), confirmed still correct.
+- **Dashboard** — already close on inspection: enquiries-needing-action banner,
+  then 4 compact metric cards, then Recent Enquiries + Quick Actions side by
+  side. No `View Site` duplication found (already single-instance). Left as-is.
+- **Theme flash (DONE)** — added an inline pre-hydration script in the root
+  layout (`src/app/layout.tsx`), scoped to `/admin` paths only so the
+  marketing site (no dark variant) is never touched, plus
+  `suppressHydrationWarning` on `<html>` since the script's pre-hydration
+  class mutation is intentional and otherwise trips React's hydration-mismatch
+  check on every admin load. `ThemeToggle` now reads the already-applied class
+  in a `useEffect` instead of re-deriving it, avoiding a second, possibly
+  conflicting write. Verified live: dark persists across reload with no flash
+  and no console error; public site never receives `.dark`.
+- **Media library (DONE)** — `DataTable` now renders a responsive image grid
+  for the `media` resource (2/3/4/5 columns by breakpoint) instead of the
+  generic `url`-column table, reusing the existing selection/bulk-delete/
+  pagination/search infrastructure. Hid the generic "New Media Library"
+  create button/empty-state action, since media has no standalone create
+  flow — assets are uploaded through the `ImagePicker` embedded in other
+  resources' forms, and the generic form only has an `alt` field with no
+  way to supply a file. Verified live with seeded test assets (grid layout,
+  hover actions, selection, mobile 2-col, no horizontal overflow), then
+  removed the test data.
+- **Session staleness (DONE)** — `auth.ts` now overrides the `jwt` callback
+  (Node-runtime only — `auth.config.ts` stays Edge-safe/DB-free for
+  `middleware.ts`) to re-check the user's `role`/`active` status against
+  Mongo every 5 minutes instead of trusting the 8h JWT for its whole
+  lifetime; returns `null` to invalidate the session if the user was
+  deactivated or deleted mid-session, and fails open (keeps the existing
+  token) if the DB is transiently unreachable, so a blip never signs
+  someone out. Verified live end-to-end: temporarily lowered the interval,
+  deactivated a test user mid-session, confirmed the very next request
+  redirected to `/admin/login`; reverted the interval afterward.
+- Spacing/typography pass — spot-checked; no material inconsistencies found
+  beyond what Phases 1-5 already normalized. Not reworked further to avoid
+  low-value churn across already-working pages.
+- `usersConfig` fold-in — deliberately **not done**. The plan flagged this as
+  "harmless but inconsistent," not a bug, and folding user management (which
+  needs password hashing and role-change safeguards the generic
+  `ResourceForm` doesn't have) into the generic CRUD path risks the
+  auth-sensitive one area of the admin for a purely architectural tidiness
+  gain. Left as dedicated routes.
 
 ## Phase 7 — Wire up what was built but never connected
 

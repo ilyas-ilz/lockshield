@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { ArrowDown, ArrowUp, ChevronsUpDown, Plus, Search, Pencil, Trash2, X } from "lucide-react";
+import { ArrowDown, ArrowUp, ChevronsUpDown, Plus, Search, Pencil, Trash2, X, ImageOff, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, Badge } from "@/components/ui/card";
@@ -177,6 +177,7 @@ export function DataTable({
 
   const hasFilters = Boolean(search || (hasStatusColumn && statusFilter !== "all"));
   const allSelected = Boolean(data?.items.length && selectedIds.size === data.items.length);
+  const isMediaGrid = config.key === "media";
 
   return (
     <div className="space-y-4">
@@ -231,12 +232,17 @@ export function DataTable({
           <div />
         )}
 
-        <Button variant="primary" size="sm" asChild className="w-full sm:w-auto shadow-xs">
-          <Link href={`/admin/${config.key}/new`}>
-            <Plus className="size-4" aria-hidden />
-            New {singular(config.label)}
-          </Link>
-        </Button>
+        {/* Media has no standalone "create" flow - assets are uploaded via
+            the image picker embedded in other resources' forms, so a bare
+            alt-text-only creation form here would be a dead end. */}
+        {!isMediaGrid && (
+          <Button variant="primary" size="sm" asChild className="w-full sm:w-auto shadow-xs">
+            <Link href={`/admin/${config.key}/new`}>
+              <Plus className="size-4" aria-hidden />
+              New {singular(config.label)}
+            </Link>
+          </Button>
+        )}
       </div>
 
       {/* Floating Bulk Action Bar */}
@@ -282,14 +288,16 @@ export function DataTable({
           description={
             hasFilters
               ? "Try a different search term or status filter, or clear them to view everything."
-              : `Create your first ${singular(config.label).toLowerCase()} to get started.`
+              : isMediaGrid
+                ? "Images you upload from any image field in the admin (cover photos, logos, etc.) will show up here."
+                : `Create your first ${singular(config.label).toLowerCase()} to get started.`
           }
           action={
             hasFilters ? (
               <Button variant="secondary" size="sm" onClick={() => setParams({ search: null, status: null })}>
                 Clear filters
               </Button>
-            ) : (
+            ) : isMediaGrid ? undefined : (
               <Button variant="primary" size="sm" asChild>
                 <Link href={`/admin/${config.key}/new`}>
                   <Plus className="size-4" aria-hidden />
@@ -299,6 +307,95 @@ export function DataTable({
             )
           }
         />
+      ) : isMediaGrid ? (
+        <>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
+            {data.items.map((row) => {
+              const id = String(row._id);
+              const isSelected = selectedIds.has(id);
+              const url = typeof row.url === "string" ? row.url : "";
+              const alt = typeof row.alt === "string" ? row.alt : "";
+              const format = typeof row.format === "string" ? row.format : undefined;
+              const bytes = typeof row.bytes === "number" ? row.bytes : undefined;
+
+              return (
+                <Card
+                  key={id}
+                  className={cn(
+                    "group relative overflow-hidden border-app p-0 transition-all",
+                    isSelected && "ring-2 ring-[var(--color-brand-500)]"
+                  )}
+                >
+                  <button
+                    type="button"
+                    onClick={() => toggleSelectRow(id)}
+                    aria-label={isSelected ? "Deselect" : "Select"}
+                    aria-pressed={isSelected}
+                    className={cn(
+                      "absolute left-2 top-2 z-10 flex size-6 items-center justify-center rounded-md border transition-all cursor-pointer",
+                      isSelected
+                        ? "border-[var(--color-brand-500)] bg-[var(--color-brand-500)] text-white"
+                        : "border-white/70 bg-black/30 text-transparent opacity-0 backdrop-blur-xs group-hover:opacity-100 group-focus-within:opacity-100 sm:opacity-0"
+                    )}
+                  >
+                    <Check className="size-3.5" aria-hidden />
+                  </button>
+
+                  <Link href={`/admin/media/${id}`} className="block">
+                    <div className="relative aspect-square bg-surface-2">
+                      {url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={url} alt={alt || "Media asset"} className="size-full object-cover" loading="lazy" />
+                      ) : (
+                        <div className="flex size-full items-center justify-center text-muted/50">
+                          <ImageOff className="size-6" aria-hidden />
+                        </div>
+                      )}
+                    </div>
+                  </Link>
+
+                  <div className="space-y-1.5 p-2.5">
+                    <p className="truncate text-xs font-medium text-foreground" title={alt}>
+                      {alt || "—"}
+                    </p>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="truncate text-[10px] uppercase tracking-wide text-muted">
+                        {[format, bytes ? formatBytes(bytes) : null].filter(Boolean).join(" · ") || "—"}
+                      </span>
+                      <div className="flex shrink-0 gap-0.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                        <Button variant="ghost" size="icon" asChild className="size-7 rounded-md">
+                          <Link href={`/admin/media/${id}`} aria-label="Edit">
+                            <Pencil className="size-3.5" aria-hidden />
+                          </Link>
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setDeleteTarget(row)}
+                          aria-label="Delete"
+                          className="size-7 rounded-md text-[var(--danger)] hover:bg-[var(--danger)]/10"
+                        >
+                          <Trash2 className="size-3.5" aria-hidden />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+
+          <DataPagination
+            page={data.page}
+            pageSize={data.pageSize ?? pageSize}
+            total={data.total}
+            totalPages={data.totalPages}
+            hasPrevPage={data.hasPrevPage}
+            hasNextPage={data.hasNextPage}
+            onPageChange={(p) => setParams({ page: p }, { resetPage: false })}
+            onPageSizeChange={(s) => setParams({ pageSize: s })}
+          />
+        </>
       ) : (
         <>
           {/* Mobile: card list */}
@@ -573,6 +670,12 @@ function renderCell(row: Row, col: ColumnConfig): React.ReactNode {
   }
 
   return String(value);
+}
+
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 function singular(label: string): string {

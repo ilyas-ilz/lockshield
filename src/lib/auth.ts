@@ -2,7 +2,7 @@ import NextAuth, { CredentialsSignin } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { authConfig } from "./auth.config";
 import { connectDB } from "./db";
-import { User } from "@/models/User";
+import { User, type UserRole } from "@/models/User";
 import { verifyPassword } from "./password";
 import { isLocked, recordFailedAttempt, resetLockout } from "./lockout";
 import { checkRateLimit, RATE_LIMITS } from "./rate-limit";
@@ -25,6 +25,12 @@ class LoginError extends CredentialsSignin {
   }
 }
 
+// How often an existing session re-checks the user's role/active status
+// against the DB, instead of trusting the 8h JWT for its whole lifetime -
+// deactivating or demoting someone should take effect in minutes, not
+// whenever they happen to sign out.
+const ROLE_REVALIDATE_MS = 5 * 60 * 1000;
+
 // WHY split from auth.config.ts: this is the Node-runtime half — the
 // Credentials provider's authorize() below imports connectDB/Mongoose,
 // which cannot run on the Edge runtime. middleware.ts must NEVER import
@@ -33,6 +39,38 @@ class LoginError extends CredentialsSignin {
 // import this file for the full `auth()`/`signIn`/`signOut`/`handlers`.
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
+  callbacks: {
+    ...authConfig.callbacks,
+    async jwt({ token, user }) {
+      if (user) {
+        token.role = (user as { role: UserRole }).role;
+        token.id = user.id as string;
+        token.roleCheckedAt = Date.now();
+        return token;
+      }
+
+      if (Date.now() - (token.roleCheckedAt ?? 0) < ROLE_REVALIDATE_MS) return token;
+
+      // WHY not on the Edge-safe authConfig: this needs Mongoose, which
+      // middleware.ts (Edge runtime) can never import - see the module
+      // comment above. Node-runtime callers only (route handlers, Server
+      // Components), so it's safe here.
+      try {
+        await connectDB();
+        const dbUser = await User.findById(token.id).select("role active").lean();
+        // Deactivated or deleted mid-session - returning null invalidates
+        // the token, forcing a fresh sign-in on the next request.
+        if (!dbUser || !dbUser.active) return null;
+        token.role = dbUser.role;
+        token.roleCheckedAt = Date.now();
+      } catch (err) {
+        // DB unreachable - don't sign someone out over a transient blip;
+        // keep the existing token and retry the check next request.
+        logger.error("jwt role revalidation skipped: database unreachable", err);
+      }
+      return token;
+    },
+  },
   providers: [
     Credentials({
       credentials: {

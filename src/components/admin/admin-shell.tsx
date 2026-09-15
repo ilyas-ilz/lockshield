@@ -323,14 +323,15 @@ export function AdminShell({
 }
 
 function ThemeToggle() {
+  // Start false to match SSR (no `document` on the server) and avoid a
+  // hydration mismatch; sync from the real DOM state right after mount -
+  // the inline pre-hydration script in the root layout already applied
+  // .dark before paint, so this only corrects the icon, not the page,
+  // which is what actually flashed before.
   const [dark, setDark] = React.useState(false);
 
   React.useEffect(() => {
-    const stored = localStorage.getItem("ls-admin-theme");
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const isDark = stored ? stored === "dark" : prefersDark;
-    setDark(isDark);
-    document.documentElement.classList.toggle("dark", isDark);
+    setDark(document.documentElement.classList.contains("dark"));
   }, []);
 
   function toggle() {
