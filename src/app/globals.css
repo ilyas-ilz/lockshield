@@ -25,6 +25,23 @@
      no-ops. */
   --color-foreground: var(--text);
   --color-line: var(--border);
+
+  /* Marketing-site tokens, ported from the legacy static site's
+     assets/css/main.css :root block rather than invented. The admin above
+     uses its own --bg/--surface/--text scale (light/dark aware); these are
+     the public-site equivalents, which are deliberately NOT dark-mode aware
+     - the legacy site never had a dark public theme. */
+  --color-paper: #ffffff;
+  --color-paper-soft: #f7f7f8;
+  --color-navy: #131b2e; /* legacy --navy: header-inner glass tint, brand sub-line */
+  --color-ink: #0d1220; /* legacy --ink: body text, all dark sections */
+  --marketing-line: rgba(13, 18, 32, 0.1); /* legacy --line: every hairline border */
+
+  /* legacy single easing curve, used on every transition site-wide */
+  --ease-brand: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* legacy .wrap container: max-width:1240px; padding:0 clamp(1rem,4vw,2.5rem) */
+  --wrap-width: 1240px;
 }
 
 :root {
@@ -131,19 +148,171 @@
     border-color: var(--border);
   }
 
-  /* Blueprint Grid Pattern matching static HTML */
+  /* Blueprint grid: the legacy recipe is TWO overlaid grids (a 120px major +
+     a 24px minor), not one 32px grid - the single-scale version here read as
+     a visibly different, coarser texture than the original site. */
   .blueprint-grid {
     background-image:
-      linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
-    background-size: 32px 32px;
+      linear-gradient(rgba(13, 18, 32, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(13, 18, 32, 0.04) 1px, transparent 1px),
+      linear-gradient(rgba(13, 18, 32, 0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(13, 18, 32, 0.025) 1px, transparent 1px);
+    background-size: 120px 120px, 120px 120px, 24px 24px, 24px 24px;
   }
 
   .blueprint-grid-dark {
     background-image:
-      linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-    background-size: 32px 32px;
+      linear-gradient(rgba(255, 255, 255, 0.25) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.25) 1px, transparent 1px);
+    background-size: 110px 110px;
+  }
+
+  /* Legacy .wrap container - fluid gutters up to a 1240px cap. Replaces the
+     max-w-7xl (1280px) used throughout the port, which was 40px too wide. */
+  .wrap {
+    max-width: var(--wrap-width);
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 4vw, 2.5rem);
+  }
+
+  /* Eyebrow label: small red kicker with a 26x2px rule, used above every
+     section heading on the legacy site. */
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-tech);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--color-brand-500);
+  }
+  .eyebrow::before {
+    content: "";
+    width: 26px;
+    height: 2px;
+    background: var(--color-brand-500);
+  }
+
+  /* Scroll reveal - the workhorse animation on the legacy site. Toggled by
+     the Reveal component's IntersectionObserver. */
+  .reveal {
+    opacity: 0;
+    transform: translateY(34px);
+    transition: opacity 0.8s var(--ease-brand), transform 0.8s var(--ease-brand);
+  }
+  .reveal.in {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* On-load rise (hero / page-hero text), staggered via d1/d2/d3. */
+  @keyframes rise {
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .rise {
+    opacity: 0;
+    transform: translateY(26px);
+    animation: rise 0.8s var(--ease-brand) forwards;
+  }
+  .d1 {
+    animation-delay: 0.45s;
+  }
+  .d2 {
+    animation-delay: 0.6s;
+  }
+  .d3 {
+    animation-delay: 0.75s;
+  }
+
+  /* Hero H1 line-mask reveal: each .line clips a span that slides up from
+     110% into place. */
+  .hero-line {
+    display: block;
+    overflow: hidden;
+  }
+  @keyframes lineUp {
+    to {
+      transform: none;
+    }
+  }
+  .hero-line > span {
+    display: inline-block;
+    transform: translateY(110%);
+    animation: lineUp 0.9s var(--ease-brand) forwards;
+  }
+
+  /* Marquee (clients strip): duplicate the track once in markup, this
+     animates the doubled track exactly one copy-width to the left. */
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  /* Ken Burns - slow zoom/drift used on hero-adjacent still imagery. */
+  @keyframes kenburns {
+    from {
+      transform: scale(1.03) translate(0, 0);
+    }
+    to {
+      transform: scale(1.12) translate(-1.2%, 0.8%);
+    }
+  }
+
+  /* Stat counter pulse on finish. */
+  @keyframes statPulse {
+    35% {
+      transform: scale(1.16);
+      color: var(--color-brand-500);
+    }
+  }
+  .animate-stat-pulse {
+    animation: statPulse 0.55s var(--ease-brand);
+  }
+
+  /* Scroll-cue / live-dot pulse. */
+  @keyframes scrollPulse {
+    0%,
+    100% {
+      opacity: 0.4;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  /* Rotating conic border-beam on service-card hover. */
+  @property --border-angle {
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
+  }
+  @keyframes border-spin {
+    to {
+      --border-angle: 360deg;
+    }
+  }
+  .border-beam {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1.5px;
+    pointer-events: none;
+    background: conic-gradient(from var(--border-angle, 0deg), var(--color-brand-500) 0 12%, transparent 12% 100%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .group:hover .border-beam {
+    opacity: 1;
+    animation: border-spin 1.6s linear infinite;
   }
 
   /* Shimmer Keyframe for modern skeletons */
@@ -240,6 +409,16 @@
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
+    }
+
+    /* Ported from the legacy site's reduced-motion kill switch: these
+       classes start hidden/offset and rely on JS or a running animation to
+       reveal them, so they need an explicit visible end-state here too. */
+    .reveal,
+    .rise,
+    .hero-line > span {
+      opacity: 1 !important;
+      transform: none !important;
     }
   }
 }

@@ -1,6 +1,6 @@
 # Lock Shield — Migration & Cleanup Plan
 
-Status: awaiting approval on Phase 0. Phases 1–9 are ready to execute.
+Status: Phase 0 + Phase 1 done and committed. Phase 2 in progress.
 
 Derived from a full audit of the legacy static site (repo root) and the Next.js app
 (`backend/`), completed 2026-09-15. Nothing in this plan deletes a file; Phase 8

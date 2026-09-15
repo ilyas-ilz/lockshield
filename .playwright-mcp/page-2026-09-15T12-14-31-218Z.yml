@@ -1,0 +1,325 @@
+- generic [active] [ref=f1e1]:
+  - generic [ref=f1e2]:
+    - banner [ref=f1e3]:
+      - generic [ref=f1e5]:
+        - link "Lock Shield Firefighting & Safety Equipment Installation LLC" [ref=f1e6] [cursor=pointer]:
+          - /url: /
+          - generic [ref=f1e7]:
+            - generic [ref=f1e8]: Lock Shield
+            - generic [ref=f1e9]: Firefighting & Safety Equipment Installation LLC
+        - generic [ref=f1e10]:
+          - link "+971528434801" [ref=f1e11] [cursor=pointer]:
+            - /url: tel:+971528434801
+          - button "Get a Quote" [ref=f1e16] [cursor=pointer]
+          - button "Toggle navigation" [ref=f1e20] [cursor=pointer]
+    - main [ref=f1e22]:
+      - generic [ref=f1e28]:
+        - generic [ref=f1e29]:
+          - generic [ref=f1e30]:
+            - generic [ref=f1e31]: Civil Defence Approved Fire Safety UAE
+            - heading "Complete Fire Protection Solutions You Can Trust" [level=1] [ref=f1e34]
+            - paragraph [ref=f1e35]: We design, install, test, and maintain world-class firefighting and suppression systems across Dubai & the UAE — with engineering excellence, compliance, and 24/7 readiness at our core.
+            - generic [ref=f1e36]:
+              - button "Request a Free Quote" [ref=f1e37] [cursor=pointer]
+              - link "Explore Services" [ref=f1e41] [cursor=pointer]:
+                - /url: /services
+          - generic [ref=f1e45]:
+            - generic [ref=f1e51]:
+              - heading "Civil Defence Approved" [level=4] [ref=f1e52]
+              - paragraph [ref=f1e53]: DCD compliant drawings, inspection & approvals
+            - generic [ref=f1e59]:
+              - heading "24/7 Expert Support" [level=4] [ref=f1e60]
+              - paragraph [ref=f1e61]: Always on-call rapid response across UAE
+            - generic [ref=f1e69]:
+              - heading "Certified Engineers" [level=4] [ref=f1e70]
+              - paragraph [ref=f1e71]: Certified professionals with 15+ years experience
+            - generic [ref=f1e77]:
+              - heading "Premium Guaranteed Quality" [level=4] [ref=f1e78]
+              - paragraph [ref=f1e79]: UL/FM approved genuine safety products
+        - generic [ref=f1e80]:
+          - button "Go to slide 1" [ref=f1e81] [cursor=pointer]
+          - button "Go to slide 2" [ref=f1e82] [cursor=pointer]
+          - button "Go to slide 3" [ref=f1e83] [cursor=pointer]
+          - button "Go to slide 4" [ref=f1e84] [cursor=pointer]
+      - generic [ref=f1e86]:
+        - generic [ref=f1e87]:
+          - generic [ref=f1e88]:
+            - text: Complete Protection
+            - heading "Our Core Fire Safety Services" [level=2] [ref=f1e89]
+          - link "View All Services" [ref=f1e90] [cursor=pointer]:
+            - /url: /services
+        - generic [ref=f1e94]:
+          - link "Annual Maintenance Contract (AMC) Comprehensive preventative maintenance, quarterly inspections, and 24/7 emergency response for all fire protection assets. Explore Service Details" [ref=f1e95] [cursor=pointer]:
+            - /url: /services/annual-maintenance-contract
+            - generic [ref=f1e96]:
+              - heading "Annual Maintenance Contract (AMC)" [level=3] [ref=f1e100]
+              - paragraph [ref=f1e101]: Comprehensive preventative maintenance, quarterly inspections, and 24/7 emergency response for all fire protection assets.
+            - generic [ref=f1e102]: Explore Service Details
+          - link "Designing, Drawing & Civil Defence Approval Full engineering design, AutoCAD shop drawings, and hassle-free approvals from Dubai Civil Defence (DCD). Explore Service Details" [ref=f1e106] [cursor=pointer]:
+            - /url: /services/designing-drawing-civil-defence-approval
+            - generic [ref=f1e107]:
+              - heading "Designing, Drawing & Civil Defence Approval" [level=3] [ref=f1e111]
+              - paragraph [ref=f1e112]: Full engineering design, AutoCAD shop drawings, and hassle-free approvals from Dubai Civil Defence (DCD).
+            - generic [ref=f1e113]: Explore Service Details
+          - link "FM-200 Special Fire Suppression Systems Waterless clean agent fire extinguishing solutions protecting sensitive server rooms, data centers, and critical facilities. Explore Service Details" [ref=f1e117] [cursor=pointer]:
+            - /url: /services/fm-200-special-systems
+            - generic [ref=f1e118]:
+              - heading "FM-200 Special Fire Suppression Systems" [level=3] [ref=f1e122]
+              - paragraph [ref=f1e123]: Waterless clean agent fire extinguishing solutions protecting sensitive server rooms, data centers, and critical facilities.
+            - generic [ref=f1e124]: Explore Service Details
+          - link "Kitchen Fire Suppression Systems UL-300 certified wet chemical fire suppression safeguarding commercial kitchen hoods, ducts, and cooking appliances. Explore Service Details" [ref=f1e128] [cursor=pointer]:
+            - /url: /services/kitchen-fire-suppression-systems
+            - generic [ref=f1e129]:
+              - heading "Kitchen Fire Suppression Systems" [level=3] [ref=f1e133]
+              - paragraph [ref=f1e134]: UL-300 certified wet chemical fire suppression safeguarding commercial kitchen hoods, ducts, and cooking appliances.
+            - generic [ref=f1e135]: Explore Service Details
+          - link "Fire Extinguisher Refilling & Testing Authorized hydrostatic testing, refilling, and certification for CO2, DCP, foam, and water extinguishers. Explore Service Details" [ref=f1e139] [cursor=pointer]:
+            - /url: /services/fire-extinguisher-refilling
+            - generic [ref=f1e140]:
+              - heading "Fire Extinguisher Refilling & Testing" [level=3] [ref=f1e144]
+              - paragraph [ref=f1e145]: Authorized hydrostatic testing, refilling, and certification for CO2, DCP, foam, and water extinguishers.
+            - generic [ref=f1e146]: Explore Service Details
+          - link "Fire System Products Supply & Trading Genuine certified firefighting equipment, alarm panels, smoke detectors, landing valves, and fire hoses. Explore Service Details" [ref=f1e150] [cursor=pointer]:
+            - /url: /services/fire-system-products-supply
+            - generic [ref=f1e151]:
+              - heading "Fire System Products Supply & Trading" [level=3] [ref=f1e155]
+              - paragraph [ref=f1e156]: Genuine certified firefighting equipment, alarm panels, smoke detectors, landing valves, and fire hoses.
+            - generic [ref=f1e157]: Explore Service Details
+      - generic [ref=f1e162]:
+        - generic [ref=f1e163]:
+          - text: Proven Track Record
+          - heading "Why Dubai Trusts Lock Shield" [level=2] [ref=f1e164]
+          - paragraph [ref=f1e165]: From commercial high-rises and government offices to industrial warehouses, we deliver uncompromising safety systems compliant with NFPA standards and UAE Civil Defence.
+        - generic [ref=f1e166]:
+          - generic [ref=f1e167]:
+            - paragraph [ref=f1e168]: 15+
+            - heading "Years in UAE" [level=4] [ref=f1e169]
+            - paragraph [ref=f1e170]: Dedicated fire engineering
+          - generic [ref=f1e171]:
+            - paragraph [ref=f1e172]: 1000+
+            - heading "Projects Delivered" [level=4] [ref=f1e173]
+            - paragraph [ref=f1e174]: Across all 7 emirates
+          - generic [ref=f1e175]:
+            - paragraph [ref=f1e176]: 24/7
+            - heading "Emergency Support" [level=4] [ref=f1e177]
+            - paragraph [ref=f1e178]: Rapid response technicians
+          - generic [ref=f1e179]:
+            - paragraph [ref=f1e180]: 100%
+            - heading "Approval Guarantee" [level=4] [ref=f1e181]
+            - paragraph [ref=f1e182]: Civil Defence certification
+      - generic [ref=f1e184]:
+        - generic [ref=f1e185]:
+          - generic [ref=f1e186]:
+            - text: Our Portfolio
+            - heading "Featured Projects & Fit-Outs" [level=2] [ref=f1e187]
+          - link "View All Projects" [ref=f1e188] [cursor=pointer]:
+            - /url: /projects
+        - generic [ref=f1e192]:
+          - link "Pizza Hut Restaurant Suppression F&B Dubai · Pizza Hut UAE Pizza Hut Restaurant Suppression" [ref=f1e193] [cursor=pointer]:
+            - /url: /projects/pizza-hut
+            - generic [ref=f1e194]:
+              - img "Pizza Hut Restaurant Suppression" [ref=f1e195]
+              - generic [ref=f1e196]: F&B
+            - generic [ref=f1e197]:
+              - generic [ref=f1e198]: Dubai · Pizza Hut UAE
+              - heading "Pizza Hut Restaurant Suppression" [level=3] [ref=f1e199]
+          - link "Farsi Restaurant Kitchen Suppression F&B Dubai · Farsi Restaurant Farsi Restaurant Kitchen Suppression" [ref=f1e200] [cursor=pointer]:
+            - /url: /projects/farsi-restaurant
+            - generic [ref=f1e201]:
+              - img "Farsi Restaurant Kitchen Suppression" [ref=f1e202]
+              - generic [ref=f1e203]: F&B
+            - generic [ref=f1e204]:
+              - generic [ref=f1e205]: Dubai · Farsi Restaurant
+              - heading "Farsi Restaurant Kitchen Suppression" [level=3] [ref=f1e206]
+          - link "Emirates NBD Corporate Facility Banking Dubai · Emirates NBD Emirates NBD Corporate Facility" [ref=f1e207] [cursor=pointer]:
+            - /url: /projects/emirates-nbd
+            - generic [ref=f1e208]:
+              - img "Emirates NBD Corporate Facility" [ref=f1e209]
+              - generic [ref=f1e210]: Banking
+            - generic [ref=f1e211]:
+              - generic [ref=f1e212]: Dubai · Emirates NBD
+              - heading "Emirates NBD Corporate Facility" [level=3] [ref=f1e213]
+          - link "Al Manara Pharmacy Fit-out Healthcare Dubai · Al Manara Pharmacy Al Manara Pharmacy Fit-out" [ref=f1e214] [cursor=pointer]:
+            - /url: /projects/al-manara-pharmacy
+            - generic [ref=f1e215]:
+              - img "Al Manara Pharmacy Fit-out" [ref=f1e216]
+              - generic [ref=f1e217]: Healthcare
+            - generic [ref=f1e218]:
+              - generic [ref=f1e219]: Dubai · Al Manara Pharmacy
+              - heading "Al Manara Pharmacy Fit-out" [level=3] [ref=f1e220]
+          - link "The Grey Restaurant Fit-out F&B Dubai · The Grey Restaurant The Grey Restaurant Fit-out" [ref=f1e221] [cursor=pointer]:
+            - /url: /projects/the-grey-restaurant
+            - generic [ref=f1e222]:
+              - img "The Grey Restaurant Fit-out" [ref=f1e223]
+              - generic [ref=f1e224]: F&B
+            - generic [ref=f1e225]:
+              - generic [ref=f1e226]: Dubai · The Grey Restaurant
+              - heading "The Grey Restaurant Fit-out" [level=3] [ref=f1e227]
+          - link "Feetlab Retail Center Retail Dubai · Feetlab Feetlab Retail Center" [ref=f1e228] [cursor=pointer]:
+            - /url: /projects/feetlab
+            - generic [ref=f1e229]:
+              - img "Feetlab Retail Center" [ref=f1e230]
+              - generic [ref=f1e231]: Retail
+            - generic [ref=f1e232]:
+              - generic [ref=f1e233]: Dubai · Feetlab
+              - heading "Feetlab Retail Center" [level=3] [ref=f1e234]
+      - generic [ref=f1e236]:
+        - generic [ref=f1e237]:
+          - generic [ref=f1e238]:
+            - text: Knowledge Center
+            - heading "Latest Fire Safety Insights" [level=2] [ref=f1e239]
+          - link "View all articles" [ref=f1e240] [cursor=pointer]:
+            - /url: /blog
+        - generic [ref=f1e243]:
+          - link [ref=f1e244] [cursor=pointer]:
+            - /url: /blog/protecting-data-centers-fm-200-clean-agent-suppression
+            - 'img "Protecting Data Centers: Why FM-200 Clean Agent Suppression Outperforms Water" [ref=f1e246]'
+            - generic [ref=f1e247]:
+              - text: 15 Sep 2026
+              - 'heading "Protecting Data Centers: Why FM-200 Clean Agent Suppression Outperforms Water" [level=3] [ref=f1e248]'
+              - paragraph [ref=f1e249]: Water can ruin servers just as quickly as a fire. Discover how waterless gaseous suppression protects electronics without zero residue.
+          - link [ref=f1e250] [cursor=pointer]:
+            - /url: /blog/why-annual-maintenance-contracts-amc-mandatory-uae
+            - img "Why Annual Maintenance Contracts (AMC) Are Mandatory Under UAE Fire Code" [ref=f1e252]
+            - generic [ref=f1e253]:
+              - text: 15 Sep 2026
+              - heading "Why Annual Maintenance Contracts (AMC) Are Mandatory Under UAE Fire Code" [level=3] [ref=f1e254]
+              - paragraph [ref=f1e255]: UAE law requires quarterly inspections of fire alarm and firefighting systems. Learn the legal and safety responsibilities for building owners.
+          - link [ref=f1e256] [cursor=pointer]:
+            - /url: /blog/understanding-dubai-civil-defence-approval-commercial-fitouts
+            - img "Understanding Dubai Civil Defence (DCD) Approval for Commercial Fit-outs" [ref=f1e258]
+            - generic [ref=f1e259]:
+              - text: 15 Sep 2026
+              - heading "Understanding Dubai Civil Defence (DCD) Approval for Commercial Fit-outs" [level=3] [ref=f1e260]
+              - paragraph [ref=f1e261]: A step-by-step guide for business owners, interior contractors, and facility managers navigating Civil Defence drawing approvals in Dubai.
+      - generic [ref=f1e263]:
+        - generic [ref=f1e264]:
+          - text: Got Questions?
+          - heading "Frequently Asked Questions" [level=2] [ref=f1e265]
+          - paragraph [ref=f1e266]: Learn more about Civil Defence guidelines, AMC requirements, and suppression systems.
+        - generic [ref=f1e267]:
+          - generic [ref=f1e268]:
+            - button "What is an Annual Maintenance Contract (AMC) for fire safety?" [ref=f1e269] [cursor=pointer]
+            - generic [ref=f1e273]: An AMC is a mandatory yearly service agreement in the UAE under which certified technicians inspect, test, calibrate, and service your fire fighting, alarm, and suppression systems periodically to maintain full Dubai Civil Defence (DCD) compliance.
+          - button "How often must fire alarm and sprinkler systems be inspected in UAE?" [ref=f1e275] [cursor=pointer]
+          - button "Do you handle Dubai Civil Defence (DCD) drawing and design approval?" [ref=f1e280] [cursor=pointer]
+          - button "What areas and emirates do you provide fire safety services in?" [ref=f1e285] [cursor=pointer]
+          - button "Which industries and property types do you work with?" [ref=f1e290] [cursor=pointer]
+      - generic [ref=f1e296]:
+        - generic [ref=f1e297]:
+          - text: Schedule a Site Inspection
+          - heading "Secure Your Facility Get A Quote Today" [level=2] [ref=f1e298]
+          - paragraph [ref=f1e299]: Our certified fire engineers will visit your premises anywhere in Dubai or the UAE, assess compliance needs, and provide a competitive quote with zero obligation.
+          - generic [ref=f1e300]:
+            - generic [ref=f1e301]: Full Dubai Civil Defence compliance review
+            - generic [ref=f1e306]: 24/7 dedicated engineering helpline
+            - generic [ref=f1e311]: Fast turnaround on approval submissions
+        - generic [ref=f1e317]:
+          - generic [ref=f1e323]:
+            - heading "Get an Instant Quotation" [level=3] [ref=f1e324]
+            - paragraph [ref=f1e325]: Free site visit & engineering consultation
+          - generic [ref=f1e326]:
+            - generic [ref=f1e327]:
+              - generic [ref=f1e328]:
+                - generic [ref=f1e329]: Your Name *
+                - textbox "Full Name" [ref=f1e330]
+              - generic [ref=f1e331]:
+                - generic [ref=f1e332]: Phone Number *
+                - textbox "+971 50 123 4567" [ref=f1e333]
+            - generic [ref=f1e334]:
+              - generic [ref=f1e335]:
+                - generic [ref=f1e336]: Email Address
+                - textbox "your.email@company.ae" [ref=f1e337]
+              - generic [ref=f1e338]:
+                - generic [ref=f1e339]: Service Required
+                - combobox [ref=f1e340] [cursor=pointer]:
+                  - option "Annual Maintenance Contract (AMC)" [selected]
+                  - option "Civil Defence Approval & Drawing"
+                  - option "FM-200 / Clean Agent System"
+                  - option "Kitchen Fire Suppression System"
+                  - option "Fire Extinguisher Refilling & Supply"
+                  - option "Fire Alarm & Detection Systems"
+                  - option "Fire Fighting Sprinklers & Pumps"
+            - generic [ref=f1e341]:
+              - generic [ref=f1e342]: Location / Project Notes
+              - textbox "e.g. Warehouse in Al Quoz, restaurant kitchen fitout, or building AMC..." [ref=f1e343]
+            - button "Submit Free Quote Request" [ref=f1e344] [cursor=pointer]
+    - contentinfo [ref=f1e348]:
+      - generic [ref=f1e349]:
+        - generic [ref=f1e350]:
+          - generic [ref=f1e351]:
+            - link [ref=f1e352] [cursor=pointer]:
+              - /url: /
+              - img "Lock Shield — Firefighting and Safety Equipment Installation LLC" [ref=f1e353]
+            - paragraph [ref=f1e354]: Approved by Dubai Civil Defence (DCD). Leading provider of complete fire protection, kitchen suppression, FM-200 clean agent systems, and 24/7 Annual Maintenance Contracts across the UAE.
+            - generic [ref=f1e355]:
+              - generic [ref=f1e356]: Civil Defence Approved
+              - generic [ref=f1e358]: ISO Certified
+          - generic [ref=f1e359]:
+            - heading "Core Services" [level=3] [ref=f1e360]
+            - list [ref=f1e361]:
+              - listitem [ref=f1e362]:
+                - link "Annual Maintenance (AMC)" [ref=f1e363] [cursor=pointer]:
+                  - /url: /services/annual-maintenance-contract
+              - listitem [ref=f1e364]:
+                - link "Civil Defence Approvals" [ref=f1e365] [cursor=pointer]:
+                  - /url: /services/designing-drawing-civil-defence-approval
+              - listitem [ref=f1e366]:
+                - link "FM-200 Special Systems" [ref=f1e367] [cursor=pointer]:
+                  - /url: /services/fm-200-special-systems
+              - listitem [ref=f1e368]:
+                - link "Kitchen Fire Suppression" [ref=f1e369] [cursor=pointer]:
+                  - /url: /services/kitchen-fire-suppression-systems
+              - listitem [ref=f1e370]:
+                - link "Extinguisher Refilling" [ref=f1e371] [cursor=pointer]:
+                  - /url: /services/fire-extinguisher-refilling
+              - listitem [ref=f1e372]:
+                - link "Fire Products Supply" [ref=f1e373] [cursor=pointer]:
+                  - /url: /services/fire-system-products-supply
+          - generic [ref=f1e374]:
+            - heading "Company" [level=3] [ref=f1e375]
+            - list [ref=f1e376]:
+              - listitem [ref=f1e377]:
+                - link "About Lock Shield" [ref=f1e378] [cursor=pointer]:
+                  - /url: /about
+              - listitem [ref=f1e379]:
+                - link "Featured Projects" [ref=f1e380] [cursor=pointer]:
+                  - /url: /projects
+              - listitem [ref=f1e381]:
+                - link "Safety News & Guides" [ref=f1e382] [cursor=pointer]:
+                  - /url: /blog
+              - listitem [ref=f1e383]:
+                - link "Careers & Jobs" [ref=f1e384] [cursor=pointer]:
+                  - /url: /career
+              - listitem [ref=f1e385]:
+                - link "Contact Us" [ref=f1e386] [cursor=pointer]:
+                  - /url: /contact
+              - listitem [ref=f1e387]:
+                - link "Download Profile (PDF)" [ref=f1e388] [cursor=pointer]:
+                  - /url: /assets/images/company-profile.pdf
+          - generic [ref=f1e393]:
+            - heading "Get in Touch" [level=3] [ref=f1e394]
+            - list [ref=f1e395]:
+              - listitem [ref=f1e396]:
+                - generic [ref=f1e400]: Hor Al Anz, Deira, Dubai, AE
+              - listitem [ref=f1e401]:
+                - link "+971528434801" [ref=f1e404] [cursor=pointer]:
+                  - /url: tel:+971528434801
+              - listitem [ref=f1e405]:
+                - link "info@lockshield.ae" [ref=f1e409] [cursor=pointer]:
+                  - /url: mailto:info@lockshield.ae
+              - listitem [ref=f1e410]:
+                - link "Chat on WhatsApp" [ref=f1e413] [cursor=pointer]:
+                  - /url: https://wa.me/971528434801
+        - generic [ref=f1e414]:
+          - generic [ref=f1e415]: "Industry Partners:"
+          - link "Lock Shield Cart — fire safety equipment store" [ref=f1e416] [cursor=pointer]:
+            - /url: https://www.lockshieldcart.com
+          - link "Shop fire extinguishers & alarm parts" [ref=f1e417] [cursor=pointer]:
+            - /url: https://www.lockshieldcart.com
+        - generic [ref=f1e418]:
+          - paragraph [ref=f1e419]: © 2026 Lock Shield Firefighting & Safety Equipment Installation LLC. All rights reserved.
+          - paragraph [ref=f1e420]: Approved by Civil Defence UAE · Operating throughout Dubai, Abu Dhabi, Sharjah & Northern Emirates.
+      - link "Chat on WhatsApp" [ref=f1e421] [cursor=pointer]:
+        - /url: https://wa.me/971528434801?text=Hello%20Lock%20Shield,%20I%20would%20like%20to%20enquire%20about%20fire%20protection%20services.
+  - region "Notifications alt+T"
