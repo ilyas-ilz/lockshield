@@ -66,8 +66,24 @@ export default async function ProjectsPage() {
     await connectDB();
     const found = await Project.find({ publishStatus: "published" })
       .sort({ featured: -1, createdAt: -1 })
+      .select("title slug client sector emirate year coverImage")
       .lean();
-    projectsList = (found as unknown as ProjectItem[]) || [];
+
+    projectsList = found.map((p) => ({
+      _id: String(p._id),
+      title: String(p.title || ""),
+      slug: String(p.slug || ""),
+      client: p.client ? String(p.client) : undefined,
+      sector: p.sector ? String(p.sector) : undefined,
+      emirate: p.emirate ? String(p.emirate) : undefined,
+      year: typeof p.year === "number" ? p.year : undefined,
+      coverImage: p.coverImage?.url
+        ? {
+            url: String(p.coverImage.url),
+            alt: p.coverImage.alt ? String(p.coverImage.alt) : undefined,
+          }
+        : undefined,
+    }));
   } catch {
     // Fallback
   }

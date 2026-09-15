@@ -129,7 +129,11 @@ export function BlockRenderer({ blocks }: { blocks: BlockData[] | Record<string,
           }
 
           case "faq": {
-            const items = (block.items as unknown as FAQItem[]) || [];
+            const rawItems = (block.items as unknown as FAQItem[]) || [];
+            const items: FAQItem[] = rawItems.map((it) => ({
+              q: String(it.q || ""),
+              a: String(it.a || ""),
+            }));
             return (
               <div key={key} className="space-y-6">
                 {block.heading && (
