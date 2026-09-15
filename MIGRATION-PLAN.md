@@ -14,7 +14,13 @@ was deactivated or demoted, now re-checked against the DB every 5 minutes;
 an invalid empty `GeoCoordinates` block and relative image URLs in the
 homepage/blog JSON-LD; and a missing `GET /api/media/[id]` route that made
 the admin's "Edit" button on any media item silently fail. Phase 8
-(cleanup report — script only, not executed) next.
+(cleanup report) is also done — `cleanup.sh` at the repo root documents
+~109 MB of legacy/duplicate/dead-code cleanup, entirely as `git rm`/`npm
+uninstall` commands, and has deliberately not been run; re-verifying it
+live caught a real mistake a stale audit would have shipped: the
+`service/`/`services/` and `project/`/`projects/` duplicate pairs don't
+both resolve "delete the odd one out" the same way — one pair's singular
+is live, the other's plural is. Phase 9 (final verification pass) next.
 
 Derived from a full audit of the legacy static site (repo root) and the Next.js app
 (`backend/`), completed 2026-09-15. Nothing in this plan deletes a file; Phase 8
@@ -395,31 +401,52 @@ second upload pathway; flagged for the Phase 8 cleanup report.
 
 ## Phase 8 — Cleanup report *(script only — I will not run it)*
 
-Per your instruction, this produces `cleanup.sh` plus a reviewed inventory. Every
-entry below was verified by grep or md5, not inferred.
+Per your instruction, this produces `cleanup.sh` (repo root, not run) plus this
+reviewed inventory. Every entry below was re-verified live during Phase 8 —
+grep for source references, md5 for byte-duplicates, and a real (read-only)
+query against the production-shaped DB for the image-duplicate guard — not
+carried over unchecked from the original Phase 0 audit.
 
-**Exact byte-duplicates** (md5-verified identical directories):
-- `public/assets/images/project/` == `projects/` (11 files)
-- `public/assets/images/services/` == `service/` (14 files)
-- root `assets/` — all 283 unique files are byte-identical to files already in
-  `public/assets/`. Zero unique bytes.
+**Legacy static site** — `legacy/` (the Phase 0/1 move target, ~104 MB): 21
+root `.html` pages (8 `*-old-backup`), `blog/` (55 articles, all imported into
+MongoDB in Phase 5), `assets/`, `cart/`, `demo/`, loose JPEGs, `robots.txt`,
+`sitemap.xml`. Fully superseded by the Next.js app. Root `assets/` inside it
+is itself a stale duplicate: all 283 files are byte-identical to files already
+under `public/assets/` — zero unique bytes anywhere in `legacy/`.
 
-**Zero references from `src/`** (grepped each):
-- 22 theme image directories: `about/ award/ backgrounds/ bg/ blog/ brands/
-  choose/ cta/ faq/ footer/ funfact/ header/ hero/ icon/ icons/ logos/ marquee/
-  product/ shape/ shapes/ strategy/ team/ testimonial/` — 283 files
-- `public/assets/css/`, `js/`, `vendors/` — ~109 files, loaded by nothing
-- Only 21 of 380 images under `public/assets/images/` are actually referenced
+**Exact byte-duplicates inside `public/assets/images/`** (md5-verified):
+`project/` == `projects/` (11 files), `services/` == `service/` (14 files).
+**Correction found while re-verifying this phase:** which twin of each pair is
+actually live does not follow the same naming pattern both times — `projects/`
+(plural) is the one referenced (by `(public)/projects/page.tsx` and
+`seed.ts`), so `project/` (singular) is the safe-to-remove duplicate; but for
+the other pair it's `service/` (singular) that's referenced (by five
+`coverImage.url` values baked into `seed.ts`), so `services/` (plural) is the
+one to remove. A naive "keep the plural" cleanup would have deleted a
+directory five live service records point at. Confirmed via a live,
+read-only query against the current DB that zero `Service`/`Project`
+documents point at either directory actually slated for removal.
+
+**Zero references from `src/`** (re-grepped): 22 theme image directories
+(`about/ award/ backgrounds/ bg/ blog/ brands/ choose/ cta/ faq/ footer/
+funfact/ header/ hero/ icon/ icons/ logos/ marquee/ product/ shape/ shapes/
+strategy/ team/ testimonial/`, ~283 files) and `public/assets/css/`, `js/`,
+`vendors/` (~109 files) are loaded by nothing. Only ~21-28 of 380 images
+under `public/assets/images/` are actually referenced.
 
 **Serving a crash dump publicly:** `public/assets/images/bash.exe.stackdump`.
 
-**Purchased-theme demo content:** `cart/` (42 MB), `demo/` (27 MB).
-
-**Dead npm deps** (zero imports, verified): `react-hook-form`,
-`@hookform/resolvers`, `next-themes`, `slugify`, `@radix-ui/react-dropdown-menu`,
-`@radix-ui/react-switch`.
+**Dead npm deps** (zero imports, re-verified after Phases 4-7's additions):
+`react-hook-form`, `@hookform/resolvers`, `next-themes`, `slugify`,
+`@radix-ui/react-dropdown-menu`, `@radix-ui/react-switch`.
 *Keep despite appearing unused:* `@tiptap/pm` (peer), `sharp` (dynamic import in
 `storage.ts:86`), `dotenv` (side-effect import in 3 scripts), `react-dom` (peer).
+
+**Judgment call, not scripted:** `src/app/api/upload/sign/route.ts` (found
+while wiring up Phase 7) — correct and working, but genuinely uncalled; both
+upload UI components already go through the simpler `/api/upload` proxy,
+which also handles the local-storage fallback this signed route doesn't.
+Left for you to decide rather than auto-removed.
 
 **Dead code:** `DashboardSkeleton` and `FormSkeleton` in `states.tsx`,
 `paginationQuerySchema` alias in `validation/common.ts`.
@@ -432,7 +459,10 @@ boundary. Both are live. Keep both.
 reads the `Media` collection, not the filesystem, so nothing *new* can reference
 these, but pre-existing rows can.
 
-Total recoverable: ~103 MB, all restorable from git history.
+Total recoverable: ~104 MB (`legacy/`) + ~5 MB (duplicate/unused
+`public/assets/`) ≈ 109 MB, all restorable from git history. `cleanup.sh`
+at the repo root encodes every item above as `git rm`/`npm uninstall`
+commands with the same guard notes; it has not been run.
 
 ## Phase 9 — Verification
 
