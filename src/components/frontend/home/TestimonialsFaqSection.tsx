@@ -62,8 +62,9 @@ export function TestimonialsFaqSection({ faqs }: { faqs: FAQItem[] }) {
   return (
     <section className="blueprint-grid py-14 sm:py-20 lg:py-24">
       <div className="wrap grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
-        {/* Testimonials */}
-        <Reveal>
+        {/* Testimonials - centered vertically in its column so it doesn't
+            look stranded at the top when the FAQ column runs taller */}
+        <Reveal className="flex h-full flex-col justify-center">
           <span className="eyebrow">Testimonials</span>
           <h2 className="font-tech mt-2 text-[clamp(1.5rem,4.5vw,2.2rem)] font-bold uppercase leading-tight tracking-tight text-navy-900">
             What our clients say
