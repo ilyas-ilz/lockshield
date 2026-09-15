@@ -8,6 +8,8 @@ import { Post } from "@/models";
 import { BlockRenderer } from "@/components/frontend/BlockRenderer";
 import { Reveal } from "@/components/frontend/Reveal";
 import { ButtonLink } from "@/components/frontend/Button";
+import { getEnv } from "@/lib/env";
+import { buildArticleSchema, buildBreadcrumbSchema } from "@/lib/seo/jsonld";
 
 // Content is editable from the admin, so pages must not be frozen at build
 // time. Revalidate every 5 minutes.
@@ -62,35 +64,40 @@ export default async function BlogPostPage({ params }: PageProps) {
     notFound();
   }
 
-  // Article JSON-LD
-  const jsonLdArticle = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: post.title,
-    description: post.excerpt,
-    image: post.coverImage?.url ? [post.coverImage.url] : undefined,
-    datePublished: post.publishedAt || post.createdAt,
-    dateModified: post.updatedAt,
-    author: {
-      "@type": "Organization",
-      name: "Lock Shield Fire Safety Engineering Desk",
-      url: "https://lockshield.ae/",
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "Lock Shield Firefighting & Safety Equipment Installation LLC",
-      logo: {
-        "@type": "ImageObject",
-        url: "https://lockshield.ae/assets/images/logo-shield.png",
-      },
-    },
-  };
+  const siteUrl = getEnv().SITE_URL;
+  // coverImage.url is either an absolute Cloudinary URL or a local /assets
+  // path - schema.org/Google Rich Results want Article.image absolute.
+  const absoluteCoverImageUrl = post.coverImage?.url
+    ? post.coverImage.url.startsWith("http")
+      ? post.coverImage.url
+      : `${siteUrl}${post.coverImage.url}`
+    : undefined;
+  const jsonLdArticle = buildArticleSchema({
+    title: post.title,
+    excerpt: post.excerpt || "",
+    url: `${siteUrl}/blog/${slug}`,
+    imageUrl: absoluteCoverImageUrl,
+    publishedAt: post.publishedAt || post.createdAt || new Date(),
+    updatedAt: post.updatedAt || post.publishedAt || post.createdAt || new Date(),
+    authorName: "Lock Shield Fire Safety Engineering Desk",
+    publisherName: "Lock Shield Firefighting & Safety Equipment Installation LLC",
+    publisherLogoUrl: `${siteUrl}/assets/images/logo-shield.png`,
+  });
+  const jsonLdBreadcrumb = buildBreadcrumbSchema([
+    { name: "Home", url: siteUrl },
+    { name: "Blog", url: `${siteUrl}/blog` },
+    { name: post.title, url: `${siteUrl}/blog/${slug}` },
+  ]);
 
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdArticle) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdBreadcrumb) }}
       />
 
       {/* Header */}

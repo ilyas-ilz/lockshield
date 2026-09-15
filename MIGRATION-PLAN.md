@@ -1,17 +1,20 @@
 # Lock Shield — Migration & Cleanup Plan
 
-Status: Phases 0-6 done and committed (verified: typecheck/lint/tests/build
+Status: Phases 0-7 done and committed (verified: typecheck/lint/tests/build
 green after each phase; every changed page screenshotted at 375/768/1280,
 admin flows verified live with disposable test users/data, never against
-real credentials). Phases 4-6 each surfaced and fixed a real, previously
+real credentials). Phases 4-7 each surfaced and fixed a real, previously
 unnoticed bug: a navbar overflow at the `lg` breakpoint (1024-1279px)
 invisible to the document-level overflow check because the header is
 `position: fixed`; the shared `useInView` hook's ratio-based threshold
 silently leaving any Reveal-wrapped block taller than viewport-height /
 threshold at `opacity: 0` forever (a long blog article routinely exceeds
-it); and an admin session that stayed valid for up to 8 hours after a user
-was deactivated or demoted, now re-checked against the DB every 5 minutes.
-Phase 7 (wire up jsonld/redirects/notify) next.
+it); an admin session that stayed valid for up to 8 hours after a user
+was deactivated or demoted, now re-checked against the DB every 5 minutes;
+an invalid empty `GeoCoordinates` block and relative image URLs in the
+homepage/blog JSON-LD; and a missing `GET /api/media/[id]` route that made
+the admin's "Edit" button on any media item silently fail. Phase 8
+(cleanup report — script only, not executed) next.
 
 Derived from a full audit of the legacy static site (repo root) and the Next.js app
 (`backend/`), completed 2026-09-15. Nothing in this plan deletes a file; Phase 8
@@ -332,21 +335,63 @@ one `ResourceForm`. It did not need replacing. It needed finishing.
   auth-sensitive one area of the admin for a purely architectural tidiness
   gain. Left as dedicated routes.
 
-## Phase 7 — Wire up what was built but never connected
+## Phase 7 — Wire up what was built but never connected (DONE)
 
-Three modules exist, are correct, and are called by nothing:
+Three modules existed, were correct, and were called by nothing:
 
-1. **`lib/seo/jsonld.ts`** — 8 schema builders, zero imports. Meanwhile
-   hand-written `@context` blobs were inlined into `(public)/page.tsx` and
-   `blog/[slug]/page.tsx`. Replace the blobs with the builders.
-2. **`lib/redirects.ts`** — `findRedirect` is never called. The `Redirect` model,
-   `/api/redirects` CRUD and the admin "Redirects" nav item all exist, so editors
-   can create redirects that silently do nothing. Middleware can't reach Mongo
-   (Edge), so this needs a root `[...slug]` catch-all consulted before `notFound()`.
-3. **`lib/notify.ts`** — a `TODO` stub. Leads are stored but nobody is emailed.
-   For a lead-generation site this is the highest-impact functional gap.
+1. **`lib/seo/jsonld.ts`** — 8 schema builders, zero imports. Hand-written
+   `@context` blobs were inlined into `(public)/page.tsx` and
+   `blog/[slug]/page.tsx`. **Fixed:** both pages now call
+   `buildLocalBusinessSchema`/`buildFaqSchema`/`buildArticleSchema`/
+   `buildBreadcrumbSchema`, sourced from `getSettings()` instead of hardcoded
+   values. `buildArticleSchema` gained optional `publisherName`/
+   `publisherLogoUrl` params to emit a `publisher` block. Verified live via
+   curl against the rendered `<script type="application/ld+json">` output;
+   found and fixed two real bugs while doing so: (a) Mongoose always
+   materializes the `address.geo` subdocument even when lat/lng were never
+   set, which was producing an invalid empty `GeoCoordinates` block — now
+   only emitted when both lat and lng are actual numbers; (b) `image`/`logo`
+   URLs were sometimes relative (`/assets/...`), which Google Rich Results
+   requires absolute — now resolved against `SITE_URL` before being embedded.
+2. **`lib/redirects.ts`** — `findRedirect` was never called. The `Redirect`
+   model, `/api/redirects` CRUD and the admin "Redirects" nav item all
+   existed, so editors could create redirects that silently did nothing.
+   Middleware can't reach Mongo (Edge). **Fixed:** added a root
+   `src/app/[...slug]/page.tsx` catch-all, sitting below every static/dynamic
+   route, that calls `findRedirect` and issues `permanentRedirect()` (308,
+   for an admin-configured 301) or `redirect()` (307, for a 302) before
+   falling through to `notFound()`. Verified live: a 301-configured redirect
+   returns HTTP 308 with the right `Location`; a 302-configured one returns
+   307; a genuinely unmatched path still 404s.
+3. **`lib/notify.ts`** — a `TODO` stub; leads were stored but nobody was
+   emailed. **Fixed:** implemented via `nodemailer` against generic,
+   optional SMTP env vars (`SMTP_HOST`/`SMTP_PORT`/`SMTP_USER`/
+   `SMTP_PASSWORD`/`SMTP_FROM`, added to the `env.ts` zod schema alongside a
+   `hasSmtp()` helper, mirroring the existing `hasCloudinary()` pattern) —
+   provider-agnostic, works with the site's existing cPanel mailbox or any
+   SMTP relay, and requires no third-party API key I don't have. When SMTP
+   isn't configured it stays exactly today's log-only no-op; when it is, it
+   emails every address in `Settings.emails` with the lead's source/name/
+   email/phone/message. Still wrapped so it never throws — a lead
+   submission must never fail because email delivery failed. Verified live:
+   submitted a disposable test lead through `POST /api/leads` with no SMTP
+   configured, confirmed 201 + the same "new lead received" log line as
+   before with no error, then deleted the test lead.
 
-Also: `GET /api/media/[id]` is missing, and `POST /api/upload/sign` has no caller.
+Also found and fixed while re-auditing this phase: `GET /api/media/[id]`
+was genuinely missing (only `PATCH`/`DELETE` existed) — and the admin's
+generic `/admin/[resource]/[id]` edit page *does* call it, so clicking
+"Edit" on any media item was silently broken (perpetual `ErrorState`), not
+just a case of unused code. Added the missing `GET` handler matching the
+file's existing hand-rolled style. Verified live end-to-end with a
+disposable test admin + test media doc via Playwright: the edit page now
+loads the alt-text form instead of erroring. `POST /api/upload/sign`
+(a signed-direct-to-Cloudinary alternative) is genuinely unused — both
+upload UI components (`ImagePicker`, `MediaModal`) already go through the
+working server-proxy `/api/upload` route, which also transparently
+supports the local-storage fallback that the signed route does not. Left
+in place per the no-delete directive rather than building a redundant
+second upload pathway; flagged for the Phase 8 cleanup report.
 
 ## Phase 8 — Cleanup report *(script only — I will not run it)*
 

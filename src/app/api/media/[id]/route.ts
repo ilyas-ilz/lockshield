@@ -10,6 +10,18 @@ import { writeAudit } from "@/lib/audit";
 import { getClientIp } from "@/lib/rate-limit";
 import { logger } from "@/lib/logger";
 
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  return handleApi(async () => {
+    await requireRole(...STAFF);
+    await connectDB();
+    const { id } = await params;
+    objectIdSchema.parse(id);
+    const media = await Media.findById(id);
+    if (!media) throw new ApiError(404, "Media not found");
+    return ok(media);
+  });
+}
+
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return handleApi(async () => {
     const actor = await requireRole(...STAFF);

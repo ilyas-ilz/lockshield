@@ -2,6 +2,9 @@ import Link from "next/link";
 import { ArrowRight, CheckCircle } from "lucide-react";
 import { connectDB } from "@/lib/db";
 import { Service, Project } from "@/models";
+import { getSettings } from "@/lib/settings";
+import { getEnv } from "@/lib/env";
+import { buildLocalBusinessSchema, buildFaqSchema } from "@/lib/seo/jsonld";
 import { HeroSlider } from "@/components/frontend/HeroSlider";
 import { QuickQuoteForm } from "@/components/frontend/QuickQuoteForm";
 import type { FAQItem } from "@/components/frontend/FAQAccordion";
@@ -90,16 +93,45 @@ const DEFAULT_PROJECTS: CarouselProject[] = [
 export default async function HomePage() {
   let liveServices: PublicService[] = [];
   let liveProjects: CarouselProject[] = [];
+  let jsonLdLocalBusiness: ReturnType<typeof buildLocalBusinessSchema> | null = null;
 
   try {
     await connectDB();
-    const [services, projects] = await Promise.all([
+    const [services, projects, settings] = await Promise.all([
       Service.find({ status: "published" }).sort({ order: 1, title: 1 }).lean(),
       Project.find({ publishStatus: "published" }).sort({ featured: -1, createdAt: -1 }).limit(9).lean(),
+      getSettings(),
     ]);
 
     liveServices = (services as unknown as PublicService[]) || [];
     liveProjects = (projects as unknown as CarouselProject[]) || [];
+
+    // WHY sourced from Settings, not hardcoded: one place (admin > Settings)
+    // to correct the phone/address/socials that show up here AND in the
+    // footer AND on the contact page, instead of three copies drifting apart.
+    const siteUrl = getEnv().SITE_URL;
+    jsonLdLocalBusiness = buildLocalBusinessSchema({
+      legalName: settings.legalName,
+      siteUrl,
+      logoUrl: settings.logoUrl ? (settings.logoUrl.startsWith("http") ? settings.logoUrl : `${siteUrl}${settings.logoUrl}`) : undefined,
+      phones: settings.phones,
+      emails: settings.emails,
+      address: {
+        poBox: settings.address.poBox,
+        street: settings.address.street,
+        locality: settings.address.locality,
+        country: settings.address.country,
+      },
+      // Mongoose always materializes the geo subdocument, even with no
+      // lat/lng ever set, so a plain `settings.address.geo` truthy-check
+      // would emit an invalid, coordinate-less GeoCoordinates block.
+      geo:
+        typeof settings.address.geo?.lat === "number" && typeof settings.address.geo?.lng === "number"
+          ? settings.address.geo
+          : undefined,
+      socials: settings.socials.map((s) => ({ url: s.url })),
+      partnerLinks: settings.partnerLinks.map((p) => ({ url: p.url })),
+    });
   } catch {
     // Database fallback
     void 0;
@@ -108,38 +140,13 @@ export default async function HomePage() {
   const displayServices = liveServices.length > 0 ? liveServices : DEFAULT_SERVICES;
   const displayProjects = liveProjects.length > 0 ? liveProjects : DEFAULT_PROJECTS;
 
-  const jsonLdLocalBusiness = {
-    "@context": "https://schema.org",
-    "@type": "LocalBusiness",
-    name: "Lock Shield Firefighting & Safety Equipment Installation LLC",
-    description:
-      "Civil Defence approved fire protection systems: design, installation, testing and annual maintenance across the UAE.",
-    url: "https://lockshield.ae/",
-    telephone: "+971 4 272 7333",
-    email: "info@lockshield.ae",
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: "Al Qusais Industrial Area",
-      addressLocality: "Dubai",
-      addressCountry: "AE",
-    },
-    areaServed: "AE",
-    openingHours: "Mo-Su 00:00-24:00",
-  };
-
-  const jsonLdFAQ = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: FAQS.map((faq) => ({
-      "@type": "Question",
-      name: faq.q,
-      acceptedAnswer: { "@type": "Answer", text: faq.a },
-    })),
-  };
+  const jsonLdFAQ = buildFaqSchema(FAQS.map((faq) => ({ question: faq.q, answer: faq.a })));
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdLocalBusiness) }} />
+      {jsonLdLocalBusiness && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdLocalBusiness) }} />
+      )}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFAQ) }} />
 
       {/* 1. Hero */}

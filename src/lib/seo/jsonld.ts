@@ -62,6 +62,8 @@ export function buildArticleSchema(post: {
   publishedAt: Date | string;
   updatedAt: Date | string;
   authorName: string;
+  publisherName?: string;
+  publisherLogoUrl?: string;
 }) {
   return {
     "@context": "https://schema.org",
@@ -73,6 +75,15 @@ export function buildArticleSchema(post: {
     datePublished: new Date(post.publishedAt).toISOString(),
     dateModified: new Date(post.updatedAt).toISOString(),
     author: { "@type": "Person", name: post.authorName },
+    ...(post.publisherName
+      ? {
+          publisher: {
+            "@type": "Organization",
+            name: post.publisherName,
+            ...(post.publisherLogoUrl ? { logo: { "@type": "ImageObject", url: post.publisherLogoUrl } } : {}),
+          },
+        }
+      : {}),
   };
 }
 
