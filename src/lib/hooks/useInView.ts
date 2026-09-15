@@ -3,8 +3,18 @@
 import * as React from "react";
 
 interface UseInViewOptions {
-  /** Fraction of the element that must be visible before it counts. */
+  /**
+   * Fraction of the *target element* that must be visible before it counts.
+   * Ratio-based, so it's unsatisfiable for any target taller than
+   * `viewportHeight / threshold` (e.g. a long blog article body easily
+   * exceeds that) - such targets would stay permanently hidden. Defaults to
+   * 0 (any pixel overlap counts) precisely because content height varies
+   * wildly across call sites (small cards vs. full article bodies); pass a
+   * higher value only for elements you know are viewport-sized or smaller.
+   */
   threshold?: number;
+  /** Shrinks/grows the root's bounding box before intersection is computed - percentages here are relative to the viewport, not the target, so they stay correct regardless of target size. */
+  rootMargin?: string;
   /** Once true, keep observing forever instead of disconnecting after the first hit. */
   keepObserving?: boolean;
 }
@@ -18,7 +28,7 @@ interface UseInViewOptions {
 export function useInView<T extends HTMLElement>(
   options: UseInViewOptions = {}
 ): [React.RefObject<T | null>, boolean] {
-  const { threshold = 0.15, keepObserving = false } = options;
+  const { threshold = 0, rootMargin = "0px 0px -10% 0px", keepObserving = false } = options;
   const ref = React.useRef<T | null>(null);
   const [inView, setInView] = React.useState(false);
 
@@ -45,12 +55,12 @@ export function useInView<T extends HTMLElement>(
           }
         }
       },
-      { threshold }
+      { threshold, rootMargin }
     );
 
     observer.observe(el);
     return () => observer.disconnect();
-  }, [threshold, keepObserving]);
+  }, [threshold, rootMargin, keepObserving]);
 
   return [ref, inView];
 }

@@ -1,10 +1,16 @@
 # Lock Shield — Migration & Cleanup Plan
 
-Status: Phases 0-4 done and committed (verified: typecheck/lint/tests/build
-green, screenshotted at 375/768/1280 after each phase). Phase 4 also fixed a
-real navbar overflow bug at the lg breakpoint (1024-1279px) found via manual
-review, not caught by the automated document-level overflow check because the
-header is `position: fixed`. Phase 5 (blog import) next.
+Status: Phases 0-5 done and committed (verified: typecheck/lint/tests/build
+green, screenshotted at 375/768/1280 after each phase). Phase 4 fixed a real
+navbar overflow bug at the lg breakpoint (1024-1279px), found via manual
+review - not caught by the automated document-level overflow check because
+the header is `position: fixed`. Phase 5 fixed a more serious bug in the
+same family: the shared `useInView` hook's default 0.15 threshold is a
+fraction of the *target's own height*, which is unsatisfiable (and silently
+leaves content at `opacity: 0` forever) for any Reveal-wrapped block taller
+than viewport-height / 0.15 - a long blog article body is a routine example.
+Fixed by defaulting to threshold 0 + a rootMargin-based trigger, which stays
+correct regardless of target size. Phase 6 (admin UI) next.
 
 Derived from a full audit of the legacy static site (repo root) and the Next.js app
 (`backend/`), completed 2026-09-15. Nothing in this plan deletes a file; Phase 8
@@ -246,16 +252,35 @@ Brought each to parity with its legacy counterpart, using the Phase 2 primitives
   at `lg`. Confirmed via `getBoundingClientRect()` + screenshots at 1024 and
   1280, not just the 3 mandated widths.
 
-## Phase 5 — Blog import (55 articles)
+## Phase 5 — Blog import (55 articles) (DONE)
 
-The largest single task, and the biggest SEO win.
+`npm run import:blog` (`src/scripts/import-legacy-blog.ts`) parses each
+`legacy/blog/*.html` with `cheerio` into a real `Post` document: title,
+excerpt (meta description), publish date, cover image (the `.article-hero`
+image where present, rewritten to its already-ported `/assets/...` path),
+and body converted to genuine Tiptap JSON (not a raw HTML string) - real
+`<h2>/<h3>/<h4>` become heading nodes, the legacy `<p><b>Heading</b></p>`
+pseudo-heading pattern is detected and promoted to a level-3 heading too,
+`<ul>/<ol>` become list nodes, and `<b>/<strong>/<i>/<em>/<a>` become marks.
+**The original filename is kept as the slug**, so no redirect-map changes
+were needed - the existing generic `.html` → clean-path rule in
+`middleware.ts` already 301s `/blog/<slug>.html` to `/blog/<slug>`, and that
+now resolves to a real page instead of a 404. `cheerio` was added as a
+dev dependency (used only by this script).
 
-- One-off script: parse each `legacy/blog/*.html` with `cheerio` → `Post`
-  document. Preserve title, publish date, cover image, body (as Tiptap JSON so
-  it is editable in admin), and **the original slug** so the 301s resolve.
-- 55 indexed URLs currently 301 into 404s. After import they 301 into real pages.
-- `cheerio` is a new dev dependency, used once, then removed from the runtime.
-- Verification: script asserts all 55 old URLs return 301 → 200.
+Result: 55/55 articles imported (0 parse failures), idempotent
+(`findOneAndUpdate` + `$setOnInsert`, safe to re-run), all 55 legacy URLs
+verified 301 → 200 with a full curl sweep.
+
+Also surfaced (and fixed) a real bug while QA-ing the first imported
+article: `useInView`'s default threshold (0.15, a fraction of the *target's
+own height*) is mathematically unsatisfiable for any Reveal-wrapped element
+taller than `viewportHeight / threshold` - a long article body routinely
+exceeds that, and was stuck at `opacity: 0` forever, on every device,
+regardless of scrolling. Fixed in `src/lib/hooks/useInView.ts` by
+defaulting to threshold 0 with a `rootMargin` trim instead, which is
+correct independent of target size. This affects every `Reveal`-wrapped
+block sitewide, not just blog posts.
 
 ## Phase 6 — Admin UI
 
