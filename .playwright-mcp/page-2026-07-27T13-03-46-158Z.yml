@@ -1,0 +1,244 @@
+- generic [active] [ref=f16e1]:
+  - banner [ref=f16e2]:
+    - generic [ref=f16e3]:
+      - link [ref=f16e4] [cursor=pointer]:
+        - /url: index.html
+        - img "Lock Shield logo" [ref=f16e5]
+        - generic [ref=f16e6]:
+          - strong [ref=f16e7]: LOCK SHIELD
+          - text: FIREFIGHTING & SAFETY EQUIPMENT INSTALLATION LLC
+      - navigation [ref=f16e8]:
+        - link "Home" [ref=f16e9] [cursor=pointer]:
+          - /url: index.html
+        - link "About Us" [ref=f16e10] [cursor=pointer]:
+          - /url: about.html
+        - link "Services" [ref=f16e11] [cursor=pointer]:
+          - /url: index.html#services
+        - link "Projects" [ref=f16e12] [cursor=pointer]:
+          - /url: index.html#projects
+        - link "Blog" [ref=f16e13] [cursor=pointer]:
+          - /url: blog.html
+        - link "Careers" [ref=f16e14] [cursor=pointer]:
+          - /url: career.html
+        - link "Contact" [ref=f16e15] [cursor=pointer]:
+          - /url: contact.html
+      - link "Get a Quote →" [ref=f16e16] [cursor=pointer]:
+        - /url: contact.html
+        - text: Get a Quote
+        - generic [ref=f16e17]: →
+  - generic [ref=f16e19]:
+    - generic [ref=f16e20]:
+      - link "Home" [ref=f16e21] [cursor=pointer]:
+        - /url: index.html
+      - text: /Blog
+    - heading "Fire Safety Insights" [level=1] [ref=f16e22]:
+      - generic [ref=f16e23]: Fire Safety
+      - generic [ref=f16e24]: Insights
+    - paragraph [ref=f16e25]: Guides, product knowledge and industry updates from our fire protection specialists — everything you need to keep your building and people safe.
+  - generic [ref=f16e27]:
+    - search [ref=f16e28]:
+      - generic: 
+      - searchbox "Search articles" [ref=f16e29]
+    - generic [ref=f16e30]:
+      - 'link "Your Complete Guide to Fire Safety Equipment: Extinguisher Stands, Kitchen Hood Systems & Hose Reels in the UAE  15 Jul 2026 Your Complete Guide to Fire Safety Equipment: Extinguisher Stands, Kitchen Hood Systems & Hose Reels in the UAE Fire safety is not something that one puts in place and then simply forgets about it. It can make all the difference between having an emergency… Read Article →" [ref=f16e31] [cursor=pointer]':
+        - /url: blog/your-complete-guide-to-fire-safety-equipment-extinguisher-stands-kitchen-hood-systems-hose-reels-in-the-uae.html
+        - 'img "Your Complete Guide to Fire Safety Equipment: Extinguisher Stands, Kitchen Hood Systems & Hose Reels in the UAE" [ref=f16e33]'
+        - generic [ref=f16e34]:
+          - generic [ref=f16e35]:
+            - generic [ref=f16e36]: 
+            - text: 15 Jul 2026
+          - 'heading "Your Complete Guide to Fire Safety Equipment: Extinguisher Stands, Kitchen Hood Systems & Hose Reels in the UAE" [level=3] [ref=f16e37]'
+          - paragraph [ref=f16e38]: Fire safety is not something that one puts in place and then simply forgets about it. It can make all the difference between having an emergency…
+          - generic [ref=f16e39]: Read Article →
+      - 'link "Fire Alarm Sounders and Fire Alarm Cables Suppliers: Your Complete UAE Buying Guide  10 Jul 2026 Fire Alarm Sounders and Fire Alarm Cables Suppliers: Your Complete UAE Buying Guide Selecting the appropriate fire safety products is not only about ticking off a box but an important step towards saving your lives and properties. As… Read Article →" [ref=f16e40] [cursor=pointer]':
+        - /url: blog/fire-alarm-sounders-and-fire-alarm-cables-suppliers-your-complete-uae-buying-guide.html
+        - 'img "Fire Alarm Sounders and Fire Alarm Cables Suppliers: Your Complete UAE Buying Guide" [ref=f16e42]'
+        - generic [ref=f16e43]:
+          - generic [ref=f16e44]:
+            - generic [ref=f16e45]: 
+            - text: 10 Jul 2026
+          - 'heading "Fire Alarm Sounders and Fire Alarm Cables Suppliers: Your Complete UAE Buying Guide" [level=3] [ref=f16e46]'
+          - paragraph [ref=f16e47]: Selecting the appropriate fire safety products is not only about ticking off a box but an important step towards saving your lives and properties. As…
+          - generic [ref=f16e48]: Read Article →
+      - 'link "Reliable Fire Safety Starts Here: Non-UL Listed Fire Pump & Fire Alarm Cables Suppliers in the UAE  7 Jul 2026 Reliable Fire Safety Starts Here: Non-UL Listed Fire Pump & Fire Alarm Cables Suppliers in the UAE When it comes to saving lives and properties, there is no place for compromises in fire safety equipment. In case you’re looking for a… Read Article →" [ref=f16e49] [cursor=pointer]':
+        - /url: blog/reliable-fire-safety-starts-here-non-ul-listed-fire-pump-fire-alarm-cables-suppliers-in-the-uae.html
+        - 'img "Reliable Fire Safety Starts Here: Non-UL Listed Fire Pump & Fire Alarm Cables Suppliers in the UAE" [ref=f16e51]'
+        - generic [ref=f16e52]:
+          - generic [ref=f16e53]:
+            - generic [ref=f16e54]: 
+            - text: 7 Jul 2026
+          - 'heading "Reliable Fire Safety Starts Here: Non-UL Listed Fire Pump & Fire Alarm Cables Suppliers in the UAE" [level=3] [ref=f16e55]'
+          - paragraph [ref=f16e56]: When it comes to saving lives and properties, there is no place for compromises in fire safety equipment. In case you’re looking for a…
+          - generic [ref=f16e57]: Read Article →
+      - link "UAE’s Trusted Fire Pumps Supplier and Servicing | Fire Alarm Sounders, Extinguisher Stands & Hose Reel Cabinets — LockShield Cart  26 Jun 2026 UAE’s Trusted Fire Pumps Supplier and Servicing | Fire Alarm Sounders, Extinguisher Stands & Hose Reel Cabinets — LockShield Cart &nbsp; Your fire safety equipment can only be as effective as the weakest part of your system. Whether you have high-end fire pumps or loud sirens,… Read Article →" [ref=f16e58] [cursor=pointer]:
+        - /url: blog/uaes-trusted-fire-pumps-supplier-and-servicing-fire-alarm-sounders-extinguisher-stands-hose-reel-cabinets-lockshield-cart.html
+        - img "UAE’s Trusted Fire Pumps Supplier and Servicing | Fire Alarm Sounders, Extinguisher Stands & Hose Reel Cabinets — LockShield Cart" [ref=f16e60]
+        - generic [ref=f16e61]:
+          - generic [ref=f16e62]:
+            - generic [ref=f16e63]: 
+            - text: 26 Jun 2026
+          - heading "UAE’s Trusted Fire Pumps Supplier and Servicing | Fire Alarm Sounders, Extinguisher Stands & Hose Reel Cabinets — LockShield Cart" [level=3] [ref=f16e64]
+          - paragraph [ref=f16e65]: "&nbsp; Your fire safety equipment can only be as effective as the weakest part of your system. Whether you have high-end fire pumps or loud sirens,…"
+          - generic [ref=f16e66]: Read Article →
+      - link "Trusted Fire Alarm Smoke Detector Supplier in UAE | Fire Alarm Cables, Emergency Lights & CO2 Extinguishers — LockShield Cart  23 Jun 2026 Trusted Fire Alarm Smoke Detector Supplier in UAE | Fire Alarm Cables, Emergency Lights & CO2 Extinguishers — LockShield Cart An effective fire safety solution will never consist of just one device; rather, it will be a cohesive system that integrates all parts into a… Read Article →" [ref=f16e67] [cursor=pointer]:
+        - /url: blog/trusted-fire-alarm-smoke-detector-supplier-in-uae-fire-alarm-cables-emergency-lights-co2-extinguishers-lockshield-cart.html
+        - img "Trusted Fire Alarm Smoke Detector Supplier in UAE | Fire Alarm Cables, Emergency Lights & CO2 Extinguishers — LockShield Cart" [ref=f16e69]
+        - generic [ref=f16e70]:
+          - generic [ref=f16e71]:
+            - generic [ref=f16e72]: 
+            - text: 23 Jun 2026
+          - heading "Trusted Fire Alarm Smoke Detector Supplier in UAE | Fire Alarm Cables, Emergency Lights & CO2 Extinguishers — LockShield Cart" [level=3] [ref=f16e73]
+          - paragraph [ref=f16e74]: An effective fire safety solution will never consist of just one device; rather, it will be a cohesive system that integrates all parts into a…
+          - generic [ref=f16e75]: Read Article →
+      - link "Top Fire Extinguisher Cabinets & Fire Hose Reels Supplier in UAE | LockShield Cart  18 Jun 2026 Top Fire Extinguisher Cabinets & Fire Hose Reels Supplier in UAE | LockShield Cart The fire safety equipment is not limited to just having an extinguisher fixed on a wall. Having the right type of housing for it, ensuring access to… Read Article →" [ref=f16e76] [cursor=pointer]:
+        - /url: blog/top-fire-extinguisher-cabinets-fire-hose-reels-supplier-in-uae-lockshield-cart.html
+        - img "Top Fire Extinguisher Cabinets & Fire Hose Reels Supplier in UAE | LockShield Cart" [ref=f16e78]
+        - generic [ref=f16e79]:
+          - generic [ref=f16e80]:
+            - generic [ref=f16e81]: 
+            - text: 18 Jun 2026
+          - heading "Top Fire Extinguisher Cabinets & Fire Hose Reels Supplier in UAE | LockShield Cart" [level=3] [ref=f16e82]
+          - paragraph [ref=f16e83]: The fire safety equipment is not limited to just having an extinguisher fixed on a wall. Having the right type of housing for it, ensuring access to…
+          - generic [ref=f16e84]: Read Article →
+      - link "Protect Your Building with Certified Fire Rated Doors, Fire Extinguishers & UL Listed Fire Pumps in UAE  12 Jun 2026 Protect Your Building with Certified Fire Rated Doors, Fire Extinguishers & UL Listed Fire Pumps in UAE Fire safety should be viewed as something that cannot be compromised. Regardless of whether you are running a commercial complex, an industrial… Read Article →" [ref=f16e85] [cursor=pointer]:
+        - /url: blog/protect-your-building-with-certified-fire-rated-doors-fire-extinguishers-ul-listed-fire-pumps-in-uae.html
+        - img "Protect Your Building with Certified Fire Rated Doors, Fire Extinguishers & UL Listed Fire Pumps in UAE" [ref=f16e87]
+        - generic [ref=f16e88]:
+          - generic [ref=f16e89]:
+            - generic [ref=f16e90]: 
+            - text: 12 Jun 2026
+          - heading "Protect Your Building with Certified Fire Rated Doors, Fire Extinguishers & UL Listed Fire Pumps in UAE" [level=3] [ref=f16e91]
+          - paragraph [ref=f16e92]: Fire safety should be viewed as something that cannot be compromised. Regardless of whether you are running a commercial complex, an industrial…
+          - generic [ref=f16e93]: Read Article →
+      - 'link "Why Every Building Needs the Right Fire Safety Equipment: A Complete Guide  4 Jun 2026 Why Every Building Needs the Right Fire Safety Equipment: A Complete Guide Fire safety cannot be ignored — it is an obligation. As a building owner of a skyscraper, a storage unit, or a residential building, it becomes… Read Article →" [ref=f16e94] [cursor=pointer]':
+        - /url: blog/why-every-building-needs-the-right-fire-safety-equipment-a-complete-guide.html
+        - 'img "Why Every Building Needs the Right Fire Safety Equipment: A Complete Guide" [ref=f16e96]'
+        - generic [ref=f16e97]:
+          - generic [ref=f16e98]:
+            - generic [ref=f16e99]: 
+            - text: 4 Jun 2026
+          - 'heading "Why Every Building Needs the Right Fire Safety Equipment: A Complete Guide" [level=3] [ref=f16e100]'
+          - paragraph [ref=f16e101]: Fire safety cannot be ignored — it is an obligation. As a building owner of a skyscraper, a storage unit, or a residential building, it becomes…
+          - generic [ref=f16e102]: Read Article →
+      - link "Emergency Light Cable Supplier in UAE  26 May 2026 Emergency Light Cable Supplier in UAE As a dependable emergency light cable supplier, we understand the significance that is given to the operation of emergency light systems without any… Read Article →" [ref=f16e103] [cursor=pointer]:
+        - /url: blog/emergency-light-cable-supplier-in-uae.html
+        - img "Emergency Light Cable Supplier in UAE" [ref=f16e105]
+        - generic [ref=f16e106]:
+          - generic [ref=f16e107]:
+            - generic [ref=f16e108]: 
+            - text: 26 May 2026
+          - heading "Emergency Light Cable Supplier in UAE" [level=3] [ref=f16e109]
+          - paragraph [ref=f16e110]: As a dependable emergency light cable supplier, we understand the significance that is given to the operation of emergency light systems without any…
+          - generic [ref=f16e111]: Read Article →
+      - link "fire extinguisher covers for commercial and industrial use in UAE  21 May 2026 fire extinguisher covers for commercial and industrial use in UAE &nbsp; At Lock Shield Cart, we know it is cardinal to have fire extinguishers readily available for service, visible, and protected from damage. As… Read Article →" [ref=f16e112] [cursor=pointer]:
+        - /url: blog/fire-extinguisher-covers-for-commercial-and-industrial-use-in-uae.html
+        - img "fire extinguisher covers for commercial and industrial use in UAE" [ref=f16e114]
+        - generic [ref=f16e115]:
+          - generic [ref=f16e116]:
+            - generic [ref=f16e117]: 
+            - text: 21 May 2026
+          - heading "fire extinguisher covers for commercial and industrial use in UAE" [level=3] [ref=f16e118]
+          - paragraph [ref=f16e119]: "&nbsp; At Lock Shield Cart, we know it is cardinal to have fire extinguishers readily available for service, visible, and protected from damage. As…"
+          - generic [ref=f16e120]: Read Article →
+      - 'link "CO2 Fire Extinguisher Supplier in UAE: Everything You Need to Know About Complete Fire Safety  18 May 2026 CO2 Fire Extinguisher Supplier in UAE: Everything You Need to Know About Complete Fire Safety Whether you need to secure your office space, industrial space, or home, investing in quality fire safety equipment is mandatory. This comprehensive… Read Article →" [ref=f16e121] [cursor=pointer]':
+        - /url: blog/co2-fire-extinguisher-supplier-in-uae-everything-you-need-to-know-about-complete-fire-safety.html
+        - 'img "CO2 Fire Extinguisher Supplier in UAE: Everything You Need to Know About Complete Fire Safety" [ref=f16e123]'
+        - generic [ref=f16e124]:
+          - generic [ref=f16e125]:
+            - generic [ref=f16e126]: 
+            - text: 18 May 2026
+          - 'heading "CO2 Fire Extinguisher Supplier in UAE: Everything You Need to Know About Complete Fire Safety" [level=3] [ref=f16e127]'
+          - paragraph [ref=f16e128]: Whether you need to secure your office space, industrial space, or home, investing in quality fire safety equipment is mandatory. This comprehensive…
+          - generic [ref=f16e129]: Read Article →
+      - link "UAE Fire Alarm and Fire Fighting Fit-Out Services for All Properties  13 May 2026 UAE Fire Alarm and Fire Fighting Fit-Out Services for All Properties At Lock Shield Cart, we provide viable and well-planned fire alarm and fire fighting fit-outs for residential, commercial, industrial, and marine… Read Article →" [ref=f16e130] [cursor=pointer]:
+        - /url: blog/uae-fire-alarm-and-fire-fighting-fit-out-services-for-all-properties.html
+        - img "UAE Fire Alarm and Fire Fighting Fit-Out Services for All Properties" [ref=f16e132]
+        - generic [ref=f16e133]:
+          - generic [ref=f16e134]:
+            - generic [ref=f16e135]: 
+            - text: 13 May 2026
+          - heading "UAE Fire Alarm and Fire Fighting Fit-Out Services for All Properties" [level=3] [ref=f16e136]
+          - paragraph [ref=f16e137]: At Lock Shield Cart, we provide viable and well-planned fire alarm and fire fighting fit-outs for residential, commercial, industrial, and marine…
+          - generic [ref=f16e138]: Read Article →
+      - text:                                          
+    - navigation "Blog pagination" [ref=f16e139]:
+      - button "Previous page" [disabled] [ref=f16e140]: ← Prev
+      - button "1" [ref=f16e141] [cursor=pointer]
+      - button "2" [ref=f16e142] [cursor=pointer]
+      - generic [ref=f16e143]: …
+      - button "5" [ref=f16e144] [cursor=pointer]
+      - button "Next page" [ref=f16e145] [cursor=pointer]: Next →
+  - contentinfo [ref=f16e146]:
+    - generic [ref=f16e147]:
+      - generic [ref=f16e148]:
+        - img "Lock Shield — Firefighting and Safety Equipment Installation LLC" [ref=f16e149]
+        - paragraph [ref=f16e150]: We protect lives and property through advanced fire protection systems and uncompromising service quality.
+        - generic [ref=f16e151]:
+          - link "Facebook" [ref=f16e152] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=f16e153]: 
+          - link "LinkedIn" [ref=f16e154] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=f16e155]: 
+          - link "Instagram" [ref=f16e156] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=f16e157]: 
+          - link "YouTube" [ref=f16e158] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=f16e159]: 
+      - generic [ref=f16e160]:
+        - heading "Quick Links" [level=4] [ref=f16e161]
+        - link "Home" [ref=f16e162] [cursor=pointer]:
+          - /url: index.html
+        - link "About Us" [ref=f16e163] [cursor=pointer]:
+          - /url: about.html
+        - link "Services" [ref=f16e164] [cursor=pointer]:
+          - /url: index.html#services
+        - link "Projects" [ref=f16e165] [cursor=pointer]:
+          - /url: index.html#projects
+        - link "Blog" [ref=f16e166] [cursor=pointer]:
+          - /url: blog.html
+        - link "Careers" [ref=f16e167] [cursor=pointer]:
+          - /url: career.html
+        - link "Contact Us" [ref=f16e168] [cursor=pointer]:
+          - /url: contact.html
+      - generic [ref=f16e169]:
+        - heading "Our Services" [level=4] [ref=f16e170]
+        - link "Fire Alarm Systems" [ref=f16e171] [cursor=pointer]:
+          - /url: fire-system-products-supply.html
+        - link "Fire Fighting Systems" [ref=f16e172] [cursor=pointer]:
+          - /url: fire-system-products-supply.html
+        - link "Fire Suppression Systems" [ref=f16e173] [cursor=pointer]:
+          - /url: fm-200-special-systems.html
+        - link "Kitchen Fire Suppression" [ref=f16e174] [cursor=pointer]:
+          - /url: kitchen-fire-suppression-systems.html
+        - link "AMC & Maintenance" [ref=f16e175] [cursor=pointer]:
+          - /url: annual-maintenance-contract.html
+      - generic [ref=f16e176]:
+        - heading "Contact Us" [level=4] [ref=f16e177]
+        - list [ref=f16e178]:
+          - listitem [ref=f16e179]:
+            - generic [ref=f16e180]: 
+            - text: Al Qusais, Dubai, UAE
+          - listitem [ref=f16e182]:
+            - generic [ref=f16e183]: 
+            - link "+971 52 843 4801" [ref=f16e185] [cursor=pointer]:
+              - /url: tel:+971528434801
+          - listitem [ref=f16e186]:
+            - generic [ref=f16e187]: 
+            - link "info@lockshield.ae" [ref=f16e189] [cursor=pointer]:
+              - /url: mailto:info@lockshield.ae
+    - generic [ref=f16e190]:
+      - generic [ref=f16e191]: © 2026 Lock Shield. All Rights Reserved.
+      - generic [ref=f16e192]:
+        - link "Blog" [ref=f16e193] [cursor=pointer]:
+          - /url: blog.html
+        - text: ·
+        - link "Careers" [ref=f16e194] [cursor=pointer]:
+          - /url: career.html
+        - text: ·
+        - link "Contact" [ref=f16e195] [cursor=pointer]:
+          - /url: contact.html
+  - link "Chat on WhatsApp" [ref=f16e196] [cursor=pointer]:
+    - /url: https://wa.me/971528434801?text=Hello%20Lock%20Shield%2C%20I%20need%20a%20quote
+    - generic [ref=f16e197]: 

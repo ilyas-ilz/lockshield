@@ -1,0 +1,152 @@
+- generic [active] [ref=f21e1]:
+  - banner [ref=f21e2]:
+    - generic [ref=f21e3]:
+      - link [ref=f21e4] [cursor=pointer]:
+        - /url: index.html
+        - img "Lock Shield logo" [ref=f21e5]
+        - generic [ref=f21e6]:
+          - strong [ref=f21e7]: LOCK SHIELD
+          - text: FIREFIGHTING & SAFETY EQUIPMENT INSTALLATION LLC
+      - navigation [ref=f21e8]:
+        - link "Home" [ref=f21e9] [cursor=pointer]:
+          - /url: index.html
+        - link "About Us" [ref=f21e10] [cursor=pointer]:
+          - /url: about.html
+        - link "Services" [ref=f21e11] [cursor=pointer]:
+          - /url: index.html#services
+        - link "Projects" [ref=f21e12] [cursor=pointer]:
+          - /url: index.html#projects
+        - link "Blog" [ref=f21e13] [cursor=pointer]:
+          - /url: blog.html
+        - link "Careers" [ref=f21e14] [cursor=pointer]:
+          - /url: career.html
+        - link "Contact" [ref=f21e15] [cursor=pointer]:
+          - /url: contact.html
+      - link "Get a Quote →" [ref=f21e16] [cursor=pointer]:
+        - /url: contact.html
+        - text: Get a Quote
+        - generic [ref=f21e17]: →
+  - generic [ref=f21e19]:
+    - generic [ref=f21e20]:
+      - link "Home" [ref=f21e21] [cursor=pointer]:
+        - /url: index.html
+      - text: /About
+    - heading "A Team Built On Trust" [level=1] [ref=f21e22]:
+      - generic [ref=f21e23]: A Team Built
+      - generic [ref=f21e24]: On Trust
+    - paragraph [ref=f21e25]: Certified engineers and technicians dedicated to keeping the buildings, businesses and people of the UAE safe from fire — from first drawing to final handover.
+  - generic [ref=f21e27]:
+    - generic [ref=f21e28]:
+      - img "Lock Shield technician checking a fire extinguisher hose beside a fire pump control panel" [ref=f21e29]
+      - generic [ref=f21e30]: Certified team · UAE-wide
+    - generic [ref=f21e31]:
+      - generic [ref=f21e32]: About Company
+      - heading "We are a team of dedicated professionals" [level=2] [ref=f21e33]: We are a team ofdedicated professionals
+      - paragraph [ref=f21e34]: We are a team of dedicated professionals who are passionate about ensuring the safety of your business and home. Our team is composed of highly trained and certified technicians with years of experience in fire safety, well-equipped to manage any fire safety project.
+      - paragraph [ref=f21e35]: We offer a wide range of high-quality fire safety products — fire alarms, extinguishers, firefighting systems and more. Our experts are always available to help you choose the right products for your needs and budget, with full installation and maintenance services to keep your systems in top working condition.
+  - generic [ref=f21e37]:
+    - generic [ref=f21e39]:
+      - generic [ref=f21e40]: What Drives Us
+      - heading "Mission & Vision" [level=2] [ref=f21e41]
+    - generic [ref=f21e42]:
+      - generic [ref=f21e43]:
+        - img "Mission — precision-targeted fire safety goals" [ref=f21e45]
+        - generic [ref=f21e46]:
+          - heading "Mission" [level=3] [ref=f21e47]
+          - paragraph [ref=f21e48]: Our goal is to keep our customers safe by providing the best possible fire safety products and services available. We understand the importance of safeguarding your property, assets, and most importantly, your people.
+      - generic [ref=f21e49]:
+        - img "Vision — forward-looking fire safety leadership" [ref=f21e51]
+        - generic [ref=f21e52]:
+          - heading "Vision" [level=3] [ref=f21e53]
+          - paragraph [ref=f21e54]: Our vision is to be the leading provider of fire safety products, installation and maintenance services in the industry — achieved by delivering the highest quality service and products to every client we serve.
+  - generic [ref=f21e57]:
+    - heading "Need fire protection solutions for your building?" [level=2] [ref=f21e58]
+    - generic [ref=f21e59]:
+      - generic [ref=f21e60]:
+        - generic [ref=f21e61]: 
+        - generic [ref=f21e63]:
+          - generic [ref=f21e64]: Quick Response
+          - text: Within 24 hours
+      - generic [ref=f21e65]:
+        - generic [ref=f21e66]: 
+        - generic [ref=f21e68]:
+          - generic [ref=f21e69]: Expert Guidance
+          - text: From our team
+    - link "Get a Free Quote →" [ref=f21e70] [cursor=pointer]:
+      - /url: contact.html
+      - text: Get a Free Quote
+      - generic [ref=f21e71]: →
+  - contentinfo [ref=f21e72]:
+    - generic [ref=f21e73]:
+      - generic [ref=f21e74]:
+        - img "Lock Shield — Firefighting and Safety Equipment Installation LLC" [ref=f21e75]
+        - paragraph [ref=f21e76]: We protect lives and property through advanced fire protection systems and uncompromising service quality.
+        - generic [ref=f21e77]:
+          - link "Facebook" [ref=f21e78] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=f21e79]: 
+          - link "LinkedIn" [ref=f21e80] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=f21e81]: 
+          - link "Instagram" [ref=f21e82] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=f21e83]: 
+          - link "YouTube" [ref=f21e84] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=f21e85]: 
+      - generic [ref=f21e86]:
+        - heading "Quick Links" [level=4] [ref=f21e87]
+        - link "Home" [ref=f21e88] [cursor=pointer]:
+          - /url: index.html
+        - link "About Us" [ref=f21e89] [cursor=pointer]:
+          - /url: about.html
+        - link "Services" [ref=f21e90] [cursor=pointer]:
+          - /url: index.html#services
+        - link "Projects" [ref=f21e91] [cursor=pointer]:
+          - /url: index.html#projects
+        - link "Blog" [ref=f21e92] [cursor=pointer]:
+          - /url: blog.html
+        - link "Careers" [ref=f21e93] [cursor=pointer]:
+          - /url: career.html
+        - link "Contact Us" [ref=f21e94] [cursor=pointer]:
+          - /url: contact.html
+      - generic [ref=f21e95]:
+        - heading "Our Services" [level=4] [ref=f21e96]
+        - link "Fire Alarm Systems" [ref=f21e97] [cursor=pointer]:
+          - /url: fire-system-products-supply.html
+        - link "Fire Fighting Systems" [ref=f21e98] [cursor=pointer]:
+          - /url: fire-system-products-supply.html
+        - link "Fire Suppression Systems" [ref=f21e99] [cursor=pointer]:
+          - /url: fm-200-special-systems.html
+        - link "Kitchen Fire Suppression" [ref=f21e100] [cursor=pointer]:
+          - /url: kitchen-fire-suppression-systems.html
+        - link "AMC & Maintenance" [ref=f21e101] [cursor=pointer]:
+          - /url: annual-maintenance-contract.html
+      - generic [ref=f21e102]:
+        - heading "Contact Us" [level=4] [ref=f21e103]
+        - list [ref=f21e104]:
+          - listitem [ref=f21e105]:
+            - generic [ref=f21e106]: 
+            - text: Al Qusais, Dubai, UAE
+          - listitem [ref=f21e108]:
+            - generic [ref=f21e109]: 
+            - link "+971 52 843 4801" [ref=f21e111] [cursor=pointer]:
+              - /url: tel:+971528434801
+          - listitem [ref=f21e112]:
+            - generic [ref=f21e113]: 
+            - link "info@lockshield.ae" [ref=f21e115] [cursor=pointer]:
+              - /url: mailto:info@lockshield.ae
+    - generic [ref=f21e116]:
+      - generic [ref=f21e117]: © 2026 Lock Shield. All Rights Reserved.
+      - generic [ref=f21e118]:
+        - link "Blog" [ref=f21e119] [cursor=pointer]:
+          - /url: blog.html
+        - text: ·
+        - link "Careers" [ref=f21e120] [cursor=pointer]:
+          - /url: career.html
+        - text: ·
+        - link "Contact" [ref=f21e121] [cursor=pointer]:
+          - /url: contact.html
+  - link "Chat on WhatsApp" [ref=f21e122] [cursor=pointer]:
+    - /url: https://wa.me/971528434801?text=Hello%20Lock%20Shield%2C%20I%20need%20a%20quote
+    - generic [ref=f21e123]: 

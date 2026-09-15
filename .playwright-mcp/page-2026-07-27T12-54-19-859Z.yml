@@ -1,0 +1,184 @@
+- generic [active] [ref=f10e1]:
+  - banner [ref=f10e2]:
+    - generic [ref=f10e3]:
+      - link [ref=f10e4] [cursor=pointer]:
+        - /url: index.html
+        - img "Lock Shield logo" [ref=f10e5]
+        - generic [ref=f10e6]:
+          - strong [ref=f10e7]: LOCK SHIELD
+          - text: FIREFIGHTING & SAFETY EQUIPMENT INSTALLATION LLC
+      - navigation [ref=f10e8]:
+        - link "Home" [ref=f10e9] [cursor=pointer]:
+          - /url: index.html
+        - link "About Us" [ref=f10e10] [cursor=pointer]:
+          - /url: about.html
+        - link "Services" [ref=f10e11] [cursor=pointer]:
+          - /url: index.html#services
+        - link "Projects" [ref=f10e12] [cursor=pointer]:
+          - /url: index.html#projects
+        - link "Blog" [ref=f10e13] [cursor=pointer]:
+          - /url: blog.html
+        - link "Careers" [ref=f10e14] [cursor=pointer]:
+          - /url: career.html
+        - link "Contact" [ref=f10e15] [cursor=pointer]:
+          - /url: contact.html
+      - link "Get a Quote →" [ref=f10e16] [cursor=pointer]:
+        - /url: contact.html
+        - text: Get a Quote
+        - generic [ref=f10e17]: →
+  - generic [ref=f10e19]:
+    - generic [ref=f10e20]:
+      - link "Home" [ref=f10e21] [cursor=pointer]:
+        - /url: index.html
+      - text: /Blog
+    - heading "Fire Safety Insights" [level=1] [ref=f10e22]:
+      - generic [ref=f10e23]: Fire Safety
+      - generic [ref=f10e24]: Insights
+    - paragraph [ref=f10e25]: Guides, product knowledge and industry updates from our fire protection specialists — everything you need to keep your building and people safe.
+  - generic [ref=f10e27]:
+    - search [ref=f10e28]:
+      - generic: 
+      - searchbox "Search articles" [ref=f10e29]
+    - generic [ref=f10e30]:
+      - text:                                                
+      - link "Your Guide to Fire Safety and Fire Extinguishers  7 May 2024 Your Guide to Fire Safety and Fire Extinguishers Ensuring fire safety is a critical and non-neglide negligible aspect of any building. Whether it is a home, office, or commercial space, it is… Read Article →" [ref=f10e31] [cursor=pointer]:
+        - /url: blog/your-guide-to-fire-safety-and-fire-extinguishers.html
+        - img "Your Guide to Fire Safety and Fire Extinguishers" [ref=f10e33]
+        - generic [ref=f10e34]:
+          - generic [ref=f10e35]:
+            - generic [ref=f10e36]: 
+            - text: 7 May 2024
+          - heading "Your Guide to Fire Safety and Fire Extinguishers" [level=3] [ref=f10e37]
+          - paragraph [ref=f10e38]: Ensuring fire safety is a critical and non-neglide negligible aspect of any building. Whether it is a home, office, or commercial space, it is…
+          - generic [ref=f10e39]: Read Article →
+      - link "How to get DCD Approval for Restaurants and other Fit-Outs in UAE  30 Apr 2024 How to get DCD Approval for Restaurants and other Fit-Outs in UAE Getting DCD approval is necessary to ensure the safety of your restaurant or other fit-out project in the UAE, specifically Dubai. As the well… Read Article →" [ref=f10e40] [cursor=pointer]:
+        - /url: blog/how-to-get-dcd-approval-for-restaurants-and-other-fit-outs-in-uae.html
+        - img "How to get DCD Approval for Restaurants and other Fit-Outs in UAE" [ref=f10e42]
+        - generic [ref=f10e43]:
+          - generic [ref=f10e44]:
+            - generic [ref=f10e45]: 
+            - text: 30 Apr 2024
+          - heading "How to get DCD Approval for Restaurants and other Fit-Outs in UAE" [level=3] [ref=f10e46]
+          - paragraph [ref=f10e47]: Getting DCD approval is necessary to ensure the safety of your restaurant or other fit-out project in the UAE, specifically Dubai. As the well…
+          - generic [ref=f10e48]: Read Article →
+      - link "What is the most important fire safety and prevention tips for the home  20 Apr 2024 What is the most important fire safety and prevention tips for the home Installing smoke detectors and other safety equipment. There are various safety systems available on the market, including fire alarm panels, smoke… Read Article →" [ref=f10e49] [cursor=pointer]:
+        - /url: blog/what-is-the-most-important-fire-safety-and-prevention-tips-for-the-home.html
+        - img "What is the most important fire safety and prevention tips for the home" [ref=f10e51]
+        - generic [ref=f10e52]:
+          - generic [ref=f10e53]:
+            - generic [ref=f10e54]: 
+            - text: 20 Apr 2024
+          - heading "What is the most important fire safety and prevention tips for the home" [level=3] [ref=f10e55]
+          - paragraph [ref=f10e56]: Installing smoke detectors and other safety equipment. There are various safety systems available on the market, including fire alarm panels, smoke…
+          - generic [ref=f10e57]: Read Article →
+      - 'link "Lockshieldcart: Your Go-To Source for Fire and Flood Safety in the UAE  20 Apr 2024 Lockshieldcart: Your Go-To Source for Fire and Flood Safety in the UAE The current rain in the UAE, especially in Dubai and Sharjah, has resulted in a major flooding. There might be major safety dangers despite the… Read Article →" [ref=f10e58] [cursor=pointer]':
+        - /url: blog/lockshieldcart-your-go-to-source-for-fire-and-flood-safety-in-the-uae.html
+        - 'img "Lockshieldcart: Your Go-To Source for Fire and Flood Safety in the UAE" [ref=f10e60]'
+        - generic [ref=f10e61]:
+          - generic [ref=f10e62]:
+            - generic [ref=f10e63]: 
+            - text: 20 Apr 2024
+          - 'heading "Lockshieldcart: Your Go-To Source for Fire and Flood Safety in the UAE" [level=3] [ref=f10e64]'
+          - paragraph [ref=f10e65]: The current rain in the UAE, especially in Dubai and Sharjah, has resulted in a major flooding. There might be major safety dangers despite the…
+          - generic [ref=f10e66]: Read Article →
+      - link "Protect Your Home and Business with Fire Alarms  5 Apr 2024 Protect Your Home and Business with Fire Alarms Fire safety is a paramount of any property. Having a reliable alarm system is the first line of defense against devastating fires. Get the fire… Read Article →" [ref=f10e67] [cursor=pointer]:
+        - /url: blog/protect-your-home-and-business-with-fire-alarms.html
+        - img "Protect Your Home and Business with Fire Alarms" [ref=f10e69]
+        - generic [ref=f10e70]:
+          - generic [ref=f10e71]:
+            - generic [ref=f10e72]: 
+            - text: 5 Apr 2024
+          - heading "Protect Your Home and Business with Fire Alarms" [level=3] [ref=f10e73]
+          - paragraph [ref=f10e74]: Fire safety is a paramount of any property. Having a reliable alarm system is the first line of defense against devastating fires. Get the fire…
+          - generic [ref=f10e75]: Read Article →
+      - 'link "Fire Extinguisher Types — Lock Shield  18 Dec 2023 Fire Extinguisher Types Fire Extinguisher Classes: Fire extinguishers are classified based on the types of fires they can effectively combat. The most common classification… Read Article →" [ref=f10e76] [cursor=pointer]':
+        - /url: blog/fire-extinguisher-types.html
+        - img "Fire Extinguisher Types — Lock Shield" [ref=f10e78]
+        - generic [ref=f10e79]:
+          - generic [ref=f10e80]:
+            - generic [ref=f10e81]: 
+            - text: 18 Dec 2023
+          - heading "Fire Extinguisher Types" [level=3] [ref=f10e82]
+          - paragraph [ref=f10e83]: "Fire Extinguisher Classes: Fire extinguishers are classified based on the types of fires they can effectively combat. The most common classification…"
+          - generic [ref=f10e84]: Read Article →
+    - navigation "Blog pagination" [ref=f10e85]:
+      - button "Previous page" [ref=f10e86] [cursor=pointer]: ← Prev
+      - button "1" [ref=f10e87] [cursor=pointer]
+      - generic [ref=f10e88]: …
+      - button "4" [ref=f10e89] [cursor=pointer]
+      - button "5" [ref=f10e90] [cursor=pointer]
+      - button "Next page" [disabled] [ref=f10e91]: Next →
+  - contentinfo [ref=f10e92]:
+    - generic [ref=f10e93]:
+      - generic [ref=f10e94]:
+        - img "Lock Shield — Firefighting and Safety Equipment Installation LLC" [ref=f10e95]
+        - paragraph [ref=f10e96]: We protect lives and property through advanced fire protection systems and uncompromising service quality.
+        - generic [ref=f10e97]:
+          - link "Facebook" [ref=f10e98] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=f10e99]: 
+          - link "LinkedIn" [ref=f10e100] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=f10e101]: 
+          - link "Instagram" [ref=f10e102] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=f10e103]: 
+          - link "YouTube" [ref=f10e104] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=f10e105]: 
+      - generic [ref=f10e106]:
+        - heading "Quick Links" [level=4] [ref=f10e107]
+        - link "Home" [ref=f10e108] [cursor=pointer]:
+          - /url: index.html
+        - link "About Us" [ref=f10e109] [cursor=pointer]:
+          - /url: about.html
+        - link "Services" [ref=f10e110] [cursor=pointer]:
+          - /url: index.html#services
+        - link "Projects" [ref=f10e111] [cursor=pointer]:
+          - /url: index.html#projects
+        - link "Blog" [ref=f10e112] [cursor=pointer]:
+          - /url: blog.html
+        - link "Careers" [ref=f10e113] [cursor=pointer]:
+          - /url: career.html
+        - link "Contact Us" [ref=f10e114] [cursor=pointer]:
+          - /url: contact.html
+      - generic [ref=f10e115]:
+        - heading "Our Services" [level=4] [ref=f10e116]
+        - link "Fire Alarm Systems" [ref=f10e117] [cursor=pointer]:
+          - /url: fire-system-products-supply.html
+        - link "Fire Fighting Systems" [ref=f10e118] [cursor=pointer]:
+          - /url: fire-system-products-supply.html
+        - link "Fire Suppression Systems" [ref=f10e119] [cursor=pointer]:
+          - /url: fm-200-special-systems.html
+        - link "Kitchen Fire Suppression" [ref=f10e120] [cursor=pointer]:
+          - /url: kitchen-fire-suppression-systems.html
+        - link "AMC & Maintenance" [ref=f10e121] [cursor=pointer]:
+          - /url: annual-maintenance-contract.html
+      - generic [ref=f10e122]:
+        - heading "Contact Us" [level=4] [ref=f10e123]
+        - list [ref=f10e124]:
+          - listitem [ref=f10e125]:
+            - generic [ref=f10e126]: 
+            - text: Al Qusais, Dubai, UAE
+          - listitem [ref=f10e128]:
+            - generic [ref=f10e129]: 
+            - link "+971 52 843 4801" [ref=f10e131] [cursor=pointer]:
+              - /url: tel:+971528434801
+          - listitem [ref=f10e132]:
+            - generic [ref=f10e133]: 
+            - link "info@lockshield.ae" [ref=f10e135] [cursor=pointer]:
+              - /url: mailto:info@lockshield.ae
+    - generic [ref=f10e136]:
+      - generic [ref=f10e137]: © 2026 Lock Shield. All Rights Reserved.
+      - generic [ref=f10e138]:
+        - link "Blog" [ref=f10e139] [cursor=pointer]:
+          - /url: blog.html
+        - text: ·
+        - link "Careers" [ref=f10e140] [cursor=pointer]:
+          - /url: career.html
+        - text: ·
+        - link "Contact" [ref=f10e141] [cursor=pointer]:
+          - /url: contact.html
+  - link "Chat on WhatsApp" [ref=f10e142] [cursor=pointer]:
+    - /url: https://wa.me/971528434801?text=Hello%20Lock%20Shield%2C%20I%20need%20a%20quote
+    - generic [ref=f10e143]: 

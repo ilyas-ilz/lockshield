@@ -1,0 +1,140 @@
+- generic [active] [ref=f12e1]:
+  - banner [ref=f12e2]:
+    - generic [ref=f12e3]:
+      - link [ref=f12e4] [cursor=pointer]:
+        - /url: index.html
+        - img "Lock Shield logo" [ref=f12e5]
+        - generic [ref=f12e6]:
+          - strong [ref=f12e7]: LOCK SHIELD
+          - text: FIREFIGHTING & SAFETY EQUIPMENT INSTALLATION LLC
+      - navigation [ref=f12e8]:
+        - link "Home" [ref=f12e9] [cursor=pointer]:
+          - /url: index.html
+        - link "About Us" [ref=f12e10] [cursor=pointer]:
+          - /url: about.html
+        - link "Services" [ref=f12e11] [cursor=pointer]:
+          - /url: index.html#services
+        - link "Projects" [ref=f12e12] [cursor=pointer]:
+          - /url: index.html#projects
+        - link "Blog" [ref=f12e13] [cursor=pointer]:
+          - /url: blog.html
+        - link "Careers" [ref=f12e14] [cursor=pointer]:
+          - /url: career.html
+        - link "Contact" [ref=f12e15] [cursor=pointer]:
+          - /url: contact.html
+      - link "Get a Quote →" [ref=f12e16] [cursor=pointer]:
+        - /url: contact.html
+        - text: Get a Quote
+        - generic [ref=f12e17]: →
+  - generic [ref=f12e19]:
+    - generic [ref=f12e20]:
+      - link "Home" [ref=f12e21] [cursor=pointer]:
+        - /url: index.html
+      - text: /Careers
+    - heading "Join Our Team" [level=1] [ref=f12e22]:
+      - generic [ref=f12e23]: Join Our
+      - generic [ref=f12e24]: Team
+    - paragraph [ref=f12e25]: We're thrilled that you're exploring career opportunities with us. Lock Shield builds a diverse, talented team passionate about making a difference in fire safety.
+  - generic [ref=f12e27]:
+    - generic [ref=f12e29]:
+      - generic [ref=f12e30]: Why Lock Shield
+      - heading "Grow with a team that protects lives" [level=2] [ref=f12e31]: Grow with a teamthat protects lives
+    - generic [ref=f12e32]:
+      - generic [ref=f12e33]:
+        - generic [ref=f12e34]: 
+        - heading "Hands-On Training" [level=3] [ref=f12e36]
+        - paragraph [ref=f12e37]: Certified, on-the-job training across every fire protection discipline.
+      - generic [ref=f12e38]:
+        - generic [ref=f12e39]: 
+        - heading "Real Projects" [level=3] [ref=f12e41]
+        - paragraph [ref=f12e42]: Work on landmark towers, hospitals and industrial sites across the UAE.
+      - generic [ref=f12e43]:
+        - generic [ref=f12e44]: 
+        - heading "Career Growth" [level=3] [ref=f12e46]
+        - paragraph [ref=f12e47]: Clear paths from technician to certified fire protection engineer.
+      - generic [ref=f12e48]:
+        - generic [ref=f12e49]: 
+        - heading "Team Culture" [level=3] [ref=f12e51]
+        - paragraph [ref=f12e52]: A close-knit crew of 50+ professionals who look out for each other.
+    - generic [ref=f12e53]:
+      - generic [ref=f12e54]: Send Your CV
+      - heading "Ready to build a safer UAE with us?" [level=2] [ref=f12e55]
+      - paragraph [ref=f12e56]: Email your CV and we'll reach out if there's a fit for our team.
+      - link "Send CV Here →" [ref=f12e57] [cursor=pointer]:
+        - /url: mailto:info@lockshield.ae?subject=Job%20Application%20—%20CV
+        - text: Send CV Here
+        - generic [ref=f12e58]: →
+  - contentinfo [ref=f12e59]:
+    - generic [ref=f12e60]:
+      - generic [ref=f12e61]:
+        - img "Lock Shield — Firefighting and Safety Equipment Installation LLC" [ref=f12e62]
+        - paragraph [ref=f12e63]: We protect lives and property through advanced fire protection systems and uncompromising service quality.
+        - generic [ref=f12e64]:
+          - link "Facebook" [ref=f12e65] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=f12e66]: 
+          - link "LinkedIn" [ref=f12e67] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=f12e68]: 
+          - link "Instagram" [ref=f12e69] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=f12e70]: 
+          - link "YouTube" [ref=f12e71] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=f12e72]: 
+      - generic [ref=f12e73]:
+        - heading "Quick Links" [level=4] [ref=f12e74]
+        - link "Home" [ref=f12e75] [cursor=pointer]:
+          - /url: index.html
+        - link "About Us" [ref=f12e76] [cursor=pointer]:
+          - /url: about.html
+        - link "Services" [ref=f12e77] [cursor=pointer]:
+          - /url: index.html#services
+        - link "Projects" [ref=f12e78] [cursor=pointer]:
+          - /url: index.html#projects
+        - link "Blog" [ref=f12e79] [cursor=pointer]:
+          - /url: blog.html
+        - link "Careers" [ref=f12e80] [cursor=pointer]:
+          - /url: career.html
+        - link "Contact Us" [ref=f12e81] [cursor=pointer]:
+          - /url: contact.html
+      - generic [ref=f12e82]:
+        - heading "Our Services" [level=4] [ref=f12e83]
+        - link "Fire Alarm Systems" [ref=f12e84] [cursor=pointer]:
+          - /url: fire-system-products-supply.html
+        - link "Fire Fighting Systems" [ref=f12e85] [cursor=pointer]:
+          - /url: fire-system-products-supply.html
+        - link "Fire Suppression Systems" [ref=f12e86] [cursor=pointer]:
+          - /url: fm-200-special-systems.html
+        - link "Kitchen Fire Suppression" [ref=f12e87] [cursor=pointer]:
+          - /url: kitchen-fire-suppression-systems.html
+        - link "AMC & Maintenance" [ref=f12e88] [cursor=pointer]:
+          - /url: annual-maintenance-contract.html
+      - generic [ref=f12e89]:
+        - heading "Contact Us" [level=4] [ref=f12e90]
+        - list [ref=f12e91]:
+          - listitem [ref=f12e92]:
+            - generic [ref=f12e93]: 
+            - text: Al Qusais, Dubai, UAE
+          - listitem [ref=f12e95]:
+            - generic [ref=f12e96]: 
+            - link "+971 52 843 4801" [ref=f12e98] [cursor=pointer]:
+              - /url: tel:+971528434801
+          - listitem [ref=f12e99]:
+            - generic [ref=f12e100]: 
+            - link "info@lockshield.ae" [ref=f12e102] [cursor=pointer]:
+              - /url: mailto:info@lockshield.ae
+    - generic [ref=f12e103]:
+      - generic [ref=f12e104]: © 2026 Lock Shield. All Rights Reserved.
+      - generic [ref=f12e105]:
+        - link "Blog" [ref=f12e106] [cursor=pointer]:
+          - /url: blog.html
+        - text: ·
+        - link "Careers" [ref=f12e107] [cursor=pointer]:
+          - /url: career.html
+        - text: ·
+        - link "Contact" [ref=f12e108] [cursor=pointer]:
+          - /url: contact.html
+  - link "Chat on WhatsApp" [ref=f12e109] [cursor=pointer]:
+    - /url: https://wa.me/971528434801?text=Hello%20Lock%20Shield%2C%20I%20need%20a%20quote
+    - generic [ref=f12e110]: 

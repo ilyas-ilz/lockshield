@@ -1,0 +1,461 @@
+- generic [active] [ref=f25e1]:
+  - banner [ref=f25e2]:
+    - generic [ref=f25e3]:
+      - link [ref=f25e4] [cursor=pointer]:
+        - /url: index.html
+        - img "Lock Shield logo" [ref=f25e5]
+        - generic [ref=f25e6]:
+          - strong [ref=f25e7]: LOCK SHIELD
+          - text: FIREFIGHTING & SAFETY EQUIPMENT INSTALLATION LLC
+      - navigation:
+        - link "Home":
+          - /url: index.html
+        - link "About Us":
+          - /url: about.html
+        - link "Services":
+          - /url: "#services"
+        - link "Projects":
+          - /url: "#projects"
+        - link "Blog":
+          - /url: blog.html
+        - link "Careers":
+          - /url: career.html
+        - link "Contact":
+          - /url: contact.html
+      - button "Menu" [ref=f25e8] [cursor=pointer]
+  - generic [ref=f25e19]:
+    - generic [ref=f25e20]:
+      - generic [ref=f25e21]: Protecting lives. Securing futures.
+      - heading "Complete Fire Protection Solutions You Can Trust" [level=1] [ref=f25e22]:
+        - generic [ref=f25e23]: Complete
+        - generic [ref=f25e25]: Fire Protection
+        - generic [ref=f25e27]: Solutions
+        - generic [ref=f25e29]: You Can Trust
+      - paragraph [ref=f25e31]: We design, install, test and maintain world-class fire protection systems across the UAE — with quality, compliance and reliability at the core of everything we do.
+      - generic [ref=f25e32]:
+        - link "Our Services →" [ref=f25e33] [cursor=pointer]:
+          - /url: "#services"
+          - text: Our Services
+          - generic [ref=f25e34]: →
+        - link "Get a Quote →" [ref=f25e35] [cursor=pointer]:
+          - /url: contact.html
+          - text: Get a Quote
+          - generic [ref=f25e36]: →
+    - generic [ref=f25e37]:
+      - generic [ref=f25e38]:
+        - generic [ref=f25e39]: 
+        - generic [ref=f25e41]:
+          - generic [ref=f25e42]: Civil Defence Approved
+          - text: DCD-compliant systems & drawings
+      - generic [ref=f25e43]:
+        - generic [ref=f25e44]: 
+        - generic [ref=f25e46]:
+          - generic [ref=f25e47]: 24/7 Expert Support
+          - text: Always on call, UAE-wide
+      - generic [ref=f25e48]:
+        - generic [ref=f25e49]: 
+        - generic [ref=f25e51]:
+          - generic [ref=f25e52]: Professional Engineers
+          - text: Certified & experienced team
+      - generic [ref=f25e53]:
+        - generic [ref=f25e54]: 
+        - generic [ref=f25e56]:
+          - generic [ref=f25e57]: Premium Quality
+          - text: Genuine, certified products only
+  - generic [ref=f25e59]:
+    - generic [ref=f25e60]:
+      - generic [ref=f25e61]:
+        - generic [ref=f25e62]: Our Core Services
+        - heading "End-to-end fire protection under one roof" [level=2] [ref=f25e63]: End-to-end fire protectionunder one roof
+      - link "View All Services →" [ref=f25e64] [cursor=pointer]:
+        - /url: designing-drawing-civil-defence-approval.html
+        - text: View All Services
+        - generic [ref=f25e65]: →
+    - generic [ref=f25e66]:
+      - link " Designing, Drawing & Civil Defence Approval Learn More →" [ref=f25e67] [cursor=pointer]:
+        - /url: designing-drawing-civil-defence-approval.html
+        - generic [ref=f25e68]: 
+        - heading "Designing, Drawing & Civil Defence Approval" [level=3] [ref=f25e70]
+        - generic [ref=f25e71]:
+          - text: Learn More
+          - generic [ref=f25e72]: →
+      - link " Supply & Trading Learn More →" [ref=f25e73] [cursor=pointer]:
+        - /url: fire-system-products-supply.html
+        - generic [ref=f25e74]: 
+        - heading "Supply & Trading" [level=3] [ref=f25e76]
+        - generic [ref=f25e77]:
+          - text: Learn More
+          - generic [ref=f25e78]: →
+      - link " Projects & Fit-Outs Learn More →" [ref=f25e79] [cursor=pointer]:
+        - /url: projects-and-fit-outs.html
+        - generic [ref=f25e80]: 
+        - heading "Projects & Fit-Outs" [level=3] [ref=f25e82]
+        - generic [ref=f25e83]:
+          - text: Learn More
+          - generic [ref=f25e84]: →
+      - link " Annual Maintenance Contracts Learn More →" [ref=f25e85] [cursor=pointer]:
+        - /url: annual-maintenance-contract.html
+        - generic [ref=f25e86]: 
+        - heading "Annual Maintenance Contracts" [level=3] [ref=f25e88]
+        - generic [ref=f25e89]:
+          - text: Learn More
+          - generic [ref=f25e90]: →
+      - link " Fire Extinguisher Refilling Learn More →" [ref=f25e91] [cursor=pointer]:
+        - /url: fire-extinguisher-refilling.html
+        - generic [ref=f25e92]: 
+        - heading "Fire Extinguisher Refilling" [level=3] [ref=f25e94]
+        - generic [ref=f25e95]:
+          - text: Learn More
+          - generic [ref=f25e96]: →
+  - generic [ref=f25e98]:
+    - generic [ref=f25e100]:
+      - generic [ref=f25e101]: Our Completed Projects
+      - heading "Built with trust. Secured with safety." [level=2] [ref=f25e102]
+    - generic [ref=f25e103]:
+      - article [ref=f25e104] [cursor=pointer]:
+        - img "The Grey Restaurant fire safety project" [ref=f25e105]
+        - generic [ref=f25e106]:
+          - generic [ref=f25e107]: F&B · Al Khawaneej
+          - generic [ref=f25e108]: The Grey Restaurant
+          - generic: "Client: MAD Hospitality Group."
+      - article [ref=f25e109] [cursor=pointer]:
+        - img "Emirates NBD fire safety project" [ref=f25e110]
+        - generic [ref=f25e111]:
+          - generic [ref=f25e112]: Banking · Muwailih Commercial, Sharjah
+          - generic [ref=f25e113]: Emirates NBD
+          - generic: "Client: Himaya Contracting."
+      - article [ref=f25e114] [cursor=pointer]:
+        - img "G+M+R warehouse fire safety project" [ref=f25e115]
+        - generic [ref=f25e116]:
+          - generic [ref=f25e117]: Industrial · DIP 1, Dubai
+          - generic [ref=f25e118]: G + M + R Warehouse
+          - generic: "Client: Al Abrar Contracting."
+      - article [ref=f25e119] [cursor=pointer]:
+        - img "G+M+R warehouse fire safety project" [ref=f25e120]
+        - generic [ref=f25e121]:
+          - generic [ref=f25e122]: Industrial · DIP 1, Dubai
+          - generic [ref=f25e123]: G + M + R Warehouse
+          - generic: "Client: Al Abrar Contracting."
+      - article [ref=f25e124] [cursor=pointer]:
+        - img "G+M+R warehouse fire safety project" [ref=f25e125]
+        - generic [ref=f25e126]:
+          - generic [ref=f25e127]: Industrial · DIP 1, Dubai
+          - generic [ref=f25e128]: G + M + R Warehouse
+          - generic: "Client: Al Abrar Contracting."
+      - article [ref=f25e129] [cursor=pointer]:
+        - img "Farsi Restaurant kitchen suppression project" [ref=f25e130]
+        - generic [ref=f25e131]:
+          - generic [ref=f25e132]: F&B · Deira, Dubai
+          - generic [ref=f25e133]: Kitchen Suppression System
+          - generic: "Client: Farsi Restaurant."
+      - article [ref=f25e134] [cursor=pointer]:
+        - img "Pizza Hut fire safety project" [ref=f25e135]
+        - generic [ref=f25e136]:
+          - generic [ref=f25e137]: F&B · Muwailih Commercial, Sharjah
+          - generic [ref=f25e138]: Fire and Safety Installations
+          - generic: "Client: Pizza Hut."
+      - article [ref=f25e139] [cursor=pointer]:
+        - img "Feetlab fire safety project" [ref=f25e140]
+        - generic [ref=f25e141]:
+          - generic [ref=f25e142]: Retail · Creek, Dubai
+          - generic [ref=f25e143]: Fire and Safety Installations
+          - generic: "Client: Feetlab."
+      - article [ref=f25e144] [cursor=pointer]:
+        - img "Al Manara Pharmacy fire safety project" [ref=f25e145]
+        - generic [ref=f25e146]:
+          - generic [ref=f25e147]: Retail · Barsha Heights, Dubai
+          - generic [ref=f25e148]: Fire and Safety Installations
+          - generic: "Client: Al Manara Pharmacy."
+  - generic [ref=f25e160]:
+    - generic [ref=f25e162]:
+      - generic [ref=f25e163]: How We Deliver
+      - heading "Our story, told in five steps" [level=2] [ref=f25e164]
+    - generic [ref=f25e166]:
+      - article [ref=f25e167]:
+        - generic [ref=f25e168]:
+          - img "Site survey" [ref=f25e169]
+          - generic [ref=f25e170]: "01"
+        - generic [ref=f25e171]:
+          - generic [ref=f25e172]: Site Survey
+          - paragraph [ref=f25e173]: Our engineers walk your site, assess risks and map every zone before a single line is drawn.
+      - article [ref=f25e174]:
+        - generic [ref=f25e175]:
+          - img "Design and drawings" [ref=f25e176]
+          - generic [ref=f25e177]: "02"
+        - generic [ref=f25e178]:
+          - generic [ref=f25e179]: Design & Drawings
+          - paragraph [ref=f25e180]: Code-compliant system design and detailed shop drawings, engineered for your building.
+      - article [ref=f25e181]:
+        - generic [ref=f25e182]:
+          - img "Civil Defence approval" [ref=f25e183]
+          - generic [ref=f25e184]: "03"
+        - generic [ref=f25e185]:
+          - generic [ref=f25e186]: Civil Defence Approval
+          - paragraph [ref=f25e187]: We prepare, submit and follow through the full DCD documentation and approval process.
+      - article [ref=f25e188]:
+        - generic [ref=f25e189]:
+          - img "Installation and testing" [ref=f25e190]
+          - generic [ref=f25e191]: "04"
+        - generic [ref=f25e192]:
+          - generic [ref=f25e193]: Installation & Testing
+          - paragraph [ref=f25e194]: Certified technicians install, commission and pressure-test every system to specification.
+      - article [ref=f25e195]:
+        - generic [ref=f25e196]:
+          - img "Handover and AMC" [ref=f25e197]
+          - generic [ref=f25e198]: "05"
+        - generic [ref=f25e199]:
+          - generic [ref=f25e200]: Handover & AMC
+          - paragraph [ref=f25e201]: Training, documentation and a maintenance contract that keeps you protected year-round.
+  - generic [ref=f25e203]:
+    - generic [ref=f25e204]:
+      - generic [ref=f25e205]: Why Choose Lock Shield?
+      - heading "Engineered trust, proven on site" [level=2] [ref=f25e206]: Engineered trust,proven on site
+      - generic [ref=f25e207]:
+        - generic [ref=f25e208]: 
+        - generic [ref=f25e210]:
+          - generic [ref=f25e211]: Civil Defence Approved
+          - text: All systems designed as per DCD regulations and approved standards.
+      - generic [ref=f25e212]:
+        - generic [ref=f25e213]: 
+        - generic [ref=f25e215]:
+          - generic [ref=f25e216]: Experienced Team
+          - text: Highly trained, certified professionals across every discipline.
+      - generic [ref=f25e217]:
+        - generic [ref=f25e218]: 
+        - generic [ref=f25e220]:
+          - generic [ref=f25e221]: Quality Assurance
+          - text: We use only certified, genuine products from approved manufacturers.
+      - generic [ref=f25e222]:
+        - generic [ref=f25e223]: 
+        - generic [ref=f25e225]:
+          - generic [ref=f25e226]: 24/7 Support
+          - text: Always available when you need us — emergencies don't keep office hours.
+    - generic [ref=f25e227]:
+      - img "Lock Shield technicians installing a smoke detector and checking the fire alarm control panel on site in Dubai" [ref=f25e228]
+      - generic [ref=f25e229]: Field team · ready 24/7
+  - generic [ref=f25e232]:
+    - generic [ref=f25e233]:
+      - generic [ref=f25e234]: 
+      - generic [ref=f25e236]: 0Employees
+    - generic [ref=f25e237]:
+      - generic [ref=f25e238]: 
+      - generic [ref=f25e240]: 0Projects Completed
+    - generic [ref=f25e241]:
+      - generic [ref=f25e242]: 
+      - generic [ref=f25e244]: 0Sites Maintained
+    - generic [ref=f25e245]:
+      - generic [ref=f25e246]: 
+      - generic [ref=f25e248]: 0Years Experience
+  - generic [ref=f25e250]:
+    - generic [ref=f25e251]:
+      - generic [ref=f25e252]: Testimonials
+      - heading "What our clients say" [level=2] [ref=f25e253]
+      - generic [ref=f25e254]:
+        - generic [ref=f25e255]:
+          - generic [ref=f25e256]: "\""
+          - paragraph [ref=f25e257]: Lock Shield has been an exceptional partner in ensuring the fire safety of our facilities. Their team is highly professional and always delivers on time.
+          - generic [ref=f25e258]: ★★★★★
+          - generic [ref=f25e259]:
+            - generic [ref=f25e260]: FM
+            - generic [ref=f25e261]:
+              - generic [ref=f25e262]: Facilities Manager
+              - text: Emirates Hospital, Dubai
+        - generic:
+          - generic: "\""
+          - paragraph: From design to Civil Defence approval, Lock Shield handled everything smoothly. Clear communication and certified work at every stage of our tower project.
+          - generic: ★★★★★
+          - generic:
+            - generic: PM
+            - generic:
+              - generic: Project Manager
+              - text: Burj Vista Residences, Dubai
+        - generic:
+          - generic: "\""
+          - paragraph: Our AMC with Lock Shield keeps every alarm panel and extinguisher compliant year-round. Their technicians are punctual and genuinely know the systems inside out.
+          - generic: ★★★★★
+          - generic:
+            - generic: OM
+            - generic:
+              - generic: Operations Manager
+              - text: Logistics Warehouse Complex, Al Qusais
+        - generic:
+          - generic: "\""
+          - paragraph: Kitchen hood suppression installed across all 12 outlets without disrupting service. Professional crew, proper documentation, zero issues at inspection.
+          - generic: ★★★★★
+          - generic:
+            - generic: FB
+            - generic:
+              - generic: F&B Group Director
+              - text: Downtown Dubai
+    - generic [ref=f25e268]:
+      - generic [ref=f25e269]: FAQs
+      - heading "Quick answers" [level=2] [ref=f25e270]
+      - generic [ref=f25e271]:
+        - button "What is an Annual Maintenance Contract (AMC)? +" [ref=f25e272] [cursor=pointer]:
+          - text: What is an Annual Maintenance Contract (AMC)?
+          - generic [ref=f25e273]: +
+        - paragraph [ref=f25e274]: An AMC is a yearly service agreement under which we inspect, test and maintain your fire protection systems on a scheduled basis, keeping them compliant and ready at all times.
+      - generic [ref=f25e275]:
+        - button "How often should fire alarm systems be serviced? +" [ref=f25e276] [cursor=pointer]:
+          - text: How often should fire alarm systems be serviced?
+          - generic [ref=f25e277]: +
+        - paragraph [ref=f25e278]: UAE Civil Defence requires fire alarm systems to be inspected and serviced at least quarterly, with a full annual test and certification.
+      - generic [ref=f25e279]:
+        - button "Do you provide Civil Defence approval? +" [ref=f25e280] [cursor=pointer]:
+          - text: Do you provide Civil Defence approval?
+          - generic [ref=f25e281]: +
+        - paragraph [ref=f25e282]: Yes — we handle drawings, documentation, submission and follow-up until your project receives full DCD approval.
+      - generic [ref=f25e283]:
+        - button "What areas do you serve in UAE? +" [ref=f25e284] [cursor=pointer]:
+          - text: What areas do you serve in UAE?
+          - generic [ref=f25e285]: +
+        - paragraph [ref=f25e286]: We serve all seven emirates, with rapid-response teams based in Dubai covering the wider UAE.
+  - generic [ref=f25e288]:
+    - generic [ref=f25e290]:
+      - generic [ref=f25e291]: Our Work Process
+      - heading "How we deliver safety with excellence" [level=2] [ref=f25e292]
+    - generic [ref=f25e293]:
+      - generic [ref=f25e294]:
+        - generic [ref=f25e295]: 
+        - generic [ref=f25e297]:
+          - generic: "01"
+          - generic [ref=f25e298]: Consultation
+          - generic [ref=f25e299]: Understanding your requirements
+      - generic [ref=f25e300]:
+        - generic [ref=f25e301]: 
+        - generic [ref=f25e303]:
+          - generic: "02"
+          - generic [ref=f25e304]: Design & Planning
+          - generic [ref=f25e305]: Engineering safe & cost-effective solutions
+      - generic [ref=f25e306]:
+        - generic [ref=f25e307]: 
+        - generic [ref=f25e309]:
+          - generic: "03"
+          - generic [ref=f25e310]: Civil Defence Approval
+          - generic [ref=f25e311]: Documentation & submission
+      - generic [ref=f25e312]:
+        - generic [ref=f25e313]: 
+        - generic [ref=f25e315]:
+          - generic: "04"
+          - generic [ref=f25e316]: Installation
+          - generic [ref=f25e317]: Professional installation by certified team
+      - generic [ref=f25e318]:
+        - generic [ref=f25e319]: 
+        - generic [ref=f25e321]:
+          - generic: "05"
+          - generic [ref=f25e322]: Testing & Handover
+          - generic [ref=f25e323]: Testing, training & final handover
+  - generic [ref=f25e324]:
+    - generic [ref=f25e327]:
+      - generic [ref=f25e328]: Our Clients
+      - heading "Trusted by leading organizations" [level=2] [ref=f25e329]
+    - generic [ref=f25e330]:
+      - generic [ref=f25e331]:
+        - generic [ref=f25e332]: EMAAR
+        - generic [ref=f25e333]: ADNOC
+        - generic [ref=f25e334]: DAMAC
+        - generic [ref=f25e335]: EMIRATES
+        - generic [ref=f25e336]: NAKHEEL
+        - generic [ref=f25e337]: DUBAI HOLDING
+        - generic [ref=f25e338]: MERAAS
+        - generic [ref=f25e339]: ALDAR
+      - generic [ref=f25e340]:
+        - generic [ref=f25e341]: EMAAR
+        - generic [ref=f25e342]: ADNOC
+        - generic [ref=f25e343]: DAMAC
+        - generic [ref=f25e344]: EMIRATES
+        - generic [ref=f25e345]: NAKHEEL
+        - generic [ref=f25e346]: DUBAI HOLDING
+        - generic [ref=f25e347]: MERAAS
+        - generic [ref=f25e348]: ALDAR
+  - generic [ref=f25e351]:
+    - heading "Need fire protection solutions for your building?" [level=2] [ref=f25e352]
+    - generic [ref=f25e353]:
+      - generic [ref=f25e354]:
+        - generic [ref=f25e355]: 
+        - generic [ref=f25e357]:
+          - generic [ref=f25e358]: Quick Response
+          - text: Within 24 hours
+      - generic [ref=f25e359]:
+        - generic [ref=f25e360]: 
+        - generic [ref=f25e362]:
+          - generic [ref=f25e363]: Expert Guidance
+          - text: From our team
+    - link "Get a Free Quote →" [ref=f25e364] [cursor=pointer]:
+      - /url: contact.html
+      - text: Get a Free Quote
+      - generic [ref=f25e365]: →
+  - contentinfo [ref=f25e366]:
+    - generic [ref=f25e367]:
+      - generic [ref=f25e368]:
+        - img "Lock Shield — Firefighting and Safety Equipment Installation LLC" [ref=f25e369]
+        - paragraph [ref=f25e370]: We protect lives and property through advanced fire protection systems and uncompromising service quality.
+        - generic [ref=f25e371]:
+          - link "Facebook" [ref=f25e372] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=f25e373]: 
+          - link "LinkedIn" [ref=f25e374] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=f25e375]: 
+          - link "Instagram" [ref=f25e376] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=f25e377]: 
+          - link "YouTube" [ref=f25e378] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=f25e379]: 
+      - generic [ref=f25e380]:
+        - heading "Quick Links" [level=4] [ref=f25e381]
+        - link "Home" [ref=f25e382] [cursor=pointer]:
+          - /url: index.html
+        - link "About Us" [ref=f25e383] [cursor=pointer]:
+          - /url: about.html
+        - link "Services" [ref=f25e384] [cursor=pointer]:
+          - /url: "#services"
+        - link "Projects" [ref=f25e385] [cursor=pointer]:
+          - /url: "#projects"
+        - link "Blog" [ref=f25e386] [cursor=pointer]:
+          - /url: blog.html
+        - link "Careers" [ref=f25e387] [cursor=pointer]:
+          - /url: career.html
+        - link "Contact Us" [ref=f25e388] [cursor=pointer]:
+          - /url: contact.html
+      - generic [ref=f25e389]:
+        - heading "Our Services" [level=4] [ref=f25e390]
+        - link "Fire Alarm Systems" [ref=f25e391] [cursor=pointer]:
+          - /url: fire-system-products-supply.html
+        - link "Fire Fighting Systems" [ref=f25e392] [cursor=pointer]:
+          - /url: fire-system-products-supply.html
+        - link "Fire Suppression Systems" [ref=f25e393] [cursor=pointer]:
+          - /url: fm-200-special-systems.html
+        - link "Kitchen Fire Suppression" [ref=f25e394] [cursor=pointer]:
+          - /url: kitchen-fire-suppression-systems.html
+        - link "AMC & Maintenance" [ref=f25e395] [cursor=pointer]:
+          - /url: annual-maintenance-contract.html
+      - generic [ref=f25e396]:
+        - heading "Contact Us" [level=4] [ref=f25e397]
+        - list [ref=f25e398]:
+          - listitem [ref=f25e399]:
+            - generic [ref=f25e400]: 
+            - text: Al Qusais, Dubai, UAE
+          - listitem [ref=f25e402]:
+            - generic [ref=f25e403]: 
+            - link "+971 52 843 4801" [ref=f25e405] [cursor=pointer]:
+              - /url: tel:+971528434801
+          - listitem [ref=f25e406]:
+            - generic [ref=f25e407]: 
+            - link "info@lockshield.ae" [ref=f25e409] [cursor=pointer]:
+              - /url: mailto:info@lockshield.ae
+    - generic [ref=f25e410]:
+      - generic [ref=f25e411]: © 2026 Lock Shield. All Rights Reserved.
+      - generic [ref=f25e412]:
+        - link "Blog" [ref=f25e413] [cursor=pointer]:
+          - /url: blog.html
+        - text: ·
+        - link "Careers" [ref=f25e414] [cursor=pointer]:
+          - /url: career.html
+        - text: ·
+        - link "Contact" [ref=f25e415] [cursor=pointer]:
+          - /url: contact.html
+  - link "Chat on WhatsApp" [ref=f25e416] [cursor=pointer]:
+    - /url: https://wa.me/971528434801?text=Hello%20Lock%20Shield%2C%20I%20need%20a%20quote
+    - generic [ref=f25e417]: 

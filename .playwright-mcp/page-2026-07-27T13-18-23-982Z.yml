@@ -1,0 +1,177 @@
+- generic [active] [ref=f30e1]:
+  - banner [ref=f30e2]:
+    - generic [ref=f30e3]:
+      - link [ref=f30e4] [cursor=pointer]:
+        - /url: index.html
+        - img "Lock Shield logo" [ref=f30e5]
+        - generic [ref=f30e6]:
+          - strong [ref=f30e7]: LOCK SHIELD
+          - text: FIREFIGHTING & SAFETY EQUIPMENT INSTALLATION LLC
+      - navigation:
+        - link "Home":
+          - /url: index.html
+        - link "About Us":
+          - /url: about.html
+        - link "Services":
+          - /url: index.html#services
+        - link "Projects":
+          - /url: index.html#projects
+        - link "Blog":
+          - /url: blog.html
+        - link "Careers":
+          - /url: career.html
+        - link "Contact":
+          - /url: contact.html
+      - button "Menu" [ref=f30e8] [cursor=pointer]
+  - generic [ref=f30e13]:
+    - generic [ref=f30e14]:
+      - link "Home" [ref=f30e15] [cursor=pointer]:
+        - /url: index.html
+      - text: /Fire System Products Supply
+    - heading "Fire System Products Supply" [level=1] [ref=f30e16]:
+      - generic [ref=f30e17]: Fire System
+      - generic [ref=f30e18]: Products Supply
+    - paragraph [ref=f30e19]: Genuine, certified fire safety equipment sourced from top manufacturers — supplied for commercial and residential properties across the UAE.
+  - generic [ref=f30e21]:
+    - complementary [ref=f30e22]:
+      - heading "Our Services" [level=4] [ref=f30e23]
+      - generic [ref=f30e24]:
+        - link "Designing, Drawing & Civil Defence →" [ref=f30e25] [cursor=pointer]:
+          - /url: designing-drawing-civil-defence-approval.html
+          - text: Designing, Drawing & Civil Defence
+          - generic [ref=f30e26]: →
+        - link "Supply & Trading →" [ref=f30e27] [cursor=pointer]:
+          - /url: fire-system-products-supply.html
+          - text: Supply & Trading
+          - generic [ref=f30e28]: →
+        - link "Projects & Fit-Outs →" [ref=f30e29] [cursor=pointer]:
+          - /url: projects-and-fit-outs.html
+          - text: Projects & Fit-Outs
+          - generic [ref=f30e30]: →
+        - link "Annual Maintenance Contract →" [ref=f30e31] [cursor=pointer]:
+          - /url: annual-maintenance-contract.html
+          - text: Annual Maintenance Contract
+          - generic [ref=f30e32]: →
+        - link "Fire Extinguisher Refilling →" [ref=f30e33] [cursor=pointer]:
+          - /url: fire-extinguisher-refilling.html
+          - text: Fire Extinguisher Refilling
+          - generic [ref=f30e34]: →
+      - generic [ref=f30e35]:
+        - generic [ref=f30e36]: 
+        - generic [ref=f30e37]:
+          - generic [ref=f30e38]: Company Profile
+          - link "Download PDF" [ref=f30e39] [cursor=pointer]:
+            - /url: assets/images/company-profile.pdf
+    - generic [ref=f30e40]:
+      - generic [ref=f30e41]: 
+      - heading "Complete fire safety equipment, from one trusted supplier" [level=2] [ref=f30e43]
+      - paragraph [ref=f30e44]: We are a major supplier of fire system products for commercial and residential properties, offering a wide range of fire safety equipment and systems — including fire alarms, firefighting systems, fire extinguishers, FM-200 systems, kitchen fire suppression systems and special systems such as foam suppression and water mist systems.
+      - paragraph [ref=f30e45]: Our products are sourced from top manufacturers and designed to meet local fire safety regulations and standards. Our team of experts provides professional advice and guidance to help you choose the right products and systems for your specific needs and budget.
+      - list [ref=f30e46]:
+        - listitem [ref=f30e47]:
+          - generic [ref=f30e48]: 
+          - text: Fire alarm panels, detectors & call points
+        - listitem [ref=f30e49]:
+          - generic [ref=f30e50]: 
+          - text: Extinguishers, hose reels & hydrants
+        - listitem [ref=f30e51]:
+          - generic [ref=f30e52]: 
+          - text: Certified, genuine products from approved manufacturers
+        - listitem [ref=f30e53]:
+          - generic [ref=f30e54]: 
+          - text: Expert guidance on the right system for your budget
+      - link "Request a Quote →" [ref=f30e55] [cursor=pointer]:
+        - /url: contact.html
+        - text: Request a Quote
+        - generic [ref=f30e56]: →
+  - generic [ref=f30e59]:
+    - heading "Need fire protection solutions for your building?" [level=2] [ref=f30e60]
+    - generic [ref=f30e61]:
+      - generic [ref=f30e62]:
+        - generic [ref=f30e63]: 
+        - generic [ref=f30e65]:
+          - generic [ref=f30e66]: Quick Response
+          - text: Within 24 hours
+      - generic [ref=f30e67]:
+        - generic [ref=f30e68]: 
+        - generic [ref=f30e70]:
+          - generic [ref=f30e71]: Expert Guidance
+          - text: From our team
+    - link "Get a Free Quote →" [ref=f30e72] [cursor=pointer]:
+      - /url: contact.html
+      - text: Get a Free Quote
+      - generic [ref=f30e73]: →
+  - contentinfo [ref=f30e74]:
+    - generic [ref=f30e75]:
+      - generic [ref=f30e76]:
+        - img "Lock Shield — Firefighting and Safety Equipment Installation LLC" [ref=f30e77]
+        - paragraph [ref=f30e78]: We protect lives and property through advanced fire protection systems and uncompromising service quality.
+        - generic [ref=f30e79]:
+          - link "Facebook" [ref=f30e80] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=f30e81]: 
+          - link "LinkedIn" [ref=f30e82] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=f30e83]: 
+          - link "Instagram" [ref=f30e84] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=f30e85]: 
+          - link "YouTube" [ref=f30e86] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=f30e87]: 
+      - generic [ref=f30e88]:
+        - heading "Quick Links" [level=4] [ref=f30e89]
+        - link "Home" [ref=f30e90] [cursor=pointer]:
+          - /url: index.html
+        - link "About Us" [ref=f30e91] [cursor=pointer]:
+          - /url: about.html
+        - link "Services" [ref=f30e92] [cursor=pointer]:
+          - /url: index.html#services
+        - link "Projects" [ref=f30e93] [cursor=pointer]:
+          - /url: index.html#projects
+        - link "Blog" [ref=f30e94] [cursor=pointer]:
+          - /url: blog.html
+        - link "Careers" [ref=f30e95] [cursor=pointer]:
+          - /url: career.html
+        - link "Contact Us" [ref=f30e96] [cursor=pointer]:
+          - /url: contact.html
+      - generic [ref=f30e97]:
+        - heading "Our Services" [level=4] [ref=f30e98]
+        - link "Fire Alarm Systems" [ref=f30e99] [cursor=pointer]:
+          - /url: fire-system-products-supply.html
+        - link "Fire Fighting Systems" [ref=f30e100] [cursor=pointer]:
+          - /url: fire-system-products-supply.html
+        - link "Fire Suppression Systems" [ref=f30e101] [cursor=pointer]:
+          - /url: fm-200-special-systems.html
+        - link "Kitchen Fire Suppression" [ref=f30e102] [cursor=pointer]:
+          - /url: kitchen-fire-suppression-systems.html
+        - link "AMC & Maintenance" [ref=f30e103] [cursor=pointer]:
+          - /url: annual-maintenance-contract.html
+      - generic [ref=f30e104]:
+        - heading "Contact Us" [level=4] [ref=f30e105]
+        - list [ref=f30e106]:
+          - listitem [ref=f30e107]:
+            - generic [ref=f30e108]: 
+            - text: Al Qusais, Dubai, UAE
+          - listitem [ref=f30e110]:
+            - generic [ref=f30e111]: 
+            - link "+971 52 843 4801" [ref=f30e113] [cursor=pointer]:
+              - /url: tel:+971528434801
+          - listitem [ref=f30e114]:
+            - generic [ref=f30e115]: 
+            - link "info@lockshield.ae" [ref=f30e117] [cursor=pointer]:
+              - /url: mailto:info@lockshield.ae
+    - generic [ref=f30e118]:
+      - generic [ref=f30e119]: © 2026 Lock Shield. All Rights Reserved.
+      - generic [ref=f30e120]:
+        - link "Blog" [ref=f30e121] [cursor=pointer]:
+          - /url: blog.html
+        - text: ·
+        - link "Careers" [ref=f30e122] [cursor=pointer]:
+          - /url: career.html
+        - text: ·
+        - link "Contact" [ref=f30e123] [cursor=pointer]:
+          - /url: contact.html
+  - link "Chat on WhatsApp" [ref=f30e124] [cursor=pointer]:
+    - /url: https://wa.me/971528434801?text=Hello%20Lock%20Shield%2C%20I%20need%20a%20quote
+    - generic [ref=f30e125]: 

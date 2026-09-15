@@ -1,0 +1,201 @@
+- generic [active] [ref=f28e1]:
+  - banner [ref=f28e2]:
+    - generic [ref=f28e3]:
+      - link [ref=f28e4] [cursor=pointer]:
+        - /url: index.html
+        - img "Lock Shield logo" [ref=f28e5]
+        - generic [ref=f28e6]:
+          - strong [ref=f28e7]: LOCK SHIELD
+          - text: FIREFIGHTING & SAFETY EQUIPMENT INSTALLATION LLC
+      - navigation:
+        - link "Home":
+          - /url: index.html
+        - link "About Us":
+          - /url: about.html
+        - link "Services":
+          - /url: index.html#services
+        - link "Projects":
+          - /url: index.html#projects
+        - link "Blog":
+          - /url: blog.html
+        - link "Careers":
+          - /url: career.html
+        - link "Contact":
+          - /url: contact.html
+      - button "Menu" [ref=f28e8] [cursor=pointer]
+  - generic [ref=f28e13]:
+    - generic [ref=f28e14]:
+      - link "Home" [ref=f28e15] [cursor=pointer]:
+        - /url: index.html
+      - text: /Contact
+    - heading "Let's Protect Your Building" [level=1] [ref=f28e16]:
+      - generic [ref=f28e17]: Let's Protect
+      - generic [ref=f28e18]: Your Building
+    - paragraph [ref=f28e19]: Tell us about your project and our engineers will get back to you within 24 hours with expert guidance and a free quote.
+  - generic [ref=f28e21]:
+    - generic [ref=f28e22]:
+      - generic [ref=f28e23]: Contact Us
+      - heading "We're ready, 24/7" [level=2] [ref=f28e24]: We're ready,24/7
+      - generic [ref=f28e25]:
+        - generic [ref=f28e26]: 
+        - generic [ref=f28e28]:
+          - generic [ref=f28e29]: Visit Us
+          - text: Al Qusais, Dubai, United Arab Emirates
+      - generic [ref=f28e30]:
+        - generic [ref=f28e31]: 
+        - generic [ref=f28e33]:
+          - generic [ref=f28e34]: Call Us
+          - link "+971 52 843 4801" [ref=f28e35] [cursor=pointer]:
+            - /url: tel:+971528434801
+      - generic [ref=f28e36]:
+        - generic [ref=f28e37]: 
+        - generic [ref=f28e39]:
+          - generic [ref=f28e40]: Email Us
+          - link "info@lockshield.ae" [ref=f28e41] [cursor=pointer]:
+            - /url: mailto:info@lockshield.ae
+      - generic [ref=f28e42]:
+        - generic [ref=f28e43]: 
+        - generic [ref=f28e45]:
+          - generic [ref=f28e46]: Working Hours
+          - generic [ref=f28e47]: "Mon–Sat: 8:00 AM – 6:00 PMEmergency support: 24/7"
+      - link " Chat on WhatsApp" [ref=f28e48] [cursor=pointer]:
+        - /url: https://wa.me/971528434801
+        - generic [ref=f28e49]: 
+        - text: Chat on WhatsApp
+    - generic [ref=f28e51]:
+      - heading "Get a Free Quote" [level=3] [ref=f28e52]
+      - paragraph [ref=f28e53]: Fill in the details and we'll respond within 24 hours.
+      - generic [ref=f28e54]:
+        - generic [ref=f28e55]:
+          - generic [ref=f28e56]: Your Name *
+          - textbox "Your Name *" [ref=f28e57]:
+            - /placeholder: Full name
+        - generic [ref=f28e58]:
+          - generic [ref=f28e59]: Phone *
+          - textbox "Phone *" [ref=f28e60]:
+            - /placeholder: +971 5X XXX XXXX
+      - generic [ref=f28e61]:
+        - generic [ref=f28e62]:
+          - generic [ref=f28e63]: Email
+          - textbox "Email" [ref=f28e64]:
+            - /placeholder: you@company.com
+        - generic [ref=f28e65]:
+          - generic [ref=f28e66]: Service Needed
+          - generic [ref=f28e67]:
+            - button "Service Needed Fire Alarm Systems" [ref=f28e68] [cursor=pointer]:
+              - generic [ref=f28e69]: Fire Alarm Systems
+              - generic [ref=f28e70]: 
+            - listbox "Service Needed":
+              - option "Fire Alarm Systems " [selected]:
+                - text: Fire Alarm Systems
+                - generic: 
+              - option "Fire Fighting Systems ":
+                - text: Fire Fighting Systems
+                - generic: 
+              - option "Fire Suppression (FM-200) ":
+                - text: Fire Suppression (FM-200)
+                - generic: 
+              - option "Kitchen Fire Suppression ":
+                - text: Kitchen Fire Suppression
+                - generic: 
+              - option "Emergency Lighting ":
+                - text: Emergency Lighting
+                - generic: 
+              - option "Civil Defence Approval ":
+                - text: Civil Defence Approval
+                - generic: 
+              - option "AMC & Maintenance ":
+                - text: AMC & Maintenance
+                - generic: 
+              - option "Other ":
+                - text: Other
+                - generic: 
+      - generic [ref=f28e71]:
+        - generic [ref=f28e72]: Project Details *
+        - textbox "Project Details *" [ref=f28e73]:
+          - /placeholder: Building type, location, and what you need…
+      - textbox [ref=f28e74]
+      - button "Send Request →" [ref=f28e75] [cursor=pointer]:
+        - text: Send Request
+        - generic [ref=f28e76]: →
+      - paragraph [ref=f28e77]: Sent straight to info@lockshield.ae — no data is stored on this site.
+  - generic [ref=f28e80]:
+    - iframe [ref=f28e81]:
+      
+    - generic [ref=f28e82]:
+      - generic [ref=f28e83]: 
+      - text: Loading map…
+  - contentinfo [ref=f28e84]:
+    - generic [ref=f28e85]:
+      - generic [ref=f28e86]:
+        - img "Lock Shield — Firefighting and Safety Equipment Installation LLC" [ref=f28e87]
+        - paragraph [ref=f28e88]: We protect lives and property through advanced fire protection systems and uncompromising service quality.
+        - generic [ref=f28e89]:
+          - link "Facebook" [ref=f28e90] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=f28e91]: 
+          - link "LinkedIn" [ref=f28e92] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=f28e93]: 
+          - link "Instagram" [ref=f28e94] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=f28e95]: 
+          - link "YouTube" [ref=f28e96] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=f28e97]: 
+      - generic [ref=f28e98]:
+        - heading "Quick Links" [level=4] [ref=f28e99]
+        - link "Home" [ref=f28e100] [cursor=pointer]:
+          - /url: index.html
+        - link "About Us" [ref=f28e101] [cursor=pointer]:
+          - /url: about.html
+        - link "Services" [ref=f28e102] [cursor=pointer]:
+          - /url: index.html#services
+        - link "Projects" [ref=f28e103] [cursor=pointer]:
+          - /url: index.html#projects
+        - link "Blog" [ref=f28e104] [cursor=pointer]:
+          - /url: blog.html
+        - link "Careers" [ref=f28e105] [cursor=pointer]:
+          - /url: career.html
+        - link "Contact Us" [ref=f28e106] [cursor=pointer]:
+          - /url: contact.html
+      - generic [ref=f28e107]:
+        - heading "Our Services" [level=4] [ref=f28e108]
+        - link "Fire Alarm Systems" [ref=f28e109] [cursor=pointer]:
+          - /url: fire-system-products-supply.html
+        - link "Fire Fighting Systems" [ref=f28e110] [cursor=pointer]:
+          - /url: fire-system-products-supply.html
+        - link "Fire Suppression Systems" [ref=f28e111] [cursor=pointer]:
+          - /url: fm-200-special-systems.html
+        - link "Kitchen Fire Suppression" [ref=f28e112] [cursor=pointer]:
+          - /url: kitchen-fire-suppression-systems.html
+        - link "AMC & Maintenance" [ref=f28e113] [cursor=pointer]:
+          - /url: annual-maintenance-contract.html
+      - generic [ref=f28e114]:
+        - heading "Contact Us" [level=4] [ref=f28e115]
+        - list [ref=f28e116]:
+          - listitem [ref=f28e117]:
+            - generic [ref=f28e118]: 
+            - text: Al Qusais, Dubai, UAE
+          - listitem [ref=f28e120]:
+            - generic [ref=f28e121]: 
+            - link "+971 52 843 4801" [ref=f28e123] [cursor=pointer]:
+              - /url: tel:+971528434801
+          - listitem [ref=f28e124]:
+            - generic [ref=f28e125]: 
+            - link "info@lockshield.ae" [ref=f28e127] [cursor=pointer]:
+              - /url: mailto:info@lockshield.ae
+    - generic [ref=f28e128]:
+      - generic [ref=f28e129]: © 2026 Lock Shield. All Rights Reserved.
+      - generic [ref=f28e130]:
+        - link "Blog" [ref=f28e131] [cursor=pointer]:
+          - /url: blog.html
+        - text: ·
+        - link "Careers" [ref=f28e132] [cursor=pointer]:
+          - /url: career.html
+        - text: ·
+        - link "Contact" [ref=f28e133] [cursor=pointer]:
+          - /url: contact.html
+  - link "Chat on WhatsApp" [ref=f28e134] [cursor=pointer]:
+    - /url: https://wa.me/971528434801?text=Hello%20Lock%20Shield%2C%20I%20need%20a%20quote
+    - generic [ref=f28e135]: 

@@ -1,0 +1,133 @@
+- generic [active] [ref=f31e1]:
+  - banner [ref=f31e2]:
+    - generic [ref=f31e3]:
+      - link [ref=f31e4] [cursor=pointer]:
+        - /url: ../index.html
+        - img "Lock Shield logo" [ref=f31e5]
+        - generic [ref=f31e6]:
+          - strong [ref=f31e7]: LOCK SHIELD
+          - text: FIREFIGHTING & SAFETY EQUIPMENT INSTALLATION LLC
+      - navigation:
+        - link "Home":
+          - /url: ../index.html
+        - link "About Us":
+          - /url: ../about.html
+        - link "Services":
+          - /url: ../index.html#services
+        - link "Projects":
+          - /url: ../index.html#projects
+        - link "Blog":
+          - /url: ../blog.html
+        - link "Careers":
+          - /url: ../career.html
+        - link "Contact":
+          - /url: ../contact.html
+      - button "Menu" [ref=f31e8] [cursor=pointer]
+  - generic [ref=f31e13]:
+    - generic [ref=f31e14]:
+      - link "Home" [ref=f31e15] [cursor=pointer]:
+        - /url: ../index.html
+      - text: /
+      - link "Blog" [ref=f31e16] [cursor=pointer]:
+        - /url: ../blog.html
+      - text: /Article
+    - heading "Fire Pump" [level=1] [ref=f31e17]
+    - paragraph [ref=f31e18]:
+      - generic [ref=f31e19]:
+        - generic [ref=f31e20]: 
+        - text: 29 Nov 2024
+  - article [ref=f31e23]:
+    - paragraph [ref=f31e24]: Especially in high-rise structures, fire pumps are essential components of a building’s fire protection system. These are usually found in buildings that tend to have a difficult demand such as storage warehouses or high-rises.
+    - paragraph [ref=f31e25]: By the way, there are many types of fire pumps available. It is essential to select the right type of fire pump for the installation project to avoid unnecessary costs and to avoid unnecessary pressures that might damage your system.
+    - paragraph [ref=f31e26]: Otherwise, there are many considerations as per the (NFPA) National Fire Protection Association and the (IBC) International Building Code, which are updated from time to time
+  - generic [ref=f31e29]:
+    - heading "Need fire protection solutions for your building?" [level=2] [ref=f31e30]
+    - generic [ref=f31e31]:
+      - generic [ref=f31e32]:
+        - generic [ref=f31e33]: 
+        - generic [ref=f31e35]:
+          - generic [ref=f31e36]: Quick Response
+          - text: Within 24 hours
+      - generic [ref=f31e37]:
+        - generic [ref=f31e38]: 
+        - generic [ref=f31e40]:
+          - generic [ref=f31e41]: Expert Guidance
+          - text: From our team
+    - link "Get a Free Quote →" [ref=f31e42] [cursor=pointer]:
+      - /url: ../contact.html
+      - text: Get a Free Quote
+      - generic [ref=f31e43]: →
+  - contentinfo [ref=f31e44]:
+    - generic [ref=f31e45]:
+      - generic [ref=f31e46]:
+        - img "Lock Shield — Firefighting and Safety Equipment Installation LLC" [ref=f31e47]
+        - paragraph [ref=f31e48]: We protect lives and property through advanced fire protection systems and uncompromising service quality.
+        - generic [ref=f31e49]:
+          - link "Facebook" [ref=f31e50] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=f31e51]: 
+          - link "LinkedIn" [ref=f31e52] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=f31e53]: 
+          - link "Instagram" [ref=f31e54] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=f31e55]: 
+          - link "YouTube" [ref=f31e56] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=f31e57]: 
+      - generic [ref=f31e58]:
+        - heading "Quick Links" [level=4] [ref=f31e59]
+        - link "Home" [ref=f31e60] [cursor=pointer]:
+          - /url: ../index.html
+        - link "About Us" [ref=f31e61] [cursor=pointer]:
+          - /url: ../about.html
+        - link "Services" [ref=f31e62] [cursor=pointer]:
+          - /url: ../index.html#services
+        - link "Projects" [ref=f31e63] [cursor=pointer]:
+          - /url: ../index.html#projects
+        - link "Blog" [ref=f31e64] [cursor=pointer]:
+          - /url: ../blog.html
+        - link "Careers" [ref=f31e65] [cursor=pointer]:
+          - /url: ../career.html
+        - link "Contact Us" [ref=f31e66] [cursor=pointer]:
+          - /url: ../contact.html
+      - generic [ref=f31e67]:
+        - heading "Our Services" [level=4] [ref=f31e68]
+        - link "Fire Alarm Systems" [ref=f31e69] [cursor=pointer]:
+          - /url: ../fire-system-products-supply.html
+        - link "Fire Fighting Systems" [ref=f31e70] [cursor=pointer]:
+          - /url: ../fire-system-products-supply.html
+        - link "Fire Suppression Systems" [ref=f31e71] [cursor=pointer]:
+          - /url: ../fm-200-special-systems.html
+        - link "Kitchen Fire Suppression" [ref=f31e72] [cursor=pointer]:
+          - /url: ../kitchen-fire-suppression-systems.html
+        - link "AMC & Maintenance" [ref=f31e73] [cursor=pointer]:
+          - /url: ../annual-maintenance-contract.html
+      - generic [ref=f31e74]:
+        - heading "Contact Us" [level=4] [ref=f31e75]
+        - list [ref=f31e76]:
+          - listitem [ref=f31e77]:
+            - generic [ref=f31e78]: 
+            - text: Al Qusais, Dubai, UAE
+          - listitem [ref=f31e80]:
+            - generic [ref=f31e81]: 
+            - link "+971 52 843 4801" [ref=f31e83] [cursor=pointer]:
+              - /url: tel:+971528434801
+          - listitem [ref=f31e84]:
+            - generic [ref=f31e85]: 
+            - link "info@lockshield.ae" [ref=f31e87] [cursor=pointer]:
+              - /url: mailto:info@lockshield.ae
+    - generic [ref=f31e88]:
+      - generic [ref=f31e89]: © 2026 Lock Shield. All Rights Reserved.
+      - generic [ref=f31e90]:
+        - link "Blog" [ref=f31e91] [cursor=pointer]:
+          - /url: ../blog.html
+        - text: ·
+        - link "Careers" [ref=f31e92] [cursor=pointer]:
+          - /url: ../career.html
+        - text: ·
+        - link "Contact" [ref=f31e93] [cursor=pointer]:
+          - /url: ../contact.html
+  - link "Chat on WhatsApp" [ref=f31e94] [cursor=pointer]:
+    - /url: https://wa.me/971528434801?text=Hello%20Lock%20Shield%2C%20I%20need%20a%20quote
+    - generic [ref=f31e95]: 

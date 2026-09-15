@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /demo/
+Disallow: /cart/
+Disallow: /*-old-backup.html
+
+Sitemap: https://lockshield.ae/sitemap.xml

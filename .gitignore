@@ -1,0 +1,9 @@
+node_modules/
+.next/
+backend/node_modules/
+backend/.next/
+backend/.env
+backend/.env.local
+backend/coverage/
+*.log
+backend/public/uploads/

@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact Us — Lock Shield | Get a Free Fire Protection Quote | Dubai, UAE</title>
+<meta name="description" content="Get a free quote from Lock Shield — fire protection design, installation, Civil Defence approval and maintenance across the UAE. 24/7 support.">
+<link rel="icon" type="image/png" href="assets/images/logo-shield.webp">
+<link rel="canonical" href="https://lockshield.ae/contact.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Chakra+Petch:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/vendors/fontawesome/css/all.min.css">
+<link rel="stylesheet" href="assets/css/main.css">
+<style>
+/* ---------- contact page ---------- */
+.contact-grid{display:grid;grid-template-columns:1fr 1.35fr;gap:2.5rem;align-items:start}
+@media(max-width:900px){.contact-grid{grid-template-columns:1fr}}
+.info-card{
+  display:flex;gap:1rem;align-items:flex-start;background:#fff;border:1px solid var(--line);
+  border-radius:18px;padding:1.3rem 1.4rem;margin-bottom:1rem;
+  transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s,border-color .35s;
+}
+.info-card .ico{
+  width:48px;height:48px;flex:none;border-radius:50%;border:1.5px solid var(--red);
+  display:grid;place-items:center;color:var(--red);font-size:1.05rem;transition:.3s;
+}
+@media(hover:hover){
+  .info-card:hover{transform:translateY(-5px);box-shadow:0 18px 44px rgba(224,27,36,.12);border-color:rgba(224,27,36,.35)}
+  .info-card:hover .ico{background:var(--red);color:#fff}
+}
+.info-card b{display:block;margin-bottom:.2rem;font-size:.95rem}
+.info-card a,.info-card small{color:rgba(13,18,32,.65);font-size:.88rem;line-height:1.6}
+.info-card a:hover{color:var(--red)}
+.wa-btn{background:#25d366;color:#fff;box-shadow:0 8px 24px rgba(37,211,102,.35)}
+.wa-btn:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(37,211,102,.45)}
+
+.quote-form{
+  background:#fff;border:1px solid var(--line);border-radius:24px;
+  padding:clamp(1.5rem,3.5vw,2.5rem);box-shadow:0 30px 70px rgba(13,18,32,.08);
+}
+.quote-form h3{font-size:1.4rem;margin-bottom:.4rem}
+.quote-form .hint{color:rgba(13,18,32,.55);font-size:.88rem;margin-bottom:1.6rem}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:640px){.form-row{grid-template-columns:1fr}}
+.field{margin-bottom:1rem}
+.field label{display:block;font-weight:700;font-size:.8rem;margin-bottom:.4rem;letter-spacing:.02em}
+.field input,.field select,.field textarea{
+  width:100%;font-family:inherit;font-size:.92rem;color:var(--ink);
+  background:var(--paper-soft);border:1.5px solid transparent;border-radius:12px;
+  padding:.85rem 1rem;outline:none;transition:border-color .25s,background .25s,box-shadow .25s;
+}
+.field input:focus,.field select:focus,.field textarea:focus{
+  border-color:var(--red);background:#fff;box-shadow:0 0 0 4px rgba(224,27,36,.1);
+}
+.field textarea{min-height:130px;resize:vertical}
+.quote-form .btn{border:none;width:100%;justify-content:center;font-size:1rem;margin-top:.4rem}
+.quote-form .btn:disabled{opacity:.6;cursor:not-allowed;transform:none!important}
+.form-note{font-size:.78rem;color:rgba(13,18,32,.5);margin-top:.8rem;text-align:center}
+.form-status{display:none;font-size:.85rem;padding:.8rem 1rem;border-radius:12px;margin-top:1rem;line-height:1.6}
+.form-status.show{display:block}
+.form-status.ok{background:rgba(37,211,102,.1);color:#178a45}
+.form-status.err{background:rgba(224,27,36,.08);color:var(--red-dark)}
+
+/* ---------- custom select (replaces native <select>) ---------- */
+.xselect{position:relative}
+.xselect-trigger{
+  width:100%;display:flex;align-items:center;justify-content:space-between;gap:.6rem;
+  font-family:inherit;font-size:.92rem;color:var(--ink);text-align:left;
+  background:var(--paper-soft);border:1.5px solid transparent;border-radius:12px;
+  padding:.85rem 1rem;cursor:pointer;transition:border-color .25s,background .25s,box-shadow .25s;
+}
+.xselect-trigger .chev{font-size:.75rem;color:rgba(13,18,32,.4);transition:transform .25s}
+.xselect.open .xselect-trigger{border-color:var(--red);background:#fff;box-shadow:0 0 0 4px rgba(224,27,36,.1)}
+.xselect.open .xselect-trigger .chev{transform:rotate(180deg)}
+.xselect-panel{
+  position:absolute;left:0;right:0;top:calc(100% + 8px);z-index:20;
+  background:#fff;border:1px solid var(--line);border-radius:14px;
+  box-shadow:0 20px 48px rgba(13,18,32,.16);padding:.4rem;
+  max-height:280px;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none;
+  opacity:0;transform:translateY(-8px) scale(.98);transform-origin:top center;
+  pointer-events:none;transition:opacity .18s ease,transform .18s cubic-bezier(.2,.8,.2,1);
+}
+.xselect-panel::-webkit-scrollbar{display:none}
+.xselect.open .xselect-panel{opacity:1;transform:none;pointer-events:auto}
+.xselect-option{
+  padding:.65rem .8rem;border-radius:9px;font-size:.9rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;gap:.6rem;transition:background .15s,color .15s;
+}
+.xselect-option:hover,.xselect-option.active{background:rgba(224,27,36,.08);color:var(--red)}
+.xselect-option[aria-selected="true"]{font-weight:700;color:var(--red)}
+.xselect-option[aria-selected="true"] .check{opacity:1}
+.xselect-option .check{opacity:0;font-size:.75rem}
+
+.map-wrap{border-radius:24px;overflow:hidden;box-shadow:0 30px 70px rgba(13,18,32,.15);line-height:0;position:relative;background:var(--paper-soft)}
+.map-wrap iframe{width:100%;height:420px;border:0;filter:grayscale(.35) contrast(1.05);opacity:0;transition:opacity .4s;position:relative;z-index:1}
+.map-wrap iframe.loaded{opacity:1}
+.map-skeleton{position:absolute;inset:0;height:420px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.6rem;color:rgba(13,18,32,.4);font-size:.85rem;transition:opacity .3s}
+.map-skeleton i{font-size:1.6rem;color:var(--red);animation:mapPulse 1.4s ease-in-out infinite}
+@keyframes mapPulse{50%{opacity:.4}}
+.map-wrap.loaded .map-skeleton{opacity:0;pointer-events:none}
+</style>
+<script src="assets/js/skeleton.js"></script>
+</head>
+<body>
+
+<div class="page-loader" id="pageLoader" aria-hidden="true">
+  <div class="pl pl-bar"></div>
+  <div class="pl-hero">
+    <div class="pl pl-line"></div>
+    <div class="pl pl-line lg"></div>
+    <div class="pl pl-line md"></div>
+  </div>
+  <div class="pl-cards"><div class="pl pl-card"></div><div class="pl pl-card"></div><div class="pl pl-card"></div></div>
+</div>
+<script>(function(){var p=document.getElementById('pageLoader'),done=false,h=function(){if(done)return;done=true;p.classList.add('done');setTimeout(function(){p.remove()},500)};window.addEventListener('load',h);setTimeout(h,4000)})();</script>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="index.html">
+      <img src="assets/images/logo-shield.webp" alt="Lock Shield logo">
+      <span class="brand-name">
+        <strong>LOCK&nbsp;SHIELD</strong>
+        <span>FIREFIGHTING &amp; SAFETY EQUIPMENT INSTALLATION LLC</span>
+      </span>
+    </a>
+    <nav class="main-nav" id="nav">
+      <a href="index.html">Home</a>
+      <a href="about.html">About Us</a>
+      <a href="index.html#services">Services</a>
+      <a href="index.html#projects">Projects</a>
+      <a href="blog.html">Blog</a>
+      <a href="career.html">Careers</a>
+      <a href="contact.html" class="active">Contact</a>
+    </nav>
+    <a class="btn btn-red header-cta" href="#quote">Get a Quote <span class="arr">→</span></a>
+    <button class="nav-toggle" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+  <div class="wrap">
+    <div class="crumbs rise d1"><a href="index.html">Home</a><span class="sep">/</span>Contact</div>
+    <h1>
+      <span class="line"><span>Let's Protect</span></span>
+      <span class="line"><span class="accent">Your Building</span></span>
+    </h1>
+    <p class="rise d2">Tell us about your project and our engineers will get back to you within 24 hours with expert guidance and a free quote.</p>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="blueprint" id="quote">
+  <div class="wrap contact-grid">
+    <div class="reveal">
+      <span class="eyebrow">Contact Us</span>
+      <h2 style="margin:.7rem 0 1.6rem">We're ready,<br>24/7</h2>
+      <div class="info-card"><span class="ico"><i class="fas fa-map-marker-alt"></i></span><span><b>Visit Us</b><small>P.O Box 47672, Hor Al Anz, Deira, Dubai, United Arab Emirates</small></span></div>
+      <div class="info-card"><span class="ico"><i class="fas fa-phone-alt"></i></span><span><b>Call Us</b><a href="tel:+971528434801">+971 52 843 4801</a></span></div>
+      <div class="info-card"><span class="ico"><i class="fas fa-envelope"></i></span><span><b>Email Us</b><a href="mailto:info@lockshield.ae">info@lockshield.ae</a></span></div>
+      <div class="info-card"><span class="ico"><i class="fas fa-clock"></i></span><span><b>Working Hours</b><small>Mon–Sat: 8:00 AM – 6:00 PM<br>Emergency support: 24/7</small></span></div>
+      <a class="btn wa-btn" href="https://wa.me/971528434801" target="_blank" rel="noopener" style="margin-top:.4rem"><i class="fab fa-whatsapp" style="font-size:1.2rem"></i> Chat on WhatsApp</a>
+    </div>
+    <div class="reveal">
+      <form class="quote-form" id="quoteForm">
+        <h3>Get a Free Quote</h3>
+        <p class="hint">Fill in the details and we'll respond within 24 hours.</p>
+        <div class="form-row">
+          <div class="field"><label for="fName">Your Name *</label><input id="fName" name="name" type="text" required placeholder="Full name"></div>
+          <div class="field"><label for="fPhone">Phone *</label><input id="fPhone" name="phone" type="tel" required placeholder="+971 5X XXX XXXX"></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label for="fEmail">Email</label><input id="fEmail" name="email" type="email" placeholder="you@company.com"></div>
+          <div class="field">
+            <label id="fServiceLabel" for="fServiceTrigger">Service Needed</label>
+            <div class="xselect" id="fServiceSelect">
+              <button type="button" class="xselect-trigger" id="fServiceTrigger" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="fServiceLabel fServiceValue">
+                <span id="fServiceValue">Fire Alarm Systems</span>
+                <i class="fas fa-chevron-down chev"></i>
+              </button>
+              <ul class="xselect-panel" role="listbox" aria-labelledby="fServiceLabel" tabindex="-1">
+                <li class="xselect-option" role="option" aria-selected="true" data-value="Fire Alarm Systems">Fire Alarm Systems <i class="fas fa-check check"></i></li>
+                <li class="xselect-option" role="option" aria-selected="false" data-value="Fire Fighting Systems">Fire Fighting Systems <i class="fas fa-check check"></i></li>
+                <li class="xselect-option" role="option" aria-selected="false" data-value="Fire Suppression (FM-200)">Fire Suppression (FM-200) <i class="fas fa-check check"></i></li>
+                <li class="xselect-option" role="option" aria-selected="false" data-value="Kitchen Fire Suppression">Kitchen Fire Suppression <i class="fas fa-check check"></i></li>
+                <li class="xselect-option" role="option" aria-selected="false" data-value="Emergency Lighting">Emergency Lighting <i class="fas fa-check check"></i></li>
+                <li class="xselect-option" role="option" aria-selected="false" data-value="Civil Defence Approval">Civil Defence Approval <i class="fas fa-check check"></i></li>
+                <li class="xselect-option" role="option" aria-selected="false" data-value="AMC &amp; Maintenance">AMC &amp; Maintenance <i class="fas fa-check check"></i></li>
+                <li class="xselect-option" role="option" aria-selected="false" data-value="Other">Other <i class="fas fa-check check"></i></li>
+              </ul>
+            </div>
+            <input type="hidden" id="fService" name="service" value="Fire Alarm Systems">
+          </div>
+        </div>
+        <div class="field"><label for="fMsg">Project Details *</label><textarea id="fMsg" name="message" required placeholder="Building type, location, and what you need…"></textarea></div>
+        <input type="text" name="_honey" style="position:absolute;left:-9999px" tabindex="-1" autocomplete="off">
+        <button class="btn btn-red" type="submit" id="fSubmit">Send Request <span class="arr">→</span></button>
+        <div class="form-status" id="fStatus" role="status"></div>
+        <p class="form-note">Sent straight to info@lockshield.ae — no data is stored on this site.</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- MAP -->
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="map-wrap reveal" id="mapWrap">
+      <iframe id="mapFrame" data-src="https://maps.google.com/maps?q=Hor+Al+Anz+Deira+Dubai&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Lock Shield location — Hor Al Anz, Deira, Dubai"></iframe>
+      <div class="map-skeleton"><i class="fas fa-map-marked-alt"></i>Loading map…</div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer" style="margin-top:0">
+  <div class="wrap footer-grid">
+    <div class="footer-brand">
+      <img src="assets/images/logo-lockshield.webp" alt="Lock Shield — Firefighting and Safety Equipment Installation LLC" style="background:rgba(255,255,255,.92);border-radius:12px;padding:.5rem .7rem">
+      <p>We protect lives and property through advanced fire protection systems and uncompromising service quality.</p>
+      <div class="socials">
+        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+        <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+      </div>
+    </div>
+    <div>
+      <h4>Quick Links</h4>
+      <a href="index.html">Home</a>
+      <a href="about.html">About Us</a>
+      <a href="index.html#services">Services</a>
+      <a href="index.html#projects">Projects</a>
+      <a href="blog.html">Blog</a>
+      <a href="career.html">Careers</a>
+      <a href="contact.html">Contact Us</a>
+    </div>
+    <div>
+      <h4>Our Services</h4>
+      <a href="fire-system-products-supply.html">Fire Alarm Systems</a>
+      <a href="fire-system-products-supply.html">Fire Fighting Systems</a>
+      <a href="fm-200-special-systems.html">Fire Suppression Systems</a>
+      <a href="kitchen-fire-suppression-systems.html">Kitchen Fire Suppression</a>
+      <a href="annual-maintenance-contract.html">AMC &amp; Maintenance</a>
+    </div>
+    <div>
+      <h4>Contact Us</h4>
+      <ul class="footer-contact">
+        <li><span class="pin"><i class="fas fa-map-marker-alt"></i></span> P.O Box 47672, Hor Al Anz, Deira, Dubai, UAE</li>
+        <li><span class="pin"><i class="fas fa-phone-alt"></i></span> <a href="tel:+971528434801" style="display:inline;padding:0">+971 52 843 4801</a></li>
+        <li><span class="pin"><i class="fas fa-envelope"></i></span> <a href="mailto:info@lockshield.ae" style="display:inline;padding:0">info@lockshield.ae</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="wrap footer-bottom">
+    <span>© <span id="fy">2026</span> Lock Shield. All Rights Reserved.</span>
+    <span><a href="blog.html" style="display:inline;padding:0">Blog</a> · <a href="career.html" style="display:inline;padding:0">Careers</a> · <a href="contact.html" style="display:inline;padding:0">Contact</a></span>
+    <script>document.getElementById('fy').textContent=new Date().getFullYear();</script>
+  </div>
+</footer>
+
+<script>
+// mobile nav
+const nav = document.getElementById('nav');
+document.getElementById('navToggle').addEventListener('click', () => nav.classList.toggle('open'));
+
+// reveal on scroll
+const io = new IntersectionObserver(entries => {
+  entries.forEach(en => {
+    if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+  });
+}, {threshold: .15});
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+// custom select: keyboard + click driven listbox (replaces native <select>)
+const xs = document.getElementById('fServiceSelect');
+const xsTrigger = document.getElementById('fServiceTrigger');
+const xsPanel = xs.querySelector('.xselect-panel');
+const xsOptions = [...xs.querySelectorAll('.xselect-option')];
+const xsValueLabel = document.getElementById('fServiceValue');
+const xsHidden = document.getElementById('fService');
+
+function xsOpen() {
+  xs.classList.add('open');
+  xsTrigger.setAttribute('aria-expanded', 'true');
+  const current = xsOptions.find(o => o.getAttribute('aria-selected') === 'true');
+  (current || xsOptions[0]).focus();
+}
+function xsClose(focusTrigger) {
+  xs.classList.remove('open');
+  xsTrigger.setAttribute('aria-expanded', 'false');
+  if (focusTrigger) xsTrigger.focus();
+}
+function xsSelect(opt) {
+  xsOptions.forEach(o => o.setAttribute('aria-selected', String(o === opt)));
+  xsValueLabel.textContent = opt.dataset.value;
+  xsHidden.value = opt.dataset.value;
+}
+xsTrigger.addEventListener('click', () => xs.classList.contains('open') ? xsClose(true) : xsOpen());
+xsOptions.forEach((opt, i) => {
+  opt.tabIndex = -1;
+  opt.addEventListener('click', () => { xsSelect(opt); xsClose(true); });
+  opt.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); xsSelect(opt); xsClose(true); }
+    else if (e.key === 'Escape') { e.preventDefault(); xsClose(true); }
+    else if (e.key === 'ArrowDown') { e.preventDefault(); (xsOptions[i + 1] || xsOptions[0]).focus(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); (xsOptions[i - 1] || xsOptions[xsOptions.length - 1]).focus(); }
+    else if (e.key === 'Tab') xsClose(false);
+  });
+});
+document.addEventListener('click', e => { if (!xs.contains(e.target)) xsClose(false); });
+
+// quote form → real delivery via FormSubmit (no backend needed), mailto fallback if it fails
+const qForm = document.getElementById('quoteForm');
+const qStatus = document.getElementById('fStatus');
+const qSubmit = document.getElementById('fSubmit');
+qForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  const f = e.target;
+  if (f._honey.value) return; // honeypot tripped, silently drop
+  qSubmit.disabled = true;
+  qSubmit.textContent = 'Sending…';
+  qStatus.className = 'form-status';
+  try {
+    const res = await fetch('https://formsubmit.co/ajax/info@lockshield.ae', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+      body: JSON.stringify({
+        name: f.name.value, phone: f.phone.value, email: f.email.value || 'not provided',
+        service: f.service.value, message: f.message.value,
+        _subject: 'Quote Request — ' + f.service.value, _template: 'table'
+      })
+    });
+    if (!res.ok) throw new Error('bad response');
+    qStatus.textContent = "Thanks — your request has been sent. We'll get back to you within 24 hours.";
+    qStatus.classList.add('show', 'ok');
+    f.reset();
+    xsSelect(xsOptions[0]);
+  } catch (err) {
+    const body = `Name: ${f.name.value}\nPhone: ${f.phone.value}\nEmail: ${f.email.value}\nService: ${f.service.value}\n\n${f.message.value}`;
+    location.href = 'mailto:info@lockshield.ae?subject=' + encodeURIComponent('Quote Request — ' + f.service.value) + '&body=' + encodeURIComponent(body);
+    qStatus.textContent = "Couldn't send automatically — opening your email app instead.";
+    qStatus.classList.add('show', 'err');
+  } finally {
+    qSubmit.disabled = false;
+    qSubmit.innerHTML = 'Send Request <span class="arr">→</span>';
+  }
+});
+
+// map: defer iframe src until near viewport, fade in once loaded
+const mapWrap = document.getElementById('mapWrap');
+const mapFrame = document.getElementById('mapFrame');
+new IntersectionObserver((entries, obs) => {
+  if (!entries[0].isIntersecting) return;
+  mapFrame.addEventListener('load', () => { mapFrame.classList.add('loaded'); mapWrap.classList.add('loaded'); });
+  mapFrame.src = mapFrame.dataset.src;
+  obs.disconnect();
+}, {rootMargin: '200px'}).observe(mapWrap);
+
+// page transition
+// bfcache restore (back button / trackpad swipe) replays the page mid-fade-out,
+// leaving body at opacity 0 — clear what the transition below left behind.
+addEventListener('pageshow', () => {
+  document.body.style.transition = '';
+  document.body.style.opacity = '';
+  document.body.style.filter = '';
+});
+
+document.querySelectorAll('a[href$=".html"]').forEach(a => {
+  a.addEventListener('click', e => {
+    if (a.target || e.metaKey || e.ctrlKey) return;
+    e.preventDefault();
+    document.body.style.transition = 'opacity .3s, filter .3s';
+    document.body.style.opacity = 0;
+    document.body.style.filter = 'blur(4px)';
+    setTimeout(() => location.href = a.href, 300);
+  });
+});
+</script>
+<a class="wa-float" href="https://wa.me/971528434801?text=Hello%20Lock%20Shield%2C%20I%20need%20a%20quote" target="_blank" rel="noopener" aria-label="Chat on WhatsApp"><i class="fab fa-whatsapp"></i></a>
+</body>
+</html>

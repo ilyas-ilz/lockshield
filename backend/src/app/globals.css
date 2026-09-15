@@ -1,0 +1,118 @@
+@import "tailwindcss";
+
+/* Design tokens.
+   Brand red #e52629 is kept, but darkened for text/small elements so it
+   clears WCAG AA on white (the raw brand red is ~3.4:1 on white, which
+   fails for body-size text — it stays as-is for large fills only). */
+@theme {
+  --color-brand-50: #fff1f1;
+  --color-brand-100: #ffdfdf;
+  --color-brand-200: #ffc5c5;
+  --color-brand-300: #ff9d9d;
+  --color-brand-400: #fb6565;
+  --color-brand-500: #e52629;
+  --color-brand-600: #c81f22;
+  --color-brand-700: #a8181b;
+  --color-brand-800: #8b1719;
+  --color-brand-900: #741a1c;
+
+  --font-sans: var(--font-app-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+:root {
+  --bg: #f7f8fa;
+  --surface: #ffffff;
+  --surface-2: #f2f4f7;
+  --border: #e3e6ea;
+  --text: #10141a;
+  --text-muted: #5c6673;
+  --ring: #e52629;
+
+  --success: #15803d;
+  --success-bg: #f0fdf4;
+  --warning: #a16207;
+  --warning-bg: #fefce8;
+  --danger: #b91c1c;
+  --danger-bg: #fef2f2;
+}
+
+:root.dark {
+  --bg: #0c0f14;
+  --surface: #141922;
+  --surface-2: #1b212c;
+  --border: #262e3b;
+  --text: #e9edf3;
+  --text-muted: #939eae;
+  --ring: #fb6565;
+
+  --success: #4ade80;
+  --success-bg: #052e16;
+  --warning: #fcd34d;
+  --warning-bg: #2a2005;
+  --danger: #fca5a5;
+  --danger-bg: #300f0f;
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    /* WHY: the admin is dense; 15px base reads better than 16 on desktop
+       while staying comfortable on mobile. */
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Never remove focus visibility — replace it with something better. */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: var(--color-brand-500);
+    color: white;
+  }
+}
+
+@layer utilities {
+  .bg-app {
+    background: var(--bg);
+  }
+  .bg-surface {
+    background: var(--surface);
+  }
+  .bg-surface-2 {
+    background: var(--surface-2);
+  }
+  .text-app {
+    color: var(--text);
+  }
+  .text-muted {
+    color: var(--text-muted);
+  }
+  .border-app {
+    border-color: var(--border);
+  }
+
+  /* Respect users who ask for less motion — applies to every transition
+     and animation in the admin at once. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
