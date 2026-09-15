@@ -16,7 +16,7 @@ const SAMPLE_PROJECTS: ProjectItem[] = [
     sector: "Healthcare",
     emirate: "Dubai",
     slug: "al-manara-pharmacy",
-    coverImage: { url: "/assets/images/commercial.webp" },
+    coverImage: { url: "/assets/images/projects/al-manara-pharmacy.webp" },
   },
   {
     title: "Emirates NBD Corporate Facility",
@@ -24,7 +24,7 @@ const SAMPLE_PROJECTS: ProjectItem[] = [
     sector: "Banking",
     emirate: "Dubai",
     slug: "emirates-nbd",
-    coverImage: { url: "/assets/images/about-img1.webp" },
+    coverImage: { url: "/assets/images/projects/emirates-nbd.webp" },
   },
   {
     title: "Farsi Restaurant Kitchen Suppression",
@@ -32,7 +32,7 @@ const SAMPLE_PROJECTS: ProjectItem[] = [
     sector: "Hospitality & F&B",
     emirate: "Dubai",
     slug: "farsi-restaurant",
-    coverImage: { url: "/assets/images/restaurants.webp" },
+    coverImage: { url: "/assets/images/projects/farsi-restaurant.webp" },
   },
   {
     title: "Feetlab Retail Center",
@@ -40,7 +40,7 @@ const SAMPLE_PROJECTS: ProjectItem[] = [
     sector: "Retail",
     emirate: "Dubai",
     slug: "feetlab",
-    coverImage: { url: "/assets/images/showrooms.webp" },
+    coverImage: { url: "/assets/images/projects/feetlab.webp" },
   },
   {
     title: "Pizza Hut Restaurant Suppression",
@@ -48,7 +48,7 @@ const SAMPLE_PROJECTS: ProjectItem[] = [
     sector: "Hospitality & F&B",
     emirate: "Dubai",
     slug: "pizza-hut",
-    coverImage: { url: "/assets/images/warehouses.webp" },
+    coverImage: { url: "/assets/images/projects/pizza-hut.webp" },
   },
   {
     title: "The Grey Restaurant Fit-out",
@@ -56,7 +56,7 @@ const SAMPLE_PROJECTS: ProjectItem[] = [
     sector: "Hospitality & F&B",
     emirate: "Dubai",
     slug: "grey-restaurant",
-    coverImage: { url: "/assets/images/residential.webp" },
+    coverImage: { url: "/assets/images/projects/grey-restaurant.webp" },
   },
 ];
 
