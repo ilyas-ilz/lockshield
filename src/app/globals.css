@@ -175,6 +175,17 @@
     padding-inline: clamp(1rem, 4vw, 2.5rem);
   }
 
+  /* Hide scrollbars on horizontal snap-carousels (projects, journey) while
+     keeping them touch/keyboard scrollable - matches the legacy
+     .proj-track/.journey-track recipe. */
+  .scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
   /* Eyebrow label: small red kicker with a 26x2px rule, used above every
      section heading on the legacy site. */
   .eyebrow {
@@ -205,6 +216,14 @@
   .reveal.in {
     opacity: 1;
     transform: none;
+  }
+  /* Without JS, .in never gets added and this content would stay invisible
+     forever - fail open when scripting is unavailable. */
+  @media (scripting: none) {
+    .reveal {
+      opacity: 1;
+      transform: none;
+    }
   }
 
   /* On-load rise (hero / page-hero text), staggered via d1/d2/d3. */
@@ -252,6 +271,12 @@
     to {
       transform: translateX(-50%);
     }
+  }
+  .marquee-track {
+    animation: marquee 28s linear infinite;
+  }
+  .marquee:hover .marquee-track {
+    animation-play-state: paused;
   }
 
   /* Ken Burns - slow zoom/drift used on hero-adjacent still imagery. */
