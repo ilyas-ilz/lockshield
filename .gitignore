@@ -1,9 +1,9 @@
 node_modules/
 .next/
-backend/node_modules/
-backend/.next/
-backend/.env
-backend/.env.local
-backend/coverage/
+.env
+.env.local
 *.log
-backend/public/uploads/
+coverage/
+public/uploads/
+tsconfig.tsbuildinfo
+.code-review-graph/
