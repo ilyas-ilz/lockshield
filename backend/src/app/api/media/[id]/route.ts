@@ -5,7 +5,7 @@ import { requireRole, STAFF } from "@/lib/rbac";
 import { objectIdSchema } from "@/lib/validation/common";
 import { mediaUpdateSchema } from "@/lib/validation/user";
 import { Media } from "@/models/Media";
-import { destroyCloudinaryAsset } from "@/lib/cloudinary";
+import { deleteStoredFile } from "@/lib/storage";
 import { writeAudit } from "@/lib/audit";
 import { getClientIp } from "@/lib/rate-limit";
 import { logger } from "@/lib/logger";
@@ -37,9 +37,9 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     // the library entry gone so it stops showing as "available" — an
     // orphaned remote asset is a cheaper failure than a stuck admin UI.
     try {
-      await destroyCloudinaryAsset(media.publicId);
+      await deleteStoredFile(media);
     } catch (err) {
-      logger.error("failed to destroy Cloudinary asset, deleting registry entry anyway", err, { publicId: media.publicId });
+      logger.error("failed to delete media file, deleting registry entry anyway", err, { url: media.url, publicId: media.publicId });
     }
 
     await media.deleteOne();

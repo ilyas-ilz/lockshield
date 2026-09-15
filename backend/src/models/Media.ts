@@ -7,8 +7,10 @@ const { Schema, model, models } = mongoose;
 // accessibility + image SEO — lives with the asset, not duplicated per use.
 export interface IMedia extends Document {
   url: string;
-  publicId: string;
+  publicId?: string;
+  storage: "local" | "cloudinary";
   alt: string;
+  mimeType?: string;
   width?: number;
   height?: number;
   format?: string;
@@ -21,8 +23,10 @@ export interface IMedia extends Document {
 const mediaSchema = new Schema(
   {
     url: { type: String, required: true },
-    publicId: { type: String, required: true, unique: true },
+    publicId: { type: String, sparse: true, index: true },
+    storage: { type: String, enum: ["local", "cloudinary"], default: "local" },
     alt: { type: String, required: true, trim: true, maxlength: 200 },
+    mimeType: String,
     width: Number,
     height: Number,
     format: String,

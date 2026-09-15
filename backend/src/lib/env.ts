@@ -32,3 +32,11 @@ export function getEnv(): Env {
   cached = parsed.data;
   return cached;
 }
+
+export function hasCloudinary(): boolean {
+  return Boolean(
+    process.env.CLOUDINARY_CLOUD_NAME &&
+    process.env.CLOUDINARY_API_KEY &&
+    process.env.CLOUDINARY_API_SECRET
+  );
+}

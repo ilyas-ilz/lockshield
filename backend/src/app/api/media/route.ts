@@ -16,8 +16,10 @@ import { getClientIp } from "@/lib/rate-limit";
 // text in our own registry so the media library can list/search it later.
 const mediaRecordSchema = z.object({
   url: z.string().min(1),
-  publicId: z.string().min(1),
+  publicId: z.string().optional(),
+  storage: z.enum(["local", "cloudinary"]).default("local"),
   alt: z.string().min(1, "alt text is required"),
+  mimeType: z.string().optional(),
   width: z.number().optional(),
   height: z.number().optional(),
   format: z.string().optional(),
