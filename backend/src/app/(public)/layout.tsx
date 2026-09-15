@@ -1,13 +1,14 @@
 import * as React from "react";
 import { getSettings } from "@/lib/settings";
+import type { ISettings } from "@/models/Settings";
 import { Navbar } from "@/components/frontend/Navbar";
 import { Footer } from "@/components/frontend/Footer";
 
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
-  let settingsData: any = {};
+  let settingsData: Partial<ISettings> = {};
   try {
     const s = await getSettings();
-    settingsData = s.toObject ? s.toObject() : s;
+    settingsData = (s.toObject ? s.toObject() : s) as Partial<ISettings>;
   } catch {
     // Graceful fallback if database temporarily unavailable
   }

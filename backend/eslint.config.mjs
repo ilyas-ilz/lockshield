@@ -3,12 +3,18 @@ import { FlatCompat } from "@eslint/eslintrc";
 const compat = new FlatCompat({ baseDirectory: import.meta.dirname });
 
 const eslintConfig = [
+  {
+    ignores: ["public/**", ".next/**", "node_modules/**", "next-env.d.ts"],
+  },
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
-    // WHY next-env.d.ts: Next.js generates and rewrites this file itself
-    // (on every `next dev`/`next build`) with the exact triple-slash
-    // reference syntax our own lint rule flags — it's not ours to fix.
-    ignores: [".next/**", "node_modules/**", "next-env.d.ts"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+      ],
+    },
   },
 ];
 

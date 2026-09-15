@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { connectDB } from "@/lib/db";
 import { Project } from "@/models";
-import { ProjectsGallery } from "@/components/frontend/ProjectsGallery";
+import { ProjectsGallery, type ProjectItem } from "@/components/frontend/ProjectsGallery";
 
 export const metadata: Metadata = {
   title: "Completed Projects & Fit-Outs | Lock Shield UAE",
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     "Explore our portfolio of completed fire fighting, alarm, and kitchen suppression installations across commercial, healthcare, and retail sectors in Dubai.",
 };
 
-const SAMPLE_PROJECTS = [
+const SAMPLE_PROJECTS: ProjectItem[] = [
   {
     title: "Al Manara Pharmacy Fit-out",
     client: "Al Manara Pharmacy",
@@ -61,13 +61,13 @@ const SAMPLE_PROJECTS = [
 ];
 
 export default async function ProjectsPage() {
-  let projectsList: any[] = [];
+  let projectsList: ProjectItem[] = [];
   try {
     await connectDB();
     const found = await Project.find({ publishStatus: "published" })
       .sort({ featured: -1, createdAt: -1 })
       .lean();
-    projectsList = found || [];
+    projectsList = (found as unknown as ProjectItem[]) || [];
   } catch {
     // Fallback
   }

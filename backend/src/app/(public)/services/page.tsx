@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Flame, ShieldCheck, Phone } from "lucide-react";
+import { ArrowRight, Flame } from "lucide-react";
 import { connectDB } from "@/lib/db";
 import { Service } from "@/models";
 
@@ -10,7 +10,13 @@ export const metadata: Metadata = {
     "Explore our complete range of certified fire fighting, suppression, fire alarm, and Civil Defence approval services in Dubai & UAE.",
 };
 
-const DEFAULT_SERVICES = [
+interface ServiceItem {
+  title: string;
+  slug: string;
+  summary: string;
+}
+
+const DEFAULT_SERVICES: ServiceItem[] = [
   {
     title: "Annual Maintenance Contract (AMC)",
     slug: "annual-maintenance-contract",
@@ -50,11 +56,11 @@ const DEFAULT_SERVICES = [
 ];
 
 export default async function ServicesPage() {
-  let servicesList: any[] = [];
+  let servicesList: ServiceItem[] = [];
   try {
     await connectDB();
     const services = await Service.find({ status: "published" }).sort({ order: 1, title: 1 }).lean();
-    servicesList = services || [];
+    servicesList = (services as unknown as ServiceItem[]) || [];
   } catch {
     // Fallback
   }

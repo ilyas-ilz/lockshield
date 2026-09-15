@@ -4,10 +4,7 @@ import Link from "next/link";
 import {
   ShieldCheck,
   CheckCircle2,
-  Phone,
   ArrowRight,
-  Flame,
-  FileCheck,
   ChevronRight,
 } from "lucide-react";
 import { connectDB } from "@/lib/db";
@@ -114,19 +111,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
+interface ServiceDoc {
+  title: string;
+  summary: string;
+  coverImage?: { url: string; alt?: string };
+  blocks?: Record<string, unknown>[];
+}
+
 export default async function ServiceDetailPage({ params }: PageProps) {
   const { slug } = await params;
-  let service: any = null;
-  let allServices: any[] = [];
+  let service: ServiceDoc | null = null;
 
   try {
     await connectDB();
-    const [found, others] = await Promise.all([
-      Service.findOne({ slug, status: "published" }).lean(),
-      Service.find({ status: "published" }).select("title slug").lean(),
-    ]);
-    service = found;
-    allServices = others || [];
+    const found = await Service.findOne({ slug, status: "published" }).lean();
+    service = (found as unknown as ServiceDoc) || null;
   } catch {
     // Database connection fallback
   }

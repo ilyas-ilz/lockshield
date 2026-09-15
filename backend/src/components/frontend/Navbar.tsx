@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Phone, Menu, X, ArrowRight, Shield, ChevronDown } from "lucide-react";
+import { Phone, Menu, X, ArrowRight, Shield } from "lucide-react";
 import { QuoteModal } from "./QuoteModal";
 
 export interface NavbarProps {
@@ -55,7 +55,7 @@ export function Navbar({ phone = "+971 4 272 7333", siteName = "Lock Shield" }: 
               </div>
               <div className="flex flex-col">
                 <span className="font-tech text-base sm:text-lg font-bold tracking-tight text-[#0d1220] uppercase leading-none">
-                  Lock Shield
+                  {siteName}
                 </span>
                 <span className="text-[10px] font-medium tracking-wider text-gray-500 uppercase leading-tight mt-0.5 hidden sm:inline">
                   Fire & Safety UAE

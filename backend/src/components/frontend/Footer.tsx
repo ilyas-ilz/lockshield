@@ -4,7 +4,6 @@ import {
   Mail,
   MapPin,
   ShieldCheck,
-  ArrowRight,
   ExternalLink,
   MessageCircle,
 } from "lucide-react";

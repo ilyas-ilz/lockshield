@@ -9,7 +9,6 @@ import {
   Share2,
   Search as SearchIcon,
   BarChart3,
-  ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
 import { FieldInput } from "@/components/admin/fields/FieldInput";

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ChevronRight, Building2, MapPin, Calendar, Tag, ShieldCheck, ArrowRight } from "lucide-react";
+import { ChevronRight, Building2, MapPin, Calendar, Tag } from "lucide-react";
 import { connectDB } from "@/lib/db";
 import { Project } from "@/models";
 import { QuickQuoteForm } from "@/components/frontend/QuickQuoteForm";
@@ -22,13 +21,25 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
+interface ProjectDoc {
+  title: string;
+  client?: string;
+  sector?: string;
+  emirate?: string;
+  year?: number;
+  summary?: string;
+  scopeTags?: string[];
+  coverImage?: { url: string; alt?: string };
+  gallery?: { url: string; alt?: string }[];
+}
+
 export default async function ProjectDetailPage({ params }: PageProps) {
   const { slug } = await params;
-  let project: any = null;
+  let project: ProjectDoc | null = null;
 
   try {
     await connectDB();
-    project = await Project.findOne({ slug, publishStatus: "published" }).lean();
+    project = (await Project.findOne({ slug, publishStatus: "published" }).lean()) as ProjectDoc | null;
   } catch {
     // DB error
   }
@@ -153,7 +164,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                     Project Gallery
                   </h3>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    {project.gallery.map((img: any, i: number) => (
+                    {project.gallery.map((img: { url: string; alt?: string }, i: number) => (
                       <div key={i} className="aspect-square rounded-2xl overflow-hidden bg-gray-100 border border-gray-200">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={img.url} alt={img.alt || "Gallery image"} className="size-full object-cover hover:scale-105 transition-transform" />

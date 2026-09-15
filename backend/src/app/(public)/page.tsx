@@ -1,17 +1,5 @@
 import Link from "next/link";
-import {
-  ArrowRight,
-  ShieldCheck,
-  Award,
-  CheckCircle,
-  Building2,
-  Phone,
-  Flame,
-  Calendar,
-  Layers,
-  ChevronRight,
-  Wrench,
-} from "lucide-react";
+import { ArrowRight, CheckCircle, Flame } from "lucide-react";
 import { connectDB } from "@/lib/db";
 import { Service, Project, Post } from "@/models";
 import { HeroSlider } from "@/components/frontend/HeroSlider";
@@ -41,7 +29,33 @@ const FAQS: FAQItem[] = [
   },
 ];
 
-const DEFAULT_SERVICES = [
+interface PublicService {
+  title: string;
+  slug: string;
+  summary: string;
+  icon?: string;
+}
+
+interface PublicProject {
+  title: string;
+  slug: string;
+  client?: string;
+  sector?: string;
+  emirate?: string;
+  coverImage?: { url: string; alt?: string };
+  image?: { url: string; alt?: string };
+}
+
+interface PublicPost {
+  _id?: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  publishedAt?: Date;
+  coverImage?: { url: string; alt?: string };
+}
+
+const DEFAULT_SERVICES: PublicService[] = [
   {
     title: "Annual Maintenance Contract (AMC)",
     slug: "annual-maintenance-contract",
@@ -87,9 +101,9 @@ const DEFAULT_SERVICES = [
 ];
 
 export default async function HomePage() {
-  let liveServices: any[] = [];
-  let liveProjects: any[] = [];
-  let livePosts: any[] = [];
+  let liveServices: PublicService[] = [];
+  let liveProjects: PublicProject[] = [];
+  let livePosts: PublicPost[] = [];
 
   try {
     await connectDB();
@@ -99,9 +113,9 @@ export default async function HomePage() {
       Post.find({ status: "published" }).sort({ publishedAt: -1, createdAt: -1 }).limit(3).lean(),
     ]);
 
-    liveServices = services || [];
-    liveProjects = projects || [];
-    livePosts = posts || [];
+    liveServices = (services as unknown as PublicService[]) || [];
+    liveProjects = (projects as unknown as PublicProject[]) || [];
+    livePosts = (posts as unknown as PublicPost[]) || [];
   } catch {
     // Database fallback
   }
@@ -362,7 +376,7 @@ export default async function HomePage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {livePosts.map((post) => (
                 <Link
-                  key={post._id || post.slug}
+                  key={post.slug}
                   href={`/blog/${post.slug}`}
                   className="rounded-2xl border border-gray-200 bg-white overflow-hidden shadow-xs hover:shadow-md transition-all group"
                 >

@@ -10,7 +10,6 @@ import {
   ExternalLink,
   Layers,
   Sparkles,
-  CheckCircle2,
   HardDrive,
   Cloud,
   PlusCircle,

@@ -1,22 +1,39 @@
 import React from "react";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, Flame, Shield } from "lucide-react";
-import { FAQAccordion } from "./FAQAccordion";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { FAQAccordion, type FAQItem } from "./FAQAccordion";
 import { QuickQuoteForm } from "./QuickQuoteForm";
 
-export function BlockRenderer({ blocks }: { blocks: any[] }) {
+export interface BlockData {
+  id?: string;
+  type: string;
+  hidden?: boolean;
+  eyebrow?: string;
+  heading?: string;
+  subheading?: string;
+  primaryCta?: { href: string; label: string };
+  body?: unknown;
+  items?: Array<{ value?: string; label?: string; q?: string; a?: string }>;
+  features?: Array<{ title?: string; description?: string }>;
+  [key: string]: unknown;
+}
+
+export function BlockRenderer({ blocks }: { blocks: BlockData[] | Record<string, unknown>[] }) {
   if (!blocks || blocks.length === 0) return null;
+
+  const typedBlocks = blocks as BlockData[];
 
   return (
     <div className="space-y-16 py-8">
-      {blocks.map((block, idx) => {
+      {typedBlocks.map((block, idx) => {
         if (block.hidden) return null;
+        const key = block.id ? String(block.id) : String(idx);
 
         switch (block.type) {
           case "hero":
             return (
               <div
-                key={block.id || idx}
+                key={key}
                 className="rounded-3xl bg-[#0d1220] p-8 sm:p-12 text-white relative overflow-hidden"
               >
                 <div className="blueprint-grid-dark absolute inset-0 opacity-20 pointer-events-none" />
@@ -26,9 +43,11 @@ export function BlockRenderer({ blocks }: { blocks: any[] }) {
                       {block.eyebrow}
                     </span>
                   )}
-                  <h2 className="font-tech text-3xl sm:text-4xl font-bold uppercase tracking-tight text-white">
-                    {block.heading}
-                  </h2>
+                  {block.heading && (
+                    <h2 className="font-tech text-3xl sm:text-4xl font-bold uppercase tracking-tight text-white">
+                      {block.heading}
+                    </h2>
+                  )}
                   {block.subheading && (
                     <p className="text-gray-300 text-sm sm:text-base leading-relaxed font-light">
                       {block.subheading}
@@ -51,7 +70,7 @@ export function BlockRenderer({ blocks }: { blocks: any[] }) {
 
           case "richText":
             return (
-              <div key={block.id || idx} className="prose prose-lg max-w-none text-gray-700 leading-relaxed">
+              <div key={key} className="prose prose-lg max-w-none text-gray-700 leading-relaxed">
                 {block.heading && (
                   <h2 className="font-tech text-2xl sm:text-3xl font-bold uppercase tracking-tight text-gray-900 mb-4">
                     {block.heading}
@@ -60,15 +79,16 @@ export function BlockRenderer({ blocks }: { blocks: any[] }) {
                 {typeof block.body === "string" ? (
                   <p>{block.body}</p>
                 ) : (
-                  <TiptapRenderer content={block.body} />
+                  <TiptapRenderer content={block.body as TiptapNode} />
                 )}
               </div>
             );
 
-          case "stats":
+          case "stats": {
+            const items = (block.items as { value?: string; label?: string }[]) || [];
             return (
-              <div key={block.id || idx} className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {block.items?.map((item: any, i: number) => (
+              <div key={key} className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {items.map((item, i: number) => (
                   <div key={i} className="rounded-2xl border border-gray-200 bg-white p-6 text-center shadow-xs">
                     <p className="font-tech text-3xl sm:text-4xl font-extrabold text-[#e01b24]">
                       {item.value}
@@ -80,17 +100,19 @@ export function BlockRenderer({ blocks }: { blocks: any[] }) {
                 ))}
               </div>
             );
+          }
 
-          case "featureGrid":
+          case "featureGrid": {
+            const features = (block.features as { title?: string; description?: string }[]) || [];
             return (
-              <div key={block.id || idx} className="space-y-6">
-                {block.heading && (
+              <div key={key} className="space-y-6">
+                {Boolean(block.heading) && (
                   <h2 className="font-tech text-2xl sm:text-3xl font-bold uppercase tracking-tight text-gray-900">
-                    {block.heading}
+                    {String(block.heading)}
                   </h2>
                 )}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {block.features?.map((feat: any, i: number) => (
+                  {features.map((feat, i: number) => (
                     <div key={i} className="rounded-2xl border border-gray-200 bg-white p-6 shadow-xs">
                       <div className="size-10 rounded-xl bg-[#e01b24]/10 text-[#e01b24] flex items-center justify-center mb-4">
                         <CheckCircle2 className="size-5" />
@@ -104,23 +126,26 @@ export function BlockRenderer({ blocks }: { blocks: any[] }) {
                 </div>
               </div>
             );
+          }
 
-          case "faq":
+          case "faq": {
+            const items = (block.items as unknown as FAQItem[]) || [];
             return (
-              <div key={block.id || idx} className="space-y-6">
+              <div key={key} className="space-y-6">
                 {block.heading && (
                   <h2 className="font-tech text-2xl sm:text-3xl font-bold uppercase tracking-tight text-gray-900">
                     {block.heading}
                   </h2>
                 )}
-                <FAQAccordion items={block.items || []} />
+                <FAQAccordion items={items} />
               </div>
             );
+          }
 
           case "ctaBanner":
             return (
               <div
-                key={block.id || idx}
+                key={key}
                 className="rounded-3xl bg-gradient-to-r from-[#e01b24] to-[#b3121a] p-8 sm:p-12 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6"
               >
                 <div>
@@ -145,7 +170,7 @@ export function BlockRenderer({ blocks }: { blocks: any[] }) {
 
           case "contactForm":
             return (
-              <div key={block.id || idx} className="max-w-2xl mx-auto">
+              <div key={key} className="max-w-2xl mx-auto">
                 <QuickQuoteForm />
               </div>
             );
@@ -158,7 +183,16 @@ export function BlockRenderer({ blocks }: { blocks: any[] }) {
   );
 }
 
-function TiptapRenderer({ content }: { content: any }) {
+interface TiptapNode {
+  type?: string;
+  text?: string;
+  content?: TiptapNode[];
+  marks?: Array<{ type: string; attrs?: Record<string, unknown> }>;
+  attrs?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
+function TiptapRenderer({ content }: { content: TiptapNode | TiptapNode[] | string | null | undefined }) {
   if (!content) return null;
 
   // Simple recursive renderer for Tiptap JSON nodes
@@ -176,27 +210,28 @@ function TiptapRenderer({ content }: { content: any }) {
 
   const node = content;
   if (node.type === "text") {
-    let text = node.text;
+    let rendered: React.ReactNode = node.text;
     if (node.marks) {
       for (const mark of node.marks) {
-        if (mark.type === "bold") text = <strong key="b">{text}</strong>;
-        if (mark.type === "italic") text = <em key="i">{text}</em>;
+        if (mark.type === "bold") rendered = <strong key="b">{rendered}</strong>;
+        if (mark.type === "italic") rendered = <em key="i">{rendered}</em>;
         if (mark.type === "link") {
-          text = (
+          const href = mark.attrs?.href ? String(mark.attrs.href) : undefined;
+          rendered = (
             <a
               key="l"
-              href={mark.attrs?.href}
+              href={href}
               target="_blank"
               rel="noopener noreferrer"
               className="text-[#e01b24] underline hover:opacity-80"
             >
-              {text}
+              {rendered}
             </a>
           );
         }
       }
     }
-    return text;
+    return rendered;
   }
 
   if (node.type === "paragraph") {

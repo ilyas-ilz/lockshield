@@ -44,7 +44,7 @@ export function FieldInput({
       return (
         <RichTextEditor
           id={id}
-          value={value as any}
+          value={value as Parameters<typeof RichTextEditor>[0]["value"]}
           onChange={(val) => onChange(val)}
         />
       );

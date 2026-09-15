@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { ArrowRight, Building2, MapPin } from "lucide-react";
+import { ArrowRight, MapPin } from "lucide-react";
 
 export interface ProjectItem {
   _id?: string;

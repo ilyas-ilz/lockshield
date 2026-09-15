@@ -4,12 +4,8 @@ import {
   ShieldCheck,
   Target,
   Eye,
-  Award,
   Download,
-  Phone,
-  CheckCircle,
   ArrowRight,
-  HardHat,
 } from "lucide-react";
 
 export const metadata: Metadata = {

@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { Briefcase, MapPin, Clock, ArrowRight, CheckCircle2 } from "lucide-react";
+import { MapPin, Clock, ArrowRight, CheckCircle2 } from "lucide-react";
 import { connectDB } from "@/lib/db";
 import { Job } from "@/models";
-import { QuickQuoteForm } from "@/components/frontend/QuickQuoteForm";
 
 export const metadata: Metadata = {
   title: "Careers & Job Openings | Lock Shield Fire Protection UAE",
@@ -11,7 +9,17 @@ export const metadata: Metadata = {
     "Join our certified fire engineering team in Dubai. Explore current openings for fire protection engineers, estimation specialists, and technicians.",
 };
 
-const DEFAULT_JOBS = [
+interface JobOpening {
+  _id?: string;
+  title: string;
+  department: string;
+  location: string;
+  employmentType: string;
+  description: unknown;
+  requirements?: string[];
+}
+
+const DEFAULT_JOBS: JobOpening[] = [
   {
     title: "Senior Fire Fighting & Sprinkler Engineer",
     department: "Engineering & Design",
@@ -53,11 +61,11 @@ const DEFAULT_JOBS = [
 ];
 
 export default async function CareerPage() {
-  let liveJobs: any[] = [];
+  let liveJobs: JobOpening[] = [];
   try {
     await connectDB();
     const found = await Job.find({ status: "published" }).lean();
-    liveJobs = found || [];
+    liveJobs = (found as unknown as JobOpening[]) || [];
   } catch {
     // DB error fallback
   }
@@ -93,7 +101,7 @@ export default async function CareerPage() {
               <div className="space-y-6">
                 {items.map((job, idx) => (
                   <div
-                    key={job._id || idx}
+                    key={job._id ? String(job._id) : idx}
                     className="rounded-3xl border border-gray-200 bg-white p-6 sm:p-8 shadow-xs hover:border-[#e01b24] hover:shadow-md transition-all"
                   >
                     <div className="flex flex-wrap items-start justify-between gap-4">

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ChevronRight, Calendar, User, Clock, ArrowLeft, Share2, Tag, ShieldCheck } from "lucide-react";
+import { ChevronRight, Calendar, User, Clock, ArrowLeft } from "lucide-react";
 import { connectDB } from "@/lib/db";
 import { Post } from "@/models";
 import { BlockRenderer } from "@/components/frontend/BlockRenderer";
@@ -30,9 +30,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
+interface BlogPostDoc {
+  title: string;
+  excerpt?: string;
+  coverImage?: { url: string; alt?: string };
+  body?: unknown;
+  publishedAt?: Date | null;
+  createdAt?: Date | null;
+  updatedAt?: Date | null;
+}
+
 export default async function BlogPostPage({ params }: PageProps) {
   const { slug } = await params;
-  let post: any = null;
+  let post: BlogPostDoc | null = null;
 
   try {
     await connectDB();

@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { X, Send, ShieldCheck, Phone, Mail, CheckCircle2, Loader2 } from "lucide-react";
+import { X, Send, ShieldCheck, CheckCircle2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export interface QuoteModalProps {

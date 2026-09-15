@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Calendar, User, Clock, Flame } from "lucide-react";
+import { ArrowRight, Calendar, Clock, Flame } from "lucide-react";
 import { connectDB } from "@/lib/db";
-import { Post, Category } from "@/models";
+import { Post } from "@/models";
 
 export const metadata: Metadata = {
   title: "Fire Safety Blog & Knowledge Center | Lock Shield UAE",
@@ -10,20 +10,24 @@ export const metadata: Metadata = {
     "Insights, guidelines, UAE Fire Code updates, and maintenance best practices by certified fire protection specialists.",
 };
 
+interface PostSummary {
+  _id: string;
+  title: string;
+  slug: string;
+  excerpt?: string;
+  coverImage?: { url: string; alt?: string };
+  publishedAt?: string | number | Date;
+}
+
 export default async function BlogPage() {
-  let posts: any[] = [];
-  let categories: any[] = [];
+  let posts: PostSummary[] = [];
 
   try {
     await connectDB();
-    const [foundPosts, foundCategories] = await Promise.all([
-      Post.find({ status: "published" })
-        .sort({ publishedAt: -1, createdAt: -1 })
-        .lean(),
-      Category.find().lean(),
-    ]);
-    posts = foundPosts || [];
-    categories = foundCategories || [];
+    const foundPosts = await Post.find({ status: "published" })
+      .sort({ publishedAt: -1, createdAt: -1 })
+      .lean();
+    posts = (foundPosts as unknown as PostSummary[]) || [];
   } catch {
     // DB error fallback
   }

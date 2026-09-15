@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Send, CheckCircle2, Loader2, Phone, ShieldCheck } from "lucide-react";
+import { Send, CheckCircle2, Loader2, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 
 export function QuickQuoteForm() {

@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { ShieldCheck, Headset, HardHat, Award, ArrowRight, ChevronRight, Phone } from "lucide-react";
+import { ShieldCheck, Headset, HardHat, Award, ArrowRight, ChevronRight } from "lucide-react";
 import { QuoteModal } from "./QuoteModal";
 
 const SLIDES = [

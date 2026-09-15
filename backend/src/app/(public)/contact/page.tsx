@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Phone, Mail, MapPin, MessageCircle, Clock, ShieldCheck } from "lucide-react";
+import { Phone, Mail, MapPin, MessageCircle, Clock } from "lucide-react";
 import { getSettings } from "@/lib/settings";
 import { QuickQuoteForm } from "@/components/frontend/QuickQuoteForm";
 
@@ -9,11 +9,23 @@ export const metadata: Metadata = {
     "Get in touch with certified Dubai Civil Defence approved fire safety consultants. Request a site visit or quote for AMC, suppression systems, and approvals.",
 };
 
+interface ContactSettings {
+  phones?: string[];
+  emails?: string[];
+  whatsapp?: string;
+  address?: {
+    street?: string;
+    locality?: string;
+    country?: string;
+    poBox?: string;
+  };
+}
+
 export default async function ContactPage() {
-  let settings: any = {};
+  let settings: ContactSettings = {};
   try {
     const s = await getSettings();
-    settings = s.toObject ? s.toObject() : s;
+    settings = (s.toObject ? s.toObject() : s) as ContactSettings;
   } catch {
     // DB error fallback
   }
