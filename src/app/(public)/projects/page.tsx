@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { connectDB } from "@/lib/db";
 import { Project } from "@/models";
 import { ProjectsGallery, type ProjectItem } from "@/components/frontend/ProjectsGallery";
+import { PageHero } from "@/components/frontend/PageHero";
+import { Section } from "@/components/frontend/Section";
 
 // Content is editable from the admin, so pages must not be frozen at build
 // time. Revalidate every 5 minutes.
@@ -96,27 +98,16 @@ export default async function ProjectsPage() {
 
   return (
     <>
-      <section className="pt-36 pb-16 bg-[#0d1220] text-white relative overflow-hidden">
-        <div className="blueprint-grid-dark absolute inset-0 opacity-20 pointer-events-none" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10 text-center">
-          <span className="font-tech text-xs sm:text-sm font-bold uppercase tracking-widest text-[#e01b24]">
-            Proven Experience
-          </span>
-          <h1 className="font-tech text-4xl sm:text-5xl lg:text-6xl font-bold uppercase tracking-tight text-white mt-2">
-            Completed <span className="text-[#e01b24]">Projects</span> &amp; Case Studies
-          </h1>
-          <p className="text-gray-300 text-sm sm:text-base max-w-2xl mx-auto mt-4 font-light">
-            Showcasing over 1,000 certified fire protection installations across healthcare,
-            banking, hospitality, retail, and commercial properties in the UAE.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        crumbs={[{ label: "Home", href: "/" }, { label: "Projects" }]}
+        title="Completed"
+        accent="Projects"
+        description="Showcasing over 1,000 certified fire protection installations across healthcare, banking, hospitality, retail, and commercial properties in the UAE."
+      />
 
-      <section className="py-20 sm:py-28 bg-[#f7f8fa] blueprint-grid">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <ProjectsGallery projects={items} />
-        </div>
-      </section>
+      <Section className="blueprint-grid bg-paper-soft">
+        <ProjectsGallery projects={items} />
+      </Section>
     </>
   );
 }

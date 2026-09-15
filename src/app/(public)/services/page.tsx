@@ -3,6 +3,9 @@ import Link from "next/link";
 import { ArrowRight, Flame } from "lucide-react";
 import { connectDB } from "@/lib/db";
 import { Service } from "@/models";
+import { PageHero } from "@/components/frontend/PageHero";
+import { Section } from "@/components/frontend/Section";
+import { Reveal } from "@/components/frontend/Reveal";
 
 // Content is editable from the admin, so pages must not be frozen at build
 // time. Revalidate every 5 minutes.
@@ -24,38 +27,32 @@ const DEFAULT_SERVICES: ServiceItem[] = [
   {
     title: "Annual Maintenance Contract (AMC)",
     slug: "annual-maintenance-contract",
-    summary:
-      "Comprehensive preventative maintenance, quarterly inspections, and 24/7 emergency response for all fire protection assets.",
+    summary: "Comprehensive preventative maintenance, quarterly inspections, and 24/7 emergency response for all fire protection assets.",
   },
   {
     title: "Designing, Drawing & Civil Defence Approval",
     slug: "designing-drawing-civil-defence-approval",
-    summary:
-      "Full engineering design, AutoCAD shop drawings, and hassle-free approvals from Dubai Civil Defence (DCD).",
+    summary: "Full engineering design, AutoCAD shop drawings, and hassle-free approvals from Dubai Civil Defence (DCD).",
   },
   {
     title: "FM-200 Special Fire Suppression Systems",
     slug: "fm-200-special-systems",
-    summary:
-      "Waterless clean agent fire extinguishing solutions protecting sensitive server rooms, data centers, and critical facilities.",
+    summary: "Waterless clean agent fire extinguishing solutions protecting sensitive server rooms, data centers, and critical facilities.",
   },
   {
     title: "Kitchen Fire Suppression Systems",
     slug: "kitchen-fire-suppression-systems",
-    summary:
-      "UL-300 certified wet chemical fire suppression safeguarding commercial kitchen hoods, ducts, and cooking appliances.",
+    summary: "UL-300 certified wet chemical fire suppression safeguarding commercial kitchen hoods, ducts, and cooking appliances.",
   },
   {
     title: "Fire Extinguisher Refilling & Testing",
     slug: "fire-extinguisher-refilling",
-    summary:
-      "Authorized hydrostatic testing, refilling, and certification for CO2, DCP, foam, and water extinguishers.",
+    summary: "Authorized hydrostatic testing, refilling, and certification for CO2, DCP, foam, and water extinguishers.",
   },
   {
     title: "Fire System Products Supply & Trading",
     slug: "fire-system-products-supply",
-    summary:
-      "Genuine certified firefighting equipment, alarm panels, smoke detectors, landing valves, and fire hoses.",
+    summary: "Genuine certified firefighting equipment, alarm panels, smoke detectors, landing valves, and fire hoses.",
   },
 ];
 
@@ -67,58 +64,47 @@ export default async function ServicesPage() {
     servicesList = (services as unknown as ServiceItem[]) || [];
   } catch {
     // Fallback
+    void 0;
   }
 
   const items = servicesList.length > 0 ? servicesList : DEFAULT_SERVICES;
 
   return (
     <>
-      <section className="pt-36 pb-16 bg-[#0d1220] text-white relative overflow-hidden">
-        <div className="blueprint-grid-dark absolute inset-0 opacity-20 pointer-events-none" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10 text-center">
-          <span className="font-tech text-xs sm:text-sm font-bold uppercase tracking-widest text-[#e01b24]">
-            Certified Solutions
-          </span>
-          <h1 className="font-tech text-4xl sm:text-5xl lg:text-6xl font-bold uppercase tracking-tight text-white mt-2">
-            Our Fire Safety <span className="text-[#e01b24]">Services</span>
-          </h1>
-          <p className="text-gray-300 text-sm sm:text-base max-w-2xl mx-auto mt-4 font-light">
-            End-to-end fire engineering: design, DCD approvals, installation, suppression, and
-            24/7 annual maintenance contracts.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        crumbs={[{ label: "Home", href: "/" }, { label: "Services" }]}
+        title="Our Fire Safety"
+        accent="Services"
+        description="End-to-end fire engineering: design, DCD approvals, installation, suppression, and 24/7 annual maintenance contracts."
+      />
 
-      <section className="py-20 sm:py-28 bg-[#f7f8fa] blueprint-grid">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {items.map((service, idx) => (
+      <Section className="blueprint-grid bg-paper-soft">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+          {items.map((service, idx) => (
+            <Reveal key={service.slug || idx} delayMs={(idx % 3) * 80}>
               <Link
-                key={service.slug || idx}
                 href={`/services/${service.slug}`}
-                className="group flex flex-col justify-between rounded-3xl border border-gray-200 bg-white p-8 hover:border-[#e01b24] hover:shadow-xl transition-all duration-300"
+                className="group flex h-full flex-col justify-between rounded-3xl border border-[var(--marketing-line)] bg-white p-6 transition-all duration-300 hover:border-brand-500 hover:shadow-xl sm:p-8"
               >
                 <div>
-                  <div className="size-14 rounded-2xl bg-[#e01b24]/10 text-[#e01b24] flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-[#e01b24] group-hover:text-white transition-all">
+                  <div className="mb-6 flex size-14 items-center justify-center rounded-2xl bg-brand-500/10 text-brand-500 transition-all group-hover:scale-110 group-hover:bg-brand-500 group-hover:text-white">
                     <Flame className="size-7" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 font-tech uppercase tracking-wide group-hover:text-[#e01b24] transition-colors">
+                  <h3 className="font-tech text-lg font-bold uppercase tracking-wide text-navy-900 transition-colors group-hover:text-brand-500 sm:text-xl">
                     {service.title}
                   </h3>
-                  <p className="text-sm text-gray-600 mt-3 leading-relaxed">
-                    {service.summary}
-                  </p>
+                  <p className="mt-3 text-sm leading-relaxed text-ink/62">{service.summary}</p>
                 </div>
 
-                <div className="mt-8 pt-4 border-t border-gray-100 flex items-center justify-between text-xs font-semibold text-gray-500 group-hover:text-[#e01b24]">
-                  <span>View Details & Specifications</span>
-                  <ArrowRight className="size-4 group-hover:translate-x-1 transition-transform" />
+                <div className="mt-8 flex items-center justify-between border-t border-[var(--marketing-line)] pt-4 text-xs font-semibold text-ink/50 group-hover:text-brand-500">
+                  <span>View Details &amp; Specifications</span>
+                  <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
                 </div>
               </Link>
-            ))}
-          </div>
+            </Reveal>
+          ))}
         </div>
-      </section>
+      </Section>
     </>
   );
 }

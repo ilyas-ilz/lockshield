@@ -70,14 +70,14 @@ export function Navbar({ phone = "+971 4 272 7333", siteName = "Lock Shield" }: 
             </Link>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden items-center gap-1 lg:flex xl:gap-2">
+            <nav className="hidden items-center gap-0.5 lg:flex xl:gap-1.5">
               {NAV_LINKS.map((item) => {
                 const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors xl:text-sm ${
+                    className={`whitespace-nowrap rounded-full px-2.5 py-1.5 text-xs font-semibold transition-colors xl:px-3 xl:text-sm ${
                       active ? "bg-brand-500 text-white shadow-xs" : "text-gray-700 hover:bg-gray-100/70 hover:text-brand-500"
                     }`}
                   >
@@ -92,7 +92,7 @@ export function Navbar({ phone = "+971 4 272 7333", siteName = "Lock Shield" }: 
               {phone && (
                 <a
                   href={`tel:${phone.replace(/\s+/g, "")}`}
-                  className="hidden items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold text-gray-800 transition-colors hover:bg-gray-100 hover:text-brand-500 md:flex"
+                  className="hidden items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold text-gray-800 transition-colors hover:bg-gray-100 hover:text-brand-500 xl:flex"
                 >
                   <div className="flex size-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
                     <Phone className="size-3" />

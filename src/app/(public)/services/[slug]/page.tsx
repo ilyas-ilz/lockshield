@@ -1,16 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import {
-  ShieldCheck,
-  CheckCircle2,
-  ArrowRight,
-  ChevronRight,
-} from "lucide-react";
+import Image from "next/image";
+import { ShieldCheck, CheckCircle2, ArrowRight, ChevronRight, FileText } from "lucide-react";
 import { connectDB } from "@/lib/db";
 import { Service } from "@/models";
 import { BlockRenderer } from "@/components/frontend/BlockRenderer";
 import { QuickQuoteForm } from "@/components/frontend/QuickQuoteForm";
+import { Reveal } from "@/components/frontend/Reveal";
 
 // Content is editable from the admin, so pages must not be frozen at build
 // time. Revalidate every 5 minutes.
@@ -81,7 +78,7 @@ const SERVICE_FALLBACKS: Record<string, { title: string; summary: string; detail
       "Hydrostatic cylinder pressure testing every 3-5 years per Civil Defence code",
       "Dry chemical powder (DCP), CO2 gas, foam, and water refilling",
       "Pressure gauge inspection, discharge hose replacement, and safety pin sealing",
-      "Civil Defence compliant inspection inspection tags and certification barcodes",
+      "Civil Defence compliant inspection tags and certification barcodes",
       "Loaner extinguishers provided during workshop servicing to maintain site safety",
       "Bulk refilling services for logistics fleets, warehouses, and building communities",
     ],
@@ -132,6 +129,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
     service = (found as unknown as ServiceDoc) || null;
   } catch {
     // Database connection fallback
+    void 0;
   }
 
   const fallback = SERVICE_FALLBACKS[slug];
@@ -139,7 +137,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  const title = service?.title || fallback?.title;
+  const title = service?.title || fallback?.title || "";
   const summary = service?.summary || fallback?.summary;
   const details = fallback?.details || [];
   const blocks = service?.blocks || [];
@@ -147,58 +145,49 @@ export default async function ServiceDetailPage({ params }: PageProps) {
   return (
     <>
       {/* Header */}
-      <section className="pt-36 pb-16 bg-[#0d1220] text-white relative overflow-hidden">
-        <div className="blueprint-grid-dark absolute inset-0 opacity-20 pointer-events-none" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
-          <div className="flex items-center gap-2 text-xs text-gray-400 mb-4">
-            <Link href="/" className="hover:text-white transition-colors">
+      <section className="relative overflow-hidden bg-ink pb-12 pt-28 text-white sm:pb-16 sm:pt-32 lg:pt-36">
+        <div className="blueprint-grid-dark pointer-events-none absolute inset-0 opacity-10" />
+        <div className="wrap relative z-10">
+          <div className="font-tech mb-4 flex flex-wrap items-center gap-1.5 text-[11px] uppercase tracking-[0.2em] text-white/55 sm:text-xs">
+            <Link href="/" className="transition-colors hover:text-brand-400">
               Home
             </Link>
-            <ChevronRight className="size-3.5" />
-            <Link href="/services" className="hover:text-white transition-colors">
+            <ChevronRight className="size-3 text-brand-500" />
+            <Link href="/services" className="transition-colors hover:text-brand-400">
               Services
             </Link>
-            <ChevronRight className="size-3.5" />
-            <span className="text-white font-medium truncate">{title}</span>
+            <ChevronRight className="size-3 text-brand-500" />
+            <span className="truncate font-medium text-white">{title}</span>
           </div>
 
           <div className="max-w-3xl">
-            <span className="font-tech text-xs font-bold uppercase tracking-widest text-[#e01b24]">
-              Civil Defence Certified
-            </span>
-            <h1 className="font-tech text-3xl sm:text-5xl font-bold uppercase tracking-tight text-white mt-2">
+            <span className="eyebrow">Civil Defence Certified</span>
+            <h1 className="font-tech mt-2 text-[clamp(1.9rem,6vw,3.2rem)] font-bold uppercase leading-[1.05] tracking-tight text-white">
               {title}
             </h1>
-            <p className="text-gray-300 text-sm sm:text-base mt-4 font-light leading-relaxed">
-              {summary}
-            </p>
+            <p className="mt-4 text-sm font-light leading-relaxed text-white/75 sm:text-base">{summary}</p>
           </div>
         </div>
       </section>
 
       {/* Main Content & Sidebar */}
-      <section className="py-16 sm:py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+      <section className="bg-white py-14 sm:py-20 lg:py-24">
+        <div className="wrap">
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12">
             {/* Left Content Area */}
-            <div className="lg:col-span-8 space-y-10">
+            <div className="space-y-8 lg:col-span-8 lg:space-y-10">
               {service?.coverImage?.url && (
-                <div className="rounded-3xl overflow-hidden border border-gray-100 shadow-md">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={service.coverImage.url}
-                    alt={service.coverImage.alt || title}
-                    className="w-full h-auto max-h-96 object-cover"
-                  />
-                </div>
+                <Reveal className="relative aspect-[16/9] overflow-hidden rounded-3xl border border-[var(--marketing-line)] shadow-md">
+                  <Image src={service.coverImage.url} alt={service.coverImage.alt || title} fill sizes="(min-width: 1024px) 60vw, 100vw" className="object-cover" />
+                </Reveal>
               )}
 
               {/* Overview & Key Highlights */}
-              <div className="space-y-6">
-                <h2 className="font-tech text-2xl sm:text-3xl font-bold uppercase tracking-tight text-gray-900">
+              <Reveal delayMs={80} className="space-y-6">
+                <h2 className="font-tech text-xl font-bold uppercase tracking-tight text-navy-900 sm:text-3xl">
                   Engineering Standards &amp; Capabilities
                 </h2>
-                <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
+                <p className="text-sm leading-relaxed text-ink/65 sm:text-base">
                   Lock Shield delivers certified implementation for {title} conforming strictly to
                   Dubai Civil Defence (DCD) regulations, UAE Fire and Life Safety Codes of Practice,
                   and NFPA guidelines. Our licensed engineers carry out full system lifecycle
@@ -209,64 +198,74 @@ export default async function ServiceDetailPage({ params }: PageProps) {
                   <div className="space-y-3 pt-2">
                     {details.map((detail, idx) => (
                       <div key={idx} className="flex items-start gap-3.5">
-                        <CheckCircle2 className="size-5 text-[#e01b24] shrink-0 mt-0.5" />
-                        <span className="text-sm sm:text-base text-gray-700 leading-relaxed">
-                          {detail}
-                        </span>
+                        <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-brand-500" />
+                        <span className="text-sm leading-relaxed text-ink/72 sm:text-base">{detail}</span>
                       </div>
                     ))}
                   </div>
                 )}
-              </div>
+              </Reveal>
 
               {/* Dynamic Block Rendering if configured in admin */}
               {blocks.length > 0 && <BlockRenderer blocks={blocks} />}
 
               {/* Civil Defence Compliance Guarantee Banner */}
-              <div className="rounded-3xl bg-[#f7f8fa] border border-gray-200 p-8 flex flex-col sm:flex-row items-center gap-6">
-                <div className="size-16 rounded-2xl bg-[#e01b24]/10 text-[#e01b24] flex items-center justify-center shrink-0">
+              <Reveal delayMs={100} className="flex flex-col items-center gap-5 rounded-3xl border border-[var(--marketing-line)] bg-paper-soft p-6 sm:flex-row sm:gap-6 sm:p-8">
+                <div className="flex size-16 shrink-0 items-center justify-center rounded-2xl bg-brand-500/10 text-brand-500">
                   <ShieldCheck className="size-8" />
                 </div>
-                <div>
-                  <h3 className="font-tech text-lg font-bold uppercase text-gray-900">
+                <div className="text-center sm:text-left">
+                  <h3 className="font-tech text-base font-bold uppercase text-navy-900 sm:text-lg">
                     100% Civil Defence Approved Guarantee
                   </h3>
-                  <p className="text-xs sm:text-sm text-gray-600 mt-1">
+                  <p className="mt-1 text-xs leading-relaxed text-ink/60 sm:text-sm">
                     Every installation and maintenance inspection is accompanied by official
                     documentation and certificates accepted by Dubai Civil Defence and insurance
                     underwriters.
                   </p>
                 </div>
-              </div>
+              </Reveal>
             </div>
 
-            {/* Right Sidebar */}
-            <div className="lg:col-span-4 space-y-8">
-              {/* Quick Quote Form Box */}
-              <div className="sticky top-28 space-y-8">
+            {/* Right Sidebar - static below lg, sticky alongside content on desktop */}
+            <div className="lg:col-span-4">
+              <div className="space-y-6 lg:sticky lg:top-28 lg:space-y-8">
                 <QuickQuoteForm />
 
                 {/* Other Services List */}
-                <div className="rounded-3xl border border-gray-200 bg-[#f7f8fa] p-6 space-y-4">
-                  <h3 className="font-tech text-base font-bold uppercase tracking-wider text-gray-900">
+                <div className="space-y-4 rounded-3xl border border-[var(--marketing-line)] bg-paper-soft p-6">
+                  <h3 className="font-tech text-sm font-bold uppercase tracking-wider text-navy-900">
                     Explore Other Services
                   </h3>
-                  <ul className="space-y-2 text-sm">
+                  <ul className="space-y-1 text-sm">
                     {Object.entries(SERVICE_FALLBACKS).map(([sSlug, sData]) => {
                       if (sSlug === slug) return null;
                       return (
                         <li key={sSlug}>
                           <Link
                             href={`/services/${sSlug}`}
-                            className="flex items-center justify-between p-2.5 rounded-xl hover:bg-white hover:text-[#e01b24] transition-colors group text-gray-700 font-medium"
+                            className="group flex min-h-11 items-center justify-between rounded-xl p-2.5 font-medium text-ink/75 transition-colors hover:bg-white hover:text-brand-500"
                           >
                             <span className="truncate">{sData.title}</span>
-                            <ArrowRight className="size-3.5 text-gray-400 group-hover:text-[#e01b24] group-hover:translate-x-0.5 transition-all" />
+                            <ArrowRight className="size-3.5 shrink-0 text-ink/35 transition-all group-hover:translate-x-0.5 group-hover:text-brand-500" />
                           </Link>
                         </li>
                       );
                     })}
                   </ul>
+
+                  <a
+                    href="/assets/images/company-profile.pdf"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex min-h-11 items-center gap-2.5 border-t border-dashed border-[var(--marketing-line)] pt-4 text-sm font-semibold text-ink/75 transition-colors hover:text-brand-500"
+                  >
+                    <FileText className="size-4.5 shrink-0 text-brand-500" />
+                    <span>
+                      Company Profile
+                      <span className="block text-xs font-normal text-ink/50">Download PDF</span>
+                    </span>
+                  </a>
                 </div>
               </div>
             </div>

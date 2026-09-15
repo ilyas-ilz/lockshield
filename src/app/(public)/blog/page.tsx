@@ -1,8 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, Calendar, Clock, Flame } from "lucide-react";
 import { connectDB } from "@/lib/db";
 import { Post } from "@/models";
+import { PageHero } from "@/components/frontend/PageHero";
+import { Section } from "@/components/frontend/Section";
+import { Reveal } from "@/components/frontend/Reveal";
+import { ButtonLink } from "@/components/frontend/Button";
 
 // Content is editable from the admin, so pages must not be frozen at build
 // time. Revalidate every 5 minutes.
@@ -38,69 +43,57 @@ export default async function BlogPage() {
 
   return (
     <>
-      <section className="pt-36 pb-16 bg-[#0d1220] text-white relative overflow-hidden">
-        <div className="blueprint-grid-dark absolute inset-0 opacity-20 pointer-events-none" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10 text-center">
-          <span className="font-tech text-xs sm:text-sm font-bold uppercase tracking-widest text-[#e01b24]">
-            Engineering Knowledge
-          </span>
-          <h1 className="font-tech text-4xl sm:text-5xl lg:text-6xl font-bold uppercase tracking-tight text-white mt-2">
-            Fire Safety <span className="text-[#e01b24]">Articles</span> &amp; Guides
-          </h1>
-          <p className="text-gray-300 text-sm sm:text-base max-w-2xl mx-auto mt-4 font-light">
-            Stay informed on UAE Civil Defence requirements, preventative maintenance protocols,
-            and suppression technology innovations.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        crumbs={[{ label: "Home", href: "/" }, { label: "Blog" }]}
+        title="Fire Safety"
+        accent="Articles & Guides"
+        description="Stay informed on UAE Civil Defence requirements, preventative maintenance protocols, and suppression technology innovations."
+      />
 
-      <section className="py-20 sm:py-28 bg-[#f7f8fa] blueprint-grid">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          {posts.length === 0 ? (
-            <div className="rounded-3xl border border-gray-200 bg-white p-16 text-center max-w-xl mx-auto">
-              <Flame className="size-12 text-[#e01b24] mx-auto mb-4" />
-              <h3 className="font-tech text-xl font-bold uppercase text-gray-900">
-                Articles Publishing Soon
-              </h3>
-              <p className="text-sm text-gray-600 mt-2">
-                Our fire engineers are preparing fresh technical guides and compliance case studies.
-                Check back shortly or visit our services.
-              </p>
-              <div className="pt-6">
-                <Link
-                  href="/services"
-                  className="btn-pill inline-flex items-center gap-2 bg-[#e01b24] px-6 py-3 text-sm font-semibold text-white hover:bg-[#b3121a] transition-all"
-                >
-                  <span>Explore Our Services</span>
-                  <ArrowRight className="size-4" />
-                </Link>
-              </div>
+      <Section className="blueprint-grid bg-paper-soft">
+        {posts.length === 0 ? (
+          <Reveal className="mx-auto max-w-xl rounded-3xl border border-[var(--marketing-line)] bg-white p-10 text-center sm:p-16">
+            <Flame className="mx-auto mb-4 size-12 text-brand-500" />
+            <h3 className="font-tech text-lg font-bold uppercase text-navy-900 sm:text-xl">
+              Articles Publishing Soon
+            </h3>
+            <p className="mt-2 text-sm text-ink/62">
+              Our fire engineers are preparing fresh technical guides and compliance case studies.
+              Check back shortly or visit our services.
+            </p>
+            <div className="pt-6">
+              <ButtonLink href="/services" variant="red">
+                Explore Our Services
+              </ButtonLink>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {posts.map((post) => (
+          </Reveal>
+        ) : (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
+            {posts.map((post, idx) => (
+              <Reveal key={post._id} delayMs={(idx % 3) * 80}>
                 <Link
-                  key={post._id}
                   href={`/blog/${post.slug}`}
-                  className="group rounded-3xl overflow-hidden border border-gray-200 bg-white shadow-xs hover:border-[#e01b24] hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
+                  className="group flex h-full flex-col justify-between overflow-hidden rounded-3xl border border-[var(--marketing-line)] bg-white shadow-xs transition-all duration-300 hover:border-brand-500 hover:shadow-xl"
                 >
                   <div>
                     {post.coverImage?.url ? (
-                      <div className="aspect-[16/10] overflow-hidden bg-gray-100">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
+                      <div className="relative aspect-[16/10] overflow-hidden bg-paper-soft">
+                        <Image
                           src={post.coverImage.url}
-                          alt={post.title}
-                          className="size-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          alt={post.coverImage.alt || post.title}
+                          fill
+                          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                          className="object-cover transition-transform duration-500 group-hover:scale-105"
+                          priority={idx < 3}
                         />
                       </div>
                     ) : (
-                      <div className="aspect-[16/10] bg-gray-100 flex items-center justify-center text-gray-300">
+                      <div className="flex aspect-[16/10] items-center justify-center bg-paper-soft text-ink/20">
                         <Flame className="size-12" />
                       </div>
                     )}
-                    <div className="p-6">
-                      <div className="flex items-center gap-4 text-xs text-gray-400 mb-3">
+                    <div className="p-5 sm:p-6">
+                      <div className="mb-3 flex items-center gap-4 text-xs text-ink/40">
                         <span className="flex items-center gap-1.5">
                           <Calendar className="size-3.5" />
                           {post.publishedAt
@@ -116,25 +109,25 @@ export default async function BlogPage() {
                           5 min read
                         </span>
                       </div>
-                      <h3 className="font-tech text-xl font-bold uppercase tracking-wide text-gray-900 line-clamp-2 group-hover:text-[#e01b24] transition-colors">
+                      <h3 className="font-tech line-clamp-2 text-lg font-bold uppercase tracking-wide text-navy-900 transition-colors group-hover:text-brand-500">
                         {post.title}
                       </h3>
-                      <p className="text-sm text-gray-600 mt-2.5 line-clamp-3 leading-relaxed">
+                      <p className="mt-2.5 line-clamp-3 text-sm leading-relaxed text-ink/62">
                         {post.excerpt}
                       </p>
                     </div>
                   </div>
 
-                  <div className="px-6 pb-6 pt-2 flex items-center justify-between text-xs font-semibold text-[#e01b24]">
+                  <div className="flex items-center justify-between px-5 pb-5 pt-2 text-xs font-semibold text-brand-500 sm:px-6 sm:pb-6">
                     <span>Read Full Article</span>
-                    <ArrowRight className="size-4 group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
                   </div>
                 </Link>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
+              </Reveal>
+            ))}
+          </div>
+        )}
+      </Section>
     </>
   );
 }

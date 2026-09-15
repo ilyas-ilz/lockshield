@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { ChevronRight, Calendar, User, Clock, ArrowLeft } from "lucide-react";
 import { connectDB } from "@/lib/db";
 import { Post } from "@/models";
 import { BlockRenderer } from "@/components/frontend/BlockRenderer";
+import { Reveal } from "@/components/frontend/Reveal";
+import { ButtonLink } from "@/components/frontend/Button";
 
 // Content is editable from the admin, so pages must not be frozen at build
 // time. Revalidate every 5 minutes.
@@ -90,28 +93,29 @@ export default async function BlogPostPage({ params }: PageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdArticle) }}
       />
 
-      <section className="pt-36 pb-16 bg-[#0d1220] text-white relative overflow-hidden">
-        <div className="blueprint-grid-dark absolute inset-0 opacity-20 pointer-events-none" />
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
-          <div className="flex items-center gap-2 text-xs text-gray-400 mb-4">
-            <Link href="/" className="hover:text-white transition-colors">
+      {/* Header */}
+      <section className="relative overflow-hidden bg-ink pb-12 pt-28 text-white sm:pb-16 sm:pt-32 lg:pt-36">
+        <div className="blueprint-grid-dark pointer-events-none absolute inset-0 opacity-10" />
+        <div className="wrap max-w-4xl relative z-10">
+          <div className="font-tech mb-4 flex flex-wrap items-center gap-1.5 text-[11px] uppercase tracking-[0.2em] text-white/55 sm:text-xs">
+            <Link href="/" className="transition-colors hover:text-brand-400">
               Home
             </Link>
-            <ChevronRight className="size-3.5" />
-            <Link href="/blog" className="hover:text-white transition-colors">
+            <ChevronRight className="size-3 text-brand-500" />
+            <Link href="/blog" className="transition-colors hover:text-brand-400">
               Blog
             </Link>
-            <ChevronRight className="size-3.5" />
-            <span className="text-white font-medium truncate">{post.title}</span>
+            <ChevronRight className="size-3 text-brand-500" />
+            <span className="truncate font-medium text-white">{post.title}</span>
           </div>
 
-          <h1 className="font-tech text-3xl sm:text-4xl lg:text-5xl font-bold uppercase tracking-tight text-white leading-tight">
+          <h1 className="font-tech text-[clamp(1.8rem,6vw,3rem)] font-bold uppercase leading-[1.1] tracking-tight text-white">
             {post.title}
           </h1>
 
-          <div className="flex flex-wrap items-center gap-6 mt-6 text-xs sm:text-sm text-gray-300">
+          <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2.5 text-xs text-white/70 sm:text-sm">
             <span className="flex items-center gap-2">
-              <Calendar className="size-4 text-[#e01b24]" />
+              <Calendar className="size-4 text-brand-500" />
               {post.publishedAt
                 ? new Date(post.publishedAt).toLocaleDateString("en-AE", {
                     month: "long",
@@ -121,38 +125,40 @@ export default async function BlogPostPage({ params }: PageProps) {
                 : "Published Recently"}
             </span>
             <span className="flex items-center gap-2">
-              <User className="size-4 text-[#e01b24]" />
+              <User className="size-4 text-brand-500" />
               Lock Shield Fire Engineering Desk
             </span>
             <span className="flex items-center gap-2">
-              <Clock className="size-4 text-[#e01b24]" />
+              <Clock className="size-4 text-brand-500" />
               5 min read
             </span>
           </div>
         </div>
       </section>
 
-      <section className="py-16 sm:py-24 bg-white">
-        <article className="max-w-4xl mx-auto px-4 sm:px-6">
+      <section className="bg-white py-14 sm:py-20 lg:py-24">
+        <article className="wrap max-w-4xl">
           {post.coverImage?.url && (
-            <div className="rounded-3xl overflow-hidden shadow-lg border border-gray-100 mb-12">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+            <Reveal className="relative mb-10 aspect-[16/9] overflow-hidden rounded-3xl border border-[var(--marketing-line)] shadow-lg sm:mb-12">
+              <Image
                 src={post.coverImage.url}
                 alt={post.coverImage.alt || post.title}
-                className="w-full h-auto max-h-[480px] object-cover"
+                fill
+                sizes="(min-width: 1024px) 60vw, 100vw"
+                className="object-cover"
+                priority
               />
-            </div>
+            </Reveal>
           )}
 
           {post.excerpt && (
-            <div className="text-lg sm:text-xl text-gray-700 font-medium leading-relaxed border-l-4 border-[#e01b24] pl-6 py-2 mb-10 bg-gray-50/80 rounded-r-2xl">
+            <Reveal delayMs={60} className="mb-8 rounded-r-2xl border-l-4 border-brand-500 bg-paper-soft/80 py-2 pl-6 text-base font-medium leading-relaxed text-ink/80 sm:mb-10 sm:text-xl">
               {post.excerpt}
-            </div>
+            </Reveal>
           )}
 
           {/* Article Body */}
-          <div className="prose prose-lg max-w-none text-gray-800 leading-relaxed space-y-6">
+          <Reveal delayMs={100} className="prose prose-lg max-w-none space-y-6 leading-relaxed text-ink/85">
             {post.body ? (
               typeof post.body === "string" ? (
                 <div dangerouslySetInnerHTML={{ __html: post.body }} />
@@ -162,24 +168,21 @@ export default async function BlogPostPage({ params }: PageProps) {
             ) : (
               <p>Content for this article is being finalized.</p>
             )}
-          </div>
+          </Reveal>
 
           {/* Bottom Navigation */}
-          <div className="mt-16 pt-8 border-t border-gray-200 flex items-center justify-between">
+          <div className="mt-14 flex flex-col items-start gap-4 border-t border-[var(--marketing-line)] pt-8 sm:mt-16 sm:flex-row sm:items-center sm:justify-between">
             <Link
               href="/blog"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-[#e01b24] transition-colors"
+              className="flex min-h-11 items-center gap-2 text-sm font-semibold text-ink/72 transition-colors hover:text-brand-500"
             >
               <ArrowLeft className="size-4" />
               <span>Back to all articles</span>
             </Link>
 
-            <Link
-              href="/contact"
-              className="btn-pill inline-flex items-center gap-2 bg-[#e01b24] px-5 py-2.5 text-xs font-semibold text-white hover:bg-[#b3121a] transition-colors"
-            >
-              <span>Consult an Engineer</span>
-            </Link>
+            <ButtonLink href="/contact" arrow={false} className="px-5 py-2.5 text-xs">
+              Consult an Engineer
+            </ButtonLink>
           </div>
         </article>
       </section>

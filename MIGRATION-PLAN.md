@@ -1,6 +1,10 @@
 # Lock Shield — Migration & Cleanup Plan
 
-Status: Phase 0 + Phase 1 done and committed. Phase 2 in progress.
+Status: Phases 0-4 done and committed (verified: typecheck/lint/tests/build
+green, screenshotted at 375/768/1280 after each phase). Phase 4 also fixed a
+real navbar overflow bug at the lg breakpoint (1024-1279px) found via manual
+review, not caught by the automated document-level overflow check because the
+header is `position: fixed`. Phase 5 (blog import) next.
 
 Derived from a full audit of the legacy static site (repo root) and the Next.js app
 (`backend/`), completed 2026-09-15. Nothing in this plan deletes a file; Phase 8
@@ -213,21 +217,34 @@ All scroll-driven behaviour becomes React: one `useReveal` hook, one
 
 Respect `prefers-reduced-motion`; the original had a global kill switch.
 
-## Phase 4 — Remaining public pages
+## Phase 4 — Remaining public pages (DONE)
 
-Bring each to parity with its legacy counterpart, using the Phase 2 primitives.
+Brought each to parity with its legacy counterpart, using the Phase 2 primitives.
 
-- **About** — currently has no images at all. Legacy had `about-team-fire-extinguisher.webp`
-  trust-media plus Mission/Vision cards (`mission.webp`, `vision-img.webp`).
-- **Services index + `[slug]`** — legacy service pages had a sticky sidebar
-  (`.svc-side`) listing sibling services and a company-profile PDF download.
-- **Projects index + `[slug]`** — sector/emirate filtering.
-- **Contact** — already good; fix the CSP so the map loads.
-- **Career** — legacy had a perks grid and a "Send CV" band. Currently renders an
-  empty state because `Job` count is 0. Needs an application form: `Lead.source:"career"`,
-  `jobId` and `resumeUrl` are all modelled but unreachable from the public site.
-- **Vismaya Madathil** — a legacy page with no Next equivalent; middleware
-  silently redirects it to `/about`. Migrate or consciously drop.
+- **About** — done. Trust-media image + Mission/Vision cards were already present;
+  reskinned with `PageHero`/`Section`/`Reveal`/tokens.
+- **Services index + `[slug]`** — done. Sticky sidebar (`QuickQuoteForm` +
+  sibling-services list) plus a `.svc-pdf`-equivalent "Company Profile / Download
+  PDF" link added to the sidebar.
+- **Projects index + `[slug]`** — done. Sector filter tabs (horizontally
+  scrollable on mobile), `next/image` gallery grid, case-study detail page.
+- **Contact** — done. Map iframe unblocked by the Phase 1 CSP fix.
+- **Career** — done. Perks sidebar + `CareerApplicationForm` posting to
+  `/api/leads` with `source:"career"` and `jobId` wired up (CV upload out of
+  scope — no public upload endpoint exists by design; applicants are asked to
+  email their CV instead).
+- **Blog index + `[slug]`** — done (reskin only; the 55-article import is
+  Phase 5). Real posts already exist in Mongo from prior seeding.
+- **Vismaya Madathil** — consciously dropped; kept as the existing
+  middleware redirect to `/about` rather than building a dedicated page.
+- **Navbar bug fix** — found during Phase 4 visual QA: the desktop nav
+  (logo + 7 links + phone + CTA) overflowed off-screen at the `lg` breakpoint
+  (1024-1279px), hiding the phone number and "Get a Quote" button entirely.
+  Not caught by the automated `document.scrollWidth` check because the header
+  is `position: fixed` (fixed elements don't contribute to document flow).
+  Fixed by moving the phone pill to `xl:flex` and tightening nav link spacing
+  at `lg`. Confirmed via `getBoundingClientRect()` + screenshots at 1024 and
+  1280, not just the 3 mandated widths.
 
 ## Phase 5 — Blog import (55 articles)
 
