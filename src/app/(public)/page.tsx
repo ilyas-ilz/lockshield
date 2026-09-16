@@ -11,7 +11,6 @@ import type { FAQItem } from "@/components/frontend/FAQAccordion";
 import { Section, SectionHead } from "@/components/frontend/Section";
 import { Reveal } from "@/components/frontend/Reveal";
 import { ProjectsCarousel, type CarouselProject } from "@/components/frontend/ProjectsCarousel";
-import { JourneySection } from "@/components/frontend/home/JourneySection";
 import { WhyChooseSection } from "@/components/frontend/home/WhyChooseSection";
 import { StatsSection } from "@/components/frontend/home/StatsSection";
 import { TestimonialsFaqSection } from "@/components/frontend/home/TestimonialsFaqSection";
@@ -137,8 +136,11 @@ export default async function HomePage() {
     void 0;
   }
 
-  const displayServices = liveServices.length > 0 ? liveServices : DEFAULT_SERVICES;
-  const displayProjects = liveProjects.length > 0 ? liveProjects : DEFAULT_PROJECTS;
+  // The homepage is a teaser: /services and /projects list everything, and
+  // each item has its own detail page, so three of each is enough here.
+  const HOME_TEASER_COUNT = 3;
+  const displayServices = (liveServices.length > 0 ? liveServices : DEFAULT_SERVICES).slice(0, HOME_TEASER_COUNT);
+  const displayProjects = (liveProjects.length > 0 ? liveProjects : DEFAULT_PROJECTS).slice(0, HOME_TEASER_COUNT);
 
   const jsonLdFAQ = buildFaqSchema(FAQS.map((faq) => ({ question: faq.q, answer: faq.a })));
 
@@ -211,25 +213,24 @@ export default async function HomePage() {
         <ProjectsCarousel projects={displayProjects} />
       </Section>
 
-      {/* 4. Journey */}
-      <JourneySection />
-
-      {/* 5. Why choose us */}
+      {/* 4. Why choose us */}
       <WhyChooseSection />
 
-      {/* 6. Stats */}
+      {/* 5. Stats */}
       <StatsSection />
 
-      {/* 7. Testimonials + FAQ */}
+      {/* 6. Testimonials + FAQ */}
       <TestimonialsFaqSection faqs={FAQS} />
 
-      {/* 8. Process timeline */}
+      {/* 7. Process timeline — the single "how we work" section. JourneySection
+          told the same five steps again in a dark photo band and was dropped
+          from this page; the component still exists if it's wanted elsewhere. */}
       <ProcessTimelineSection />
 
-      {/* 9. Clients marquee */}
+      {/* 8. Clients marquee */}
       <ClientsMarquee />
 
-      {/* 10. Quote consultation CTA */}
+      {/* 9. Quote consultation CTA */}
       <section className="relative bg-ink py-14 sm:py-20 lg:py-24">
         <div className="blueprint-grid-dark pointer-events-none absolute inset-0 opacity-20" />
         <div className="wrap relative z-10">
