@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Flame } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { serviceIcon } from "@/components/frontend/serviceMeta";
 import { connectDB } from "@/lib/db";
 import { Service } from "@/models";
 import { PageHero } from "@/components/frontend/PageHero";
@@ -80,7 +81,9 @@ export default async function ServicesPage() {
 
       <Section className="blueprint-grid bg-paper-soft">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
-          {items.map((service, idx) => (
+          {items.map((service, idx) => {
+            const Icon = serviceIcon(service.slug);
+            return (
             <Reveal key={service.slug || idx} delayMs={(idx % 3) * 80}>
               <Link
                 href={`/services/${service.slug}`}
@@ -88,7 +91,7 @@ export default async function ServicesPage() {
               >
                 <div>
                   <div className="mb-6 flex size-14 items-center justify-center rounded-2xl bg-brand-500/10 text-brand-500 transition-all group-hover:scale-110 group-hover:bg-brand-500 group-hover:text-white">
-                    <Flame className="size-7" />
+                    <Icon className="size-7" aria-hidden />
                   </div>
                   <h3 className="font-tech text-lg font-bold uppercase tracking-wide text-navy-900 transition-colors group-hover:text-brand-500 sm:text-xl">
                     {service.title}
@@ -102,7 +105,8 @@ export default async function ServicesPage() {
                 </div>
               </Link>
             </Reveal>
-          ))}
+            );
+          })}
         </div>
       </Section>
     </>

@@ -27,6 +27,13 @@ const VARIANT_CLASSES: Record<MarketingButtonVariant, string> = {
 const SHARED_CLASSES =
   "btn-pill inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-all duration-300 [transition-timing-function:var(--ease-brand)] cursor-pointer";
 
+// The label is a single flex item inside the pill. When a caller passes an
+// icon *plus* text as children (About's "Download Company Profile"), both
+// landed inside this one span as plain inline content and wrapped - the icon
+// sat on its own line above the label and the pill grew to two lines while
+// the button beside it stayed one. inline-flex keeps them on one row.
+const LABEL_CLASSES = "inline-flex items-center gap-2";
+
 function Arrow({ show }: { show: boolean }) {
   if (!show) return null;
   return <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" aria-hidden />;
@@ -36,13 +43,15 @@ interface ButtonLinkProps extends BaseProps {
   href: string;
   target?: string;
   rel?: string;
+  /** Save the file instead of navigating to it (same-origin assets only). */
+  download?: boolean;
 }
 
 /** Marketing-site pill button, as a link - the legacy `<a class="btn btn-red">`. */
 export function ButtonLink({ href, variant = "red", arrow = true, className, children, ...rest }: ButtonLinkProps) {
   return (
     <Link href={href} className={cn(SHARED_CLASSES, "group", VARIANT_CLASSES[variant], className)} {...rest}>
-      <span>{children}</span>
+      <span className={LABEL_CLASSES}>{children}</span>
       <Arrow show={arrow} />
     </Link>
   );
@@ -54,7 +63,7 @@ interface ButtonActionProps extends BaseProps, Omit<React.ButtonHTMLAttributes<H
 export function ButtonAction({ variant = "red", arrow = true, className, children, type = "button", ...rest }: ButtonActionProps) {
   return (
     <button type={type} className={cn(SHARED_CLASSES, "group", VARIANT_CLASSES[variant], className)} {...rest}>
-      <span>{children}</span>
+      <span className={LABEL_CLASSES}>{children}</span>
       <Arrow show={arrow} />
     </button>
   );

@@ -3,7 +3,7 @@ import { ShieldCheck, HardHat, BadgeCheck, Headset } from "lucide-react";
 import { Reveal } from "../Reveal";
 
 const WHY_ITEMS = [
-  { icon: ShieldCheck, title: "Civil Defence Approved", desc: "All systems designed as per DCD regulations and approved standards." },
+  { icon: ShieldCheck, title: "DCD Approved Contractor", desc: "Company licensed by Dubai Civil Defence; systems designed to DCD regulations and approved standards." },
   { icon: HardHat, title: "Experienced Team", desc: "Highly trained, certified professionals across every discipline." },
   { icon: BadgeCheck, title: "Quality Assurance", desc: "We use only certified, genuine products from approved manufacturers." },
   { icon: Headset, title: "24/7 Support", desc: "Always available when you need us — emergencies don't keep office hours." },
@@ -16,7 +16,7 @@ const WHY_ITEMS = [
  */
 export function WhyChooseSection() {
   return (
-    <section className="blueprint-grid py-14 sm:py-20 lg:py-24">
+    <section className="section-y blueprint-grid">
       <div className="wrap grid grid-cols-1 gap-10 lg:grid-cols-[1fr_1.15fr] lg:items-center lg:gap-14">
         <Reveal className="order-2 lg:order-1">
           <span className="eyebrow">Why Choose Lock Shield?</span>
@@ -25,9 +25,9 @@ export function WhyChooseSection() {
             <br />
             proven on site
           </h2>
-          <div className="mt-6 divide-y divide-dashed divide-[var(--marketing-line)]">
+          <div className="mt-5 divide-y divide-dashed divide-[var(--marketing-line)]">
             {WHY_ITEMS.map((item) => (
-              <div key={item.title} className="group flex items-start gap-4 py-4 first:pt-0">
+              <div key={item.title} className="group flex items-start gap-4 py-3.5 first:pt-0 last:pb-0">
                 <span className="flex size-11 shrink-0 items-center justify-center rounded-full border-[1.5px] border-brand-500 text-brand-500 transition-all duration-300 group-hover:-rotate-6 group-hover:scale-105 group-hover:bg-brand-500 group-hover:text-white">
                   <item.icon className="size-4.5" aria-hidden />
                 </span>

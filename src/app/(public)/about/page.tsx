@@ -50,8 +50,10 @@ export default function AboutPage() {
             </p>
 
             <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:flex-wrap">
-              <ButtonLink href="/assets/images/company-profile.pdf" target="_blank" rel="noopener noreferrer" variant="red" arrow={false}>
-                <Download className="size-4" />
+              {/* `download`, not target="_blank": the label says Download, so
+                  the click should save the file rather than open a tab. */}
+              <ButtonLink href="/assets/images/company-profile.pdf" download variant="red" arrow={false}>
+                <Download className="size-4 shrink-0" />
                 <span>Download Company Profile (PDF)</span>
               </ButtonLink>
               <ButtonLink href="/contact" variant="darkGhost">

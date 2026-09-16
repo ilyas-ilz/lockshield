@@ -6,14 +6,18 @@ const STATS = [
   { icon: Users, target: 50, label: "Employees" },
   { icon: Building2, target: 500, label: "Projects Completed" },
   { icon: MapPinned, target: 1000, label: "Sites Maintained" },
-  { icon: Star, target: 10, label: "Years Experience" },
+  // Single source of truth: 15+ years everywhere (hero, about, stats).
+  { icon: Star, target: 15, label: "Years Experience" },
 ] as const;
 
 /** Restores the legacy .stats section - a static "15+/24/7/100%" band in the
  * port replaced these count-up figures entirely. */
 export function StatsSection() {
   return (
-    <section className="bg-paper-soft py-14 sm:py-20 lg:py-24">
+    // Shares `.section-y` with every other section - this band used to run
+    // py-10/14/16 against its neighbours' py-12/16/20, which made the gap
+    // above it visibly tighter than the gap below it.
+    <section className="section-y bg-paper-soft">
       <div className="wrap">
         <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 lg:gap-6">
           {STATS.map((stat, i) => (

@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ShieldCheck, Headset, HardHat, Award, ArrowRight, ChevronRight } from "lucide-react";
+import { ShieldCheck, Headset, HardHat, ArrowRight, ChevronRight } from "lucide-react";
 import { QuoteModal } from "./QuoteModal";
 
 const SLIDES = [
@@ -19,14 +19,12 @@ const FEATURES = [
   { icon: ShieldCheck, title: "Civil Defence Approved", desc: "DCD compliant drawings, inspection & approvals", tint: "brand" },
   { icon: Headset, title: "24/7 Expert Support", desc: "Always on-call rapid response across UAE", tint: "blue" },
   { icon: HardHat, title: "Certified Engineers", desc: "Certified professionals with 15+ years experience", tint: "amber" },
-  { icon: Award, title: "Premium Guaranteed Quality", desc: "UL/FM approved genuine safety products", tint: "emerald" },
 ] as const;
 
 const TINT_CLASSES: Record<(typeof FEATURES)[number]["tint"], string> = {
   brand: "bg-brand-500/20 border-brand-500/30 text-brand-500",
   blue: "bg-blue-500/20 border-blue-500/30 text-blue-400",
   amber: "bg-amber-500/20 border-amber-500/30 text-amber-400",
-  emerald: "bg-emerald-500/20 border-emerald-500/30 text-emerald-400",
 };
 
 export function HeroSlider() {
@@ -75,7 +73,7 @@ export function HeroSlider() {
             {/* Tag / Badge */}
             <div className="rise d1 inline-flex items-center gap-2 rounded-full border border-brand-500/40 bg-brand-500/20 px-4 py-1.5 text-xs font-semibold tracking-wide text-white sm:text-sm">
               <span className="size-2 animate-ping rounded-full bg-brand-500" />
-              <span>Civil Defence Approved Fire Safety UAE</span>
+              <span>Dubai Civil Defence Approved Contractor</span>
             </div>
 
             {/* Main Headline - legacy line-mask reveal */}
@@ -95,8 +93,7 @@ export function HeroSlider() {
             {/* Description */}
             <p className="rise d2 max-w-2xl text-sm font-light leading-relaxed text-gray-300 sm:text-lg">
               We design, install, test, and maintain world-class firefighting and suppression
-              systems across Dubai &amp; the UAE — with engineering excellence, compliance, and 24/7
-              readiness at our core.
+              systems across Dubai &amp; the UAE.
             </p>
 
             {/* CTA Buttons */}

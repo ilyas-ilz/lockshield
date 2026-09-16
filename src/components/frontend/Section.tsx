@@ -11,13 +11,17 @@ interface SectionProps extends React.HTMLAttributes<HTMLElement> {
 }
 
 /**
- * Section rhythm, mobile-first. Legacy used `clamp(2.2rem,4.5vw,4rem)`
- * vertical padding (~35px-64px) - py-14/sm:py-20/lg:py-24 lands in the same
- * range without a fixed desktop-sized minimum forced onto small screens.
+ * Section rhythm, mobile-first. Tight vertical rhythm: eyebrow -> 8-12px ->
+ * heading -> 32-40px -> content. Legacy used up to 64px+ which left sections
+ * feeling detached from their headings.
+ *
+ * Vertical padding comes from the `.section-y` utility (globals.css), never
+ * a literal py-* here: every public section shares that one token, so the
+ * gap between any two sections is identical down the whole page.
  */
 export function Section({ children, className, wrap = true, ...rest }: SectionProps) {
   return (
-    <section className={cn("py-14 sm:py-20 lg:py-24", className)} {...rest}>
+    <section className={cn("section-y", className)} {...rest}>
       {wrap ? <div className="wrap">{children}</div> : children}
     </section>
   );
@@ -38,7 +42,7 @@ export function SectionHead({ eyebrow, title, description, action }: SectionHead
   return (
     <Reveal
       as="div"
-      className="mb-10 flex flex-col gap-5 sm:mb-14 md:flex-row md:items-end md:justify-between"
+      className="mb-8 flex flex-col gap-5 sm:mb-10 md:flex-row md:items-end md:justify-between"
     >
       <div>
         <span className="eyebrow">{eyebrow}</span>

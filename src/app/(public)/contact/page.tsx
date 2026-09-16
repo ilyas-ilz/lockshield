@@ -132,17 +132,6 @@ export default async function ContactPage() {
               </div>
             </Reveal>
 
-            {/* Google Map Frame */}
-            <Reveal delayMs={100} className="h-64 overflow-hidden rounded-3xl border border-[var(--marketing-line)] bg-gray-100 shadow-xs">
-              <iframe
-                title="Lock Shield Dubai Office"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d115456.2483861214!2d55.2707828!3d25.2630564!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f5cc114840e67%3A0xa646ceb1d830b555!2sDubai%2C%20United%20Arab%20Emirates!5e0!3m2!1sen!2sae!4v1700000000000!5m2!1sen!2sae"
-                className="size-full border-0"
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              />
-            </Reveal>
           </div>
 
           {/* Right Quote & Consultation Form */}
@@ -150,6 +139,22 @@ export default async function ContactPage() {
             <QuickQuoteForm />
           </Reveal>
         </div>
+
+        {/* Google Map Frame - full width under both columns rather than
+            stacked inside the narrow left one. In the 5-col column it made
+            that side ~260px taller than the form, and `items-start` left
+            that difference as dead space below the form. Full width also
+            suits a map far better than a 5/12 sliver. */}
+        <Reveal delayMs={200} className="mt-10 h-72 overflow-hidden rounded-3xl border border-[var(--marketing-line)] bg-gray-100 shadow-xs sm:h-80">
+          <iframe
+            title="Lock Shield Dubai Office"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d115456.2483861214!2d55.2707828!3d25.2630564!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f5cc114840e67%3A0xa646ceb1d830b555!2sDubai%2C%20United%20Arab%20Emirates!5e0!3m2!1sen!2sae!4v1700000000000!5m2!1sen!2sae"
+            className="size-full border-0"
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
+        </Reveal>
       </Section>
     </>
   );

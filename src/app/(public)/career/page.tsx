@@ -5,6 +5,7 @@ import { Job } from "@/models";
 import { PageHero } from "@/components/frontend/PageHero";
 import { Section } from "@/components/frontend/Section";
 import { Reveal } from "@/components/frontend/Reveal";
+import { ButtonLink } from "@/components/frontend/Button";
 import { CareerJobList, type JobOpening } from "./career-client";
 
 // Content is editable from the admin, so pages must not be frozen at build
@@ -97,7 +98,7 @@ export default async function CareerPage() {
           </div>
 
           <div className="lg:col-span-4">
-            <Reveal className="lg:sticky lg:top-28">
+            <Reveal className="space-y-4 lg:sticky lg:top-28">
               <div className="space-y-4 rounded-3xl border border-[var(--marketing-line)] bg-white p-6 sm:p-8">
                 <h3 className="font-tech text-base font-bold uppercase tracking-wide text-navy-900 sm:text-lg">
                   Why Work at Lock Shield?
@@ -110,6 +111,26 @@ export default async function CareerPage() {
                     </li>
                   ))}
                 </ul>
+              </div>
+
+              {/* Second card. The perks card alone is ~330px of content beside
+                  a ~1370px job list, so even sticky the column read as mostly
+                  empty. An open application is the genuinely useful thing to
+                  put here: a candidate whose role isn't among the three
+                  listed openings otherwise has nowhere to go from this page.
+                  Routes to /contact rather than a mailto so the address stays
+                  in admin > Settings instead of being hardcoded twice. */}
+              <div className="rounded-3xl border border-brand-500/20 bg-brand-500/5 p-6 sm:p-8">
+                <h3 className="font-tech text-base font-bold uppercase tracking-wide text-navy-900 sm:text-lg">
+                  Don&apos;t see your role?
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-ink/65">
+                  We take on certified fire protection engineers and technicians year-round. Send an
+                  open application and we&apos;ll keep you on file for upcoming openings.
+                </p>
+                <ButtonLink href="/contact" variant="red" className="mt-4 w-full">
+                  Send an Open Application
+                </ButtonLink>
               </div>
             </Reveal>
           </div>

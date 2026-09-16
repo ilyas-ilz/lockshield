@@ -22,7 +22,7 @@ export function ProcessTimelineSection() {
   const [ref, go] = useInView<HTMLDivElement>({ threshold: 0.3 });
 
   return (
-    <section className="bg-paper-soft py-14 sm:py-20 lg:py-24">
+    <section className="section-y bg-paper-soft">
       <div className="wrap">
         <Reveal className="mb-10 sm:mb-14">
           <span className="eyebrow">Our Work Process</span>
@@ -31,21 +31,23 @@ export function ProcessTimelineSection() {
           </h2>
         </Reveal>
 
-        <div ref={ref} className="relative grid grid-cols-1 gap-8 md:grid-cols-5 md:gap-4">
-          {/* connecting rail: horizontal on desktop, vertical on mobile */}
-          <div className="absolute left-7 top-0 hidden h-full w-0.5 bg-[var(--marketing-line)] md:top-7 md:left-[10%] md:right-[10%] md:block md:h-0.5 md:w-auto" />
-          <div className="absolute left-7 top-0 bottom-0 w-0.5 bg-[var(--marketing-line)] md:hidden" />
+        {/* Five-across only fits at desktop widths - tablet gets a 2-col
+            grid with the vertical rail, phone a single column. */}
+        <div ref={ref} className="relative grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5 lg:gap-4">
+          {/* connecting rail: horizontal on desktop, vertical below lg */}
+          <div className="absolute left-7 top-0 hidden h-full w-0.5 bg-[var(--marketing-line)] lg:top-7 lg:left-[10%] lg:right-[10%] lg:block lg:h-0.5 lg:w-auto" />
+          <div className="absolute left-7 top-0 bottom-0 w-0.5 bg-[var(--marketing-line)] lg:hidden" />
           <div
-            className="absolute left-7 top-0 w-0.5 rounded-full bg-gradient-to-b from-brand-500 to-[#ff5a60] shadow-[0_0_14px_rgba(224,27,36,0.6)] transition-[height] duration-[1.8s] [transition-timing-function:var(--ease-brand)] md:hidden"
+            className="absolute left-7 top-0 w-0.5 rounded-full bg-gradient-to-b from-brand-500 to-[#ff5a60] shadow-[0_0_14px_rgba(224,27,36,0.6)] transition-[height] duration-[1.8s] [transition-timing-function:var(--ease-brand)] lg:hidden"
             style={{ height: go ? "100%" : "0%" }}
           />
           <div
-            className="absolute top-7 left-[10%] hidden h-0.5 rounded-full bg-gradient-to-r from-brand-500 to-[#ff5a60] shadow-[0_0_14px_rgba(224,27,36,0.6)] transition-[width] duration-[1.8s] [transition-timing-function:var(--ease-brand)] md:block"
+            className="absolute top-7 left-[10%] hidden h-0.5 rounded-full bg-gradient-to-r from-brand-500 to-[#ff5a60] shadow-[0_0_14px_rgba(224,27,36,0.6)] transition-[width] duration-[1.8s] [transition-timing-function:var(--ease-brand)] lg:block"
             style={{ width: go ? "80%" : "0%" }}
           />
 
           {STEPS.map((step, i) => (
-            <div key={step.num} className="relative flex items-start gap-4 md:flex-col md:items-center md:text-center">
+            <div key={step.num} className="relative flex items-start gap-4 lg:flex-col lg:items-center lg:text-center">
               <span
                 className={cn(
                   "relative z-10 flex size-14 shrink-0 items-center justify-center rounded-full border-2 bg-white text-ink/35 transition-all duration-500",
@@ -57,7 +59,7 @@ export function ProcessTimelineSection() {
               </span>
 
               <div
-                className="relative flex-1 overflow-hidden rounded-2xl border border-[var(--marketing-line)] bg-white p-5 transition-all duration-300 hover:border-brand-500/35 hover:shadow-[0_18px_44px_rgba(224,27,36,0.12)] md:mt-2"
+                className="relative flex-1 overflow-hidden rounded-2xl border border-[var(--marketing-line)] bg-white p-5 transition-all duration-300 hover:border-brand-500/35 hover:shadow-[0_18px_44px_rgba(224,27,36,0.12)] lg:mt-2"
                 style={{
                   opacity: go ? 1 : 0,
                   transform: go ? "none" : "translateY(26px)",

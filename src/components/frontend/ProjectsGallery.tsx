@@ -4,7 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, MapPin } from "lucide-react";
-import { Reveal } from "@/components/frontend/Reveal";
+import { useProjectMotion } from "@/lib/hooks/useProjectMotion";
 
 export interface ProjectItem {
   _id?: string;
@@ -34,6 +34,9 @@ export function ProjectsGallery({ projects }: { projects: ProjectItem[] }) {
     return projects.filter((p) => p.sector === selectedSector);
   }, [projects, selectedSector]);
 
+  const gridRef = React.useRef<HTMLDivElement>(null);
+  useProjectMotion(gridRef, [filtered]);
+
   return (
     <div className="space-y-8 sm:space-y-10">
       {/* Filter Tabs */}
@@ -57,22 +60,24 @@ export function ProjectsGallery({ projects }: { projects: ProjectItem[] }) {
       )}
 
       {/* Grid */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
+      <div ref={gridRef} className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
         {filtered.map((project, idx) => (
-          <Reveal key={project.slug || idx} delayMs={(idx % 3) * 80}>
+          <div key={project.slug || idx} data-project-card>
             <Link
               href={`/projects/${project.slug}`}
               className="group flex h-full flex-col overflow-hidden rounded-3xl border border-[var(--marketing-line)] bg-white transition-all duration-300 hover:border-brand-500 hover:shadow-xl"
             >
               <div className="relative aspect-[16/10] overflow-hidden bg-paper-soft">
-                <Image
-                  src={project.coverImage?.url || project.image?.url || "/assets/images/commercial.webp"}
-                  alt={project.coverImage?.alt || project.title}
-                  fill
-                  sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  priority={idx < 3}
-                />
+                <div data-project-media className="absolute inset-0 scale-[1.12] will-change-transform">
+                  <Image
+                    src={project.coverImage?.url || project.image?.url || "/assets/images/commercial.webp"}
+                    alt={project.coverImage?.alt || project.title}
+                    fill
+                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    priority={idx < 3}
+                  />
+                </div>
                 {project.sector && (
                   <div className="absolute left-4 top-4 rounded-full bg-white/95 px-3 py-1 text-[11px] font-bold text-navy-900 shadow-xs backdrop-blur-xs">
                     {project.sector}
@@ -98,7 +103,7 @@ export function ProjectsGallery({ projects }: { projects: ProjectItem[] }) {
                 </div>
               </div>
             </Link>
-          </Reveal>
+          </div>
         ))}
       </div>
     </div>

@@ -40,8 +40,13 @@
   /* legacy single easing curve, used on every transition site-wide */
   --ease-brand: cubic-bezier(0.2, 0.8, 0.2, 1);
 
-  /* legacy .wrap container: max-width:1240px; padding:0 clamp(1rem,4vw,2.5rem) */
-  --wrap-width: 1240px;
+  /* legacy .wrap container: max-width:1200px; padding:0 clamp(1rem,4vw,2.5rem).
+     Capped at 1200px so the floating navbar never stretches edge-to-edge on
+     large desktop monitors. */
+  --wrap-width: 1200px;
+  /* Predictable floating-header height used as the single source of truth
+     for content offset: 72px mobile, 84px desktop. */
+  --header-h: 72px;
 }
 
 :root {
@@ -106,11 +111,41 @@
     -webkit-text-size-adjust: 100%;
   }
 
+  /* Fixed floating header overlays content while scrolling - anchored
+     sections must stop below it instead of sliding underneath. */
+  section[id],
+  [id].scroll-target {
+    scroll-margin-top: calc(var(--header-h) + 12px);
+  }
+
   body {
     background: var(--bg);
     color: var(--text);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+  }
+
+  /* Single knob for every public section's vertical rhythm. Sections stack,
+     so the visible gap between any two is 2x this: 80px mobile, 104px
+     tablet, 128px desktop. Before this, each section hand-rolled its own
+     py-* (py-12/16/20, py-10/14/16, py-10/14 ...), which produced five
+     different gaps down the homepage and made the whole page read as
+     over-padded. Change the three values here, not in the components. */
+  :root {
+    --section-y: 2.5rem;
+  }
+
+@media (min-width: 640px) {
+    :root {
+      --header-h: 84px;
+      --section-y: 3.25rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    :root {
+      --section-y: 4rem;
+    }
   }
 
   :focus-visible {
@@ -125,6 +160,19 @@
 }
 
 @layer utilities {
+  /* Section vertical rhythm - every public section uses one of these two
+     instead of a literal py-*, so the gaps cannot drift apart again.
+     See --section-y for the values. */
+  .section-y {
+    padding-block: var(--section-y);
+  }
+
+  /* Slim bands (the CTA strip) - deliberately three-quarter height, but
+     still derived from the same knob so it scales with everything else. */
+  .section-y-sm {
+    padding-block: calc(var(--section-y) * 0.75);
+  }
+
   .font-tech {
     font-family: var(--font-tech);
   }
@@ -381,18 +429,17 @@
     );
   }
 
-  /* Glassmorphic floating pill header */
+  /* Floating pill header - solid white so scrolled page content never
+     ghosts through it. Blur is kept for the shadow edge only. */
   .glass-pill {
-    background: rgba(255, 255, 255, 0.88);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(227, 230, 234, 0.8);
-    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08);
+    background: #ffffff;
+    border: 1px solid rgba(227, 230, 234, 0.9);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
   }
 
   :root.dark .glass-pill {
-    background: rgba(20, 25, 34, 0.85);
-    border-color: rgba(38, 46, 59, 0.8);
+    background: #141922;
+    border-color: rgba(38, 46, 59, 0.9);
     box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4);
   }
 

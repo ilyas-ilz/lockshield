@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { ChevronRight, Building2, MapPin, Calendar, Tag } from "lucide-react";
@@ -50,24 +51,10 @@ export default async function ProjectDetailPage({ params }: PageProps) {
     // DB error
   }
 
-  // Sample fallback if matching slug
+  // Unknown slug = 404. Never fabricate a project page (client name,
+  // year, scope) from the URL - a fake case study is worse than none.
   if (!project) {
-    const titleFromSlug = slug
-      .split("-")
-      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-      .join(" ");
-
-    project = {
-      title: titleFromSlug,
-      client: titleFromSlug,
-      sector: "Commercial Fit-out",
-      emirate: "Dubai",
-      year: 2024,
-      summary:
-        "Full turnkey fire safety fit-out, Civil Defence drawings, testing and commissioning compliant with DCD regulations.",
-      scopeTags: ["Civil Defence Approval", "Fire Alarm System", "Fire Sprinklers", "Kitchen Suppression"],
-      coverImage: { url: "/assets/images/commercial.webp" },
-    };
+    notFound();
   }
 
   return (
