@@ -7,7 +7,8 @@ export const jobCreateSchema = z.object({
   department: z.string().trim().min(1),
   location: z.string().trim().min(1).default("Dubai, UAE"),
   employmentType: z.enum(["Full-time", "Part-time", "Contract"]).default("Full-time"),
-  description: z.unknown(),
+  // Required in the Job model; see the note on postCreateSchema.body.
+  description: z.unknown().refine((v) => v !== undefined && v !== null, { message: "Required" }),
   requirements: z.array(z.string()).default([]),
   status: statusSchema.default("draft"),
   closesAt: z.coerce.date().nullable().optional(),

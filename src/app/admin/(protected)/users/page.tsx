@@ -16,7 +16,11 @@ const usersConfig: ResourceConfig = {
     { key: "name", label: "Name" },
     { key: "email", label: "Email" },
     { key: "role", label: "Role" },
-    { key: "active", label: "Active", render: (r) => (r.active ? "Yes" : "No") },
+    // No `render` here on purpose: this config is built in a Server Component
+    // and handed to <DataTable>, a Client Component - a function prop cannot
+    // cross that boundary and crashed the whole page. DataTable's renderCell
+    // already formats booleans as a Yes badge / No label.
+    { key: "active", label: "Active" },
   ],
   fields: [],
 };

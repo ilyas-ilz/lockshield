@@ -20,7 +20,18 @@ uninstall` commands, and has deliberately not been run; re-verifying it
 live caught a real mistake a stale audit would have shipped: the
 `service/`/`services/` and `project/`/`projects/` duplicate pairs don't
 both resolve "delete the odd one out" the same way — one pair's singular
-is live, the other's plural is. Phase 9 (final verification pass) next.
+is live, the other's plural is.
+
+**Phase 9 (final verification) is now done — all phases complete.** Every
+route (11 public + 15 admin) was rendered against the live DB at 375/768/
+1280 with programmatic assertions, all 13 legacy `.html` and all 58 blog
+redirects verified 301 → 200, lead submission proven end-to-end from the
+browser form through to the admin list, and create/edit/delete exercised
+on all 9 writable resources. It caught six real bugs, the worst being
+`/admin/users` rendering nothing but "Application error" because a
+Server Component passed a `render` function to a Client Component — a
+crash a status-code-only check would have missed, since Next.js serves
+its error page with a 200. See the Phase 9 section for the full list.
 
 Derived from a full audit of the legacy static site (repo root) and the Next.js app
 (`backend/`), completed 2026-09-15. Nothing in this plan deletes a file; Phase 8
@@ -464,19 +475,83 @@ Total recoverable: ~104 MB (`legacy/`) + ~5 MB (duplicate/unused
 at the repo root encodes every item above as `git rm`/`npm uninstall`
 commands with the same guard notes; it has not been run.
 
-## Phase 9 — Verification
+## Phase 9 — Verification (DONE)
 
 Not "it builds". Evidence per claim:
 
-- `npm run build`, `npm run typecheck`, `npm test` — all green, output shown.
-- `npm run lint` — currently unverified.
-- Every route rendered against the live DB, not just compiled.
-- All 12 legacy `.html` redirects: 301 → 200.
-- All 55 blog redirects: 301 → 200.
-- Lead submission end-to-end: public form → Mongo → admin list.
-- Admin CRUD on each resource: create, edit, delete.
-- Auth: login, lockout after 5 attempts, RBAC redirect for a non-ADMIN user.
-- Browser console clean on every public route.
+- `npm run build` (35/35 pages), `tsc --noEmit`, `npm test` (71/71) — all green.
+- `npm run lint` — was the one item explicitly flagged "currently unverified";
+  now run across the whole repo, zero errors and zero warnings.
+- **Every route rendered against the live DB** — 11 public + 15 admin routes,
+  each at 375/768/1280, asserting HTTP status, zero horizontal overflow, no
+  console errors, no `pageerror`, and no error boundary. A 200 was explicitly
+  not treated as passing: Next.js serves its error page with a 200, which is
+  how the `/admin/users` crash below was caught.
+- All 13 legacy `.html` redirects 301 → 200 (the 12 planned plus
+  `vismaya-madathil.html`).
+- All **58** published blog posts' `.html` URLs 301 → 200 (full curl sweep,
+  not a sample — 58 pass, 0 fail).
+- **Lead submission end-to-end** — filled the real contact form in a browser at
+  375px, observed `POST /api/leads` → 201, the visitor-facing "Thank You!"
+  state, and then the lead itself appearing by name and email in
+  `/admin/leads` while signed in. Test lead deleted afterwards.
+- **Admin CRUD on each resource** — create/edit/delete exercised against all 9
+  writable resources (categories, tags, posts, pages, services, projects, jobs,
+  redirects, users) through an authenticated session, plus one full
+  **UI-driven** create → edit → delete on categories, including the
+  `AlertDialog` confirm ("Delete this category? … Cancel / Delete").
+- Auth: lockout trips on the 6th attempt, a non-ADMIN is redirected away from
+  `/admin/users` and `/admin/redirects`, and `GET /api/users` returns 403 for
+  an EDITOR (checked at the API, not just the UI).
+- Browser console clean on every public route at all three widths.
+
+### Bugs found and fixed during this phase
+
+1. **`/admin/users` was completely broken** — the page rendered "Application
+   error: a server-side exception has occurred", no table at all. `usersConfig`
+   is built in a Server Component and passed to `<DataTable>`, a Client
+   Component, and one column carried a `render` function; functions can't cross
+   that boundary. Removed the redundant `render` (DataTable's `renderCell`
+   already formats booleans as a Yes badge / No label, which is also better —
+   status not conveyed by colour alone).
+2. **Opaque 500s on two create endpoints** — `Post.body` and `Job.description`
+   are `required: true` in Mongoose, but were `z.unknown()` in zod, and Zod
+   treats `unknown` as optional. Omitting either slipped past the validation
+   boundary and died in the driver as a generic "Internal server error".
+   Both now fail as a 400 naming the field; partial updates are unaffected.
+3. **Carousel/testimonial dots were unhittable on a phone** — 6px and 8px tall.
+   The visible dot is unchanged; it now sits inside a 44px tap target.
+4. **Mobile drawer didn't trap focus and ignored Escape** — Tab leaked through
+   to the page behind it. Added a focus trap (Tab and Shift+Tab both cycle
+   within the panel) plus Escape-to-dismiss, and `role="dialog"`/`aria-modal`.
+   Backdrop click and the X button already worked.
+5. **Career application form labels weren't associated** — four visible
+   `<label>` elements with no `htmlFor`, so screen readers announced nothing.
+   Wired up `htmlFor`/`id` for all four.
+6. Admin login submit button was 40px tall; now 44px.
+
+### Mobile-first sign-off results
+
+- No horizontal scroll: asserted programmatically on all 26 routes × 3 widths.
+- Navigation opens, closes (X, backdrop, **Escape**) and traps focus — verified
+  by tabbing 14 times and confirming zero escapes.
+- Forms completable on a phone: contact (5/5 fields labelled, 48px submit),
+  career apply (4/4 labelled, 44px submit), admin login (2/2 labelled, 44px
+  submit); empty submit blocked with inline validation.
+- `DataTable` on mobile is a card layout per row — search, full-width create
+  button, per-row Edit/Delete, pagination with a rows-per-page select.
+- Carousels don't hijack vertical scroll — page `scrollY` unchanged while the
+  track scrolls horizontally.
+- Tap targets: down from 9 undersized to 0 on the homepage at 375px.
+- `next/image` emits mobile candidates — `w=640` served to a 360px-wide slot,
+  every sampled image has a `srcset`, none oversized beyond 3× its CSS width.
+
+One known non-bug: at 375px the third projects-carousel card reports as not yet
+revealed until the track is swiped. That is correct — it is off-screen to the
+right, and it fades in on swipe (verified opacity 1.00). Full-page screenshots
+also show below-the-fold sections blank, which is a capture artifact of the
+IntersectionObserver reveal, not a rendering fault; after scrolling the page
+through, 0 of 27 reveals remain stuck.
 
 ### Mobile-first sign-off
 

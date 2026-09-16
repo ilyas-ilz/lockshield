@@ -115,7 +115,7 @@ function LoginForm() {
             </div>
           </Field>
 
-          <Button type="submit" variant="primary" className="w-full h-10 rounded-xl shadow-xs" loading={loading}>
+          <Button type="submit" variant="primary" className="h-11 w-full rounded-xl shadow-xs" loading={loading}>
             {loading ? "Authenticating…" : "Sign In to Admin"}
           </Button>
         </form>

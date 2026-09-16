@@ -141,17 +141,23 @@ export function HeroSlider() {
         </div>
 
         {/* Carousel Dots */}
-        <div className="mt-8 flex items-center justify-center gap-2 sm:mt-12">
+        {/* The visible dot stays small, but the button around it is a full
+            44px tap target - the dot alone was 6px tall and unhittable on a phone. */}
+        <div className="mt-8 flex items-center justify-center sm:mt-12">
           {SLIDES.map((_, i) => (
             <button
               key={i}
               type="button"
               onClick={() => setCurrent(i)}
               aria-label={`Go to slide ${i + 1}`}
-              className={`h-1.5 min-h-1.5 rounded-full transition-all cursor-pointer ${
-                i === current ? "w-8 bg-brand-500" : "w-2 bg-white/30 hover:bg-white/60"
-              }`}
-            />
+              className="group flex h-11 cursor-pointer items-center justify-center px-2"
+            >
+              <span
+                className={`block h-1.5 rounded-full transition-all ${
+                  i === current ? "w-8 bg-brand-500" : "w-2 bg-white/30 group-hover:bg-white/60"
+                }`}
+              />
+            </button>
           ))}
         </div>
       </div>

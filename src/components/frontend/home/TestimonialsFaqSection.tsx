@@ -102,15 +102,22 @@ export function TestimonialsFaqSection({ faqs }: { faqs: FAQItem[] }) {
             ))}
           </div>
 
-          <div className="mt-5 flex gap-2">
+          {/* Dot stays small; the button around it is a 44px tap target. */}
+          <div className="mt-5 flex">
             {TESTIMONIALS.map((t, i) => (
               <button
                 key={t.company}
                 type="button"
                 onClick={() => setActive(i)}
                 aria-label={`Show testimonial ${i + 1}`}
-                className={`h-2 rounded-full transition-all ${i === active ? "w-7 bg-brand-500" : "w-2 bg-ink/15 hover:bg-ink/30"}`}
-              />
+                className="group flex h-11 cursor-pointer items-center justify-center px-2"
+              >
+                <span
+                  className={`block h-2 rounded-full transition-all ${
+                    i === active ? "w-7 bg-brand-500" : "w-2 bg-ink/15 group-hover:bg-ink/30"
+                  }`}
+                />
+              </button>
             ))}
           </div>
         </Reveal>

@@ -9,7 +9,11 @@ export const postCreateSchema = z.object({
   title: z.string().trim().min(1).max(150),
   slug: slugSchema,
   excerpt: z.string().trim().min(1).max(300),
-  body: z.unknown(),
+  // WHY refined rather than a bare z.unknown(): Zod treats unknown as
+  // optional, but Post.body is `required: true` in Mongoose - so omitting it
+  // sailed past this boundary and died in the driver as an opaque 500
+  // instead of a 400 naming the field.
+  body: z.unknown().refine((v) => v !== undefined && v !== null, { message: "Required" }),
   coverImage: imageInputSchema.optional(),
   category: objectIdSchema.optional(),
   tags: z.array(objectIdSchema).default([]),

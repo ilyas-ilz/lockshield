@@ -93,10 +93,11 @@ export function CareerApplicationForm({ jobTitle, jobId, onClose }: CareerApplic
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-xs font-semibold text-ink/70">
+              <label htmlFor="career-name" className="mb-1 block text-xs font-semibold text-ink/70">
                 Full Name <span className="text-brand-500">*</span>
               </label>
               <input
+                id="career-name"
                 type="text"
                 required
                 value={form.name}
@@ -105,10 +106,11 @@ export function CareerApplicationForm({ jobTitle, jobId, onClose }: CareerApplic
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-semibold text-ink/70">
+              <label htmlFor="career-email" className="mb-1 block text-xs font-semibold text-ink/70">
                 Email <span className="text-brand-500">*</span>
               </label>
               <input
+                id="career-email"
                 type="email"
                 required
                 value={form.email}
@@ -119,8 +121,9 @@ export function CareerApplicationForm({ jobTitle, jobId, onClose }: CareerApplic
           </div>
 
           <div>
-            <label className="mb-1 block text-xs font-semibold text-ink/70">Phone</label>
+            <label htmlFor="career-phone" className="mb-1 block text-xs font-semibold text-ink/70">Phone</label>
             <input
+              id="career-phone"
               type="tel"
               value={form.phone}
               onChange={(e) => setForm({ ...form, phone: e.target.value })}
@@ -129,8 +132,9 @@ export function CareerApplicationForm({ jobTitle, jobId, onClose }: CareerApplic
           </div>
 
           <div>
-            <label className="mb-1 block text-xs font-semibold text-ink/70">A few words about your experience</label>
+            <label htmlFor="career-message" className="mb-1 block text-xs font-semibold text-ink/70">A few words about your experience</label>
             <textarea
+              id="career-message"
               rows={3}
               value={form.message}
               onChange={(e) => setForm({ ...form, message: e.target.value })}

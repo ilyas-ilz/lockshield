@@ -54,6 +54,44 @@ export function Navbar({ phone = "+971 4 272 7333", siteName = "Lock Shield" }: 
     setMobileOpen(false);
   }, [pathname]);
 
+  // The drawer covers the page, so keyboard users must not be able to Tab
+  // out of it into the content behind, and Escape has to dismiss it.
+  const panelRef = React.useRef<HTMLDivElement>(null);
+  React.useEffect(() => {
+    if (!mobileOpen) return;
+    const FOCUSABLE = 'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])';
+
+    function visibleItems(panel: HTMLDivElement) {
+      return Array.from(panel.querySelectorAll<HTMLElement>(FOCUSABLE)).filter((el) => el.offsetParent !== null);
+    }
+
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setMobileOpen(false);
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const panel = panelRef.current;
+      if (!panel) return;
+      const items = visibleItems(panel);
+      if (items.length === 0) return;
+      const first = items[0]!;
+      const last = items[items.length - 1]!;
+      const active = document.activeElement;
+      const outside = !panel.contains(active);
+      if (e.shiftKey && (active === first || outside)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && (active === last || outside)) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [mobileOpen]);
+
   return (
     <>
       <header
@@ -64,7 +102,9 @@ export function Navbar({ phone = "+971 4 272 7333", siteName = "Lock Shield" }: 
         <div className="wrap">
           <div className="glass-pill flex items-center justify-between gap-2 rounded-[26px] px-3 py-2 transition-all sm:rounded-[30px] sm:px-6 sm:py-2.5">
             {/* Logo - the real lockup, not a placeholder icon */}
-            <Link href="/" className="group flex shrink-0 items-center gap-2.5 sm:gap-3">
+            {/* min-h-11 for the 44px tap target; costs no header height since
+                the hamburger (size-11) already sets the pill's height. */}
+            <Link href="/" className="group flex min-h-11 shrink-0 items-center gap-2.5 sm:gap-3">
               <Image
                 src="/assets/images/logo-shield.webp"
                 alt=""
@@ -134,7 +174,13 @@ export function Navbar({ phone = "+971 4 272 7333", siteName = "Lock Shield" }: 
       {mobileOpen && (
         <div className="fixed inset-0 z-30 lg:hidden">
           <div className="fixed inset-0 bg-black/50 backdrop-blur-xs" onClick={() => setMobileOpen(false)} />
-          <div className="fixed inset-x-4 top-20 max-h-[calc(100dvh-6rem)] overflow-y-auto rounded-3xl border border-gray-100 bg-white p-5 shadow-2xl duration-200 animate-in fade-in-0 zoom-in-95 sm:top-24 sm:p-6">
+          <div
+            ref={panelRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Site navigation"
+            className="fixed inset-x-4 top-20 max-h-[calc(100dvh-6rem)] overflow-y-auto rounded-3xl border border-gray-100 bg-white p-5 shadow-2xl duration-200 animate-in fade-in-0 zoom-in-95 sm:top-24 sm:p-6"
+          >
             <nav className="flex flex-col gap-1.5">
               {NAV_LINKS.map((item) => {
                 const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
