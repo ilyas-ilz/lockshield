@@ -1,21 +1,16 @@
 import type { Metadata } from "next";
-import { Archivo, Chakra_Petch } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 
-const archivo = Archivo({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
-  variable: "--font-archivo",
-  display: "swap",
-});
-
-const chakraPetch = Chakra_Petch({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-chakra",
-  display: "swap",
-});
+// NOTE: Previously used `next/font/google` (Archivo + Chakra Petch).
+// That loader fetches Google Fonts CSS at *build time* and crashes the
+// Vercel build with `TypeError: Cannot read properties of null (reading '1')`
+// in `loader.js` when the fetched CSS / font-file URL shape isn't what the
+// pinned Next version expects (no offline fallback possible).
+// Load the fonts via <link> instead so the build never depends on outbound
+// Google Fonts access; rendering falls back to system fonts if blocked.
+const FONT_ARCHIVO = "'Archivo', ui-sans-serif, system-ui, -apple-system, sans-serif";
+const FONT_CHAKRA = "'Chakra Petch', ui-monospace, monospace";
 
 export const metadata: Metadata = {
   title: {
@@ -53,8 +48,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     // error on every admin page load, even though the mismatch is expected
     // and correct. Doesn't suppress mismatches on any other attribute or
     // any child content, only this element's own tag.
-    <html lang="en" className={`${archivo.variable} ${chakraPetch.variable}`} suppressHydrationWarning>
+    <html
+      lang="en"
+      style={
+        {
+          "--font-archivo": FONT_ARCHIVO,
+          "--font-chakra": FONT_CHAKRA,
+        } as React.CSSProperties
+      }
+      suppressHydrationWarning
+    >
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700;800&family=Chakra+Petch:wght@400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
       <body className="font-sans antialiased selection:bg-[#e01b24] selection:text-white">

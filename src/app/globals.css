@@ -50,6 +50,9 @@
 }
 
 :root {
+  --font-archivo: "Archivo", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-chakra: "Chakra Petch", ui-monospace, monospace;
+
   --bg: #f7f8fa;
   --surface: #ffffff;
   --surface-2: #f2f4f7;
