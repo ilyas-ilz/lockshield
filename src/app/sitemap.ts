@@ -8,21 +8,39 @@ import { getEnv } from "@/lib/env";
 // queries every published document across every content model, so the
 // sitemap is always complete and always current — no more manually
 // editing an XML file when a post goes live.
-export const revalidate = 3600; // regenerate at most hourly; publishing also busts this via revalidateTag once frontend wiring lands
+export const revalidate = 3600; // regenerate at most hourly; an admin publish also busts it explicitly via lib/revalidate.ts
+
+type SlugDoc = { slug?: unknown; updatedAt?: Date };
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  await connectDB();
   const { SITE_URL } = getEnv();
 
-  // NOTE: Page and Job documents are deliberately not queried. A sitemap must
-  // only advertise URLs that resolve, and there is currently no route rendering
-  // a Page, nor a /career/[slug] route. Add each back in the same change that
-  // adds its route.
-  const [posts, services, projects] = await Promise.all([
-    Post.find({ status: "published" }).select("slug updatedAt").lean(),
-    Service.find({ status: "published" }).select("slug updatedAt").lean(),
-    Project.find({ publishStatus: "published" }).select("slug updatedAt").lean(),
-  ]);
+  // WHY the try/catch: this is the only public route that talked to Mongo
+  // without a fallback, so an unreachable database failed the whole
+  // `next build` at the prerender step ("Export encountered an error on
+  // /sitemap.xml") rather than degrading. Every page under (public) already
+  // falls back to static content; the sitemap now does the same and simply
+  // ships the fixed top-level URLs, which always resolve.
+  let posts: SlugDoc[] = [];
+  let services: SlugDoc[] = [];
+  let projects: SlugDoc[] = [];
+
+  try {
+    await connectDB();
+
+    // NOTE: Page and Job documents are deliberately not queried. A sitemap must
+    // only advertise URLs that resolve, and there is currently no route rendering
+    // a Page, nor a /career/[slug] route. Add each back in the same change that
+    // adds its route.
+    [posts, services, projects] = await Promise.all([
+      Post.find({ status: "published" }).select("slug updatedAt").lean() as Promise<SlugDoc[]>,
+      Service.find({ status: "published" }).select("slug updatedAt").lean() as Promise<SlugDoc[]>,
+      Project.find({ publishStatus: "published" }).select("slug updatedAt").lean() as Promise<SlugDoc[]>,
+    ]);
+  } catch {
+    // Fall through with the static entries below.
+    void 0;
+  }
 
   const entries: MetadataRoute.Sitemap = [
     { url: SITE_URL, lastModified: new Date(), changeFrequency: "weekly", priority: 1 },

@@ -57,12 +57,17 @@ export default function EditUserPage() {
   }
 
   return (
-    <>
+    // WHY the centred column: this form is a narrow `max-w-lg` card, and left
+    // -aligning it against a full-width content area left a large empty gutter
+    // on the right at desktop widths. The header sits inside the same wrapper
+    // so the title stays aligned with the card rather than drifting away
+    // from it.
+    <div className="mx-auto w-full max-w-lg">
       <PageHeader title="Edit user" />
       {error ? (
         <ErrorState message={error} onRetry={() => void load()} />
       ) : !user ? (
-        <Card className="max-w-lg">
+        <Card>
           <CardContent className="space-y-4">
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="space-y-2">
@@ -73,7 +78,7 @@ export default function EditUserPage() {
           </CardContent>
         </Card>
       ) : (
-        <form onSubmit={handleSubmit} className="max-w-lg">
+        <form onSubmit={handleSubmit}>
           <Card>
             <CardContent className="space-y-5">
               <Field label="Name" htmlFor="name">
@@ -122,6 +127,6 @@ export default function EditUserPage() {
           </div>
         </form>
       )}
-    </>
+    </div>
   );
 }

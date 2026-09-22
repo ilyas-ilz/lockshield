@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Phone, Mail, MapPin, Download, MessageCircle } from "lucide-react";
+import { Phone, Mail, MapPin, Download } from "lucide-react";
 import type { ISettings } from "@/models/Settings";
 import { formatPhoneDisplay } from "@/lib/format";
 
@@ -8,7 +8,6 @@ export function Footer({ settings }: { settings: Partial<ISettings> }) {
   const currentYear = new Date().getFullYear();
   const phone = settings.phones?.[0] || "+971 4 272 7333";
   const email = settings.emails?.[0] || "info@lockshield.ae";
-  const whatsappNumber = (settings.whatsapp || "+971 50 123 4567").replace(/[^0-9]/g, "");
 
   const fullAddress = [
     settings.address?.street || "Al Qusais Industrial Area",
@@ -19,17 +18,16 @@ export function Footer({ settings }: { settings: Partial<ISettings> }) {
     .join(", ");
 
   return (
-    <footer className="relative overflow-hidden border-t border-gray-800/80 bg-ink pb-4 pt-7 text-gray-300 sm:pt-8">
+    <footer className="relative overflow-hidden border-t border-gray-800/80 bg-ink pb-3 pt-5 text-gray-300 sm:pt-6">
       {/* Background blueprint grid overlay */}
       <div className="blueprint-grid-dark pointer-events-none absolute inset-0 opacity-20" />
 
       <div className="wrap relative z-10">
-        {/* Compact 3-column footer: identity / quick links / contact.
-            Link columns collapse below sm - the navbar and drawer already
-            carry navigation on mobile. */}
-        <div className="grid grid-cols-1 gap-5 border-b border-gray-800 pb-5 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr]">
+        {/* Mobile: centred stacked card (logo / blurb / contact). sm+: the
+            compact 3-column footer. */}
+        <div className="grid grid-cols-1 gap-6 border-b border-gray-800 pb-6 text-center sm:gap-4 sm:pb-4 sm:text-left lg:grid-cols-[1.4fr_1fr_1fr]">
           {/* Company identity */}
-          <div className="space-y-2.5 sm:col-span-2 lg:col-span-1">
+          <div className="flex flex-col items-center space-y-2.5 sm:col-span-2 sm:items-start lg:col-span-1">
             <Link href="/" className="group inline-flex items-center gap-2.5">
               <Image
                 src="/assets/images/logo-lockshield.webp"
@@ -44,16 +42,6 @@ export function Footer({ settings }: { settings: Partial<ISettings> }) {
               DCD-approved fire protection, suppression systems and 24/7
               maintenance contracts across the UAE.
             </p>
-
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400">
-                <span className="size-1.5 animate-pulse rounded-full bg-emerald-400" />
-                DCD Approved Contractor
-              </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-500/20 bg-blue-500/10 px-3 py-1 text-xs font-semibold text-blue-400">
-                ISO Certified
-              </span>
-            </div>
           </div>
 
           {/* Quick links - every destination verified: /about, /services,
@@ -110,13 +98,14 @@ export function Footer({ settings }: { settings: Partial<ISettings> }) {
             </a>
           </nav>
 
-          {/* Contact Details & NAP - inline wrap so mobile stays compact */}
+          {/* Contact Details & NAP — centred stack on mobile, inline
+              wrap from sm up. */}
           <div>
             <h3 className="font-tech mb-2 text-sm font-bold uppercase tracking-wider text-white">Get in Touch</h3>
-            <ul className="flex flex-row flex-wrap items-center gap-x-5 gap-y-1.5 text-sm">
+            <ul className="flex flex-col items-center gap-2 text-sm sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5 sm:gap-y-1.5">
               {/* The address was the only row here with an icon but no
                   destination - phone and email were already actionable. */}
-              <li className="flex basis-full items-start gap-3">
+              <li className="flex basis-full items-start justify-center gap-3 sm:justify-start">
                 <MapPin className="mt-1 size-4 shrink-0 text-brand-500" />
                 <a
                   href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`}
@@ -139,9 +128,10 @@ export function Footer({ settings }: { settings: Partial<ISettings> }) {
                   {email}
                 </a>
               </li>
-              {/* No WhatsApp row here - the floating action button below is
-                  the WhatsApp entry point and is on screen at all times, so
-                  this line was the same link twice within one viewport. */}
+              {/* No WhatsApp row here - the floating action button in
+                  ChromeEffects is the WhatsApp entry point and is on screen
+                  at all times, so this line was the same link twice within
+                  one viewport. */}
             </ul>
           </div>
         </div>
@@ -150,25 +140,13 @@ export function Footer({ settings }: { settings: Partial<ISettings> }) {
         {/* No "DCD Approved · ISO Certified · Serving UAE" strapline here - it
             restated the two trust badges sitting a few rows above it, in the
             same viewport. The badges carry that signal better. */}
-        <div className="pt-3 text-center text-xs text-gray-500 sm:text-left">
+        <div className="pt-3 text-center text-xs leading-relaxed text-gray-500 sm:pt-2 sm:text-left">
           <p>
             © {currentYear} {settings.legalName || "Lock Shield Firefighting & Safety Equipment Installation LLC"}. All
             rights reserved.
           </p>
         </div>
       </div>
-
-      {/* Floating WhatsApp Action Button - 16px mobile / 24px desktop from
-          the corner, offset for the iOS home-indicator safe area. */}
-      <a
-        href={`https://wa.me/${whatsappNumber}?text=Hello%20Lock%20Shield,%20I%20would%20like%20to%20enquire%20about%20fire%20protection%20services.`}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Chat on WhatsApp"
-        className="fixed right-4 z-40 flex size-13 items-center justify-center rounded-full bg-emerald-500 text-white shadow-xl transition-all hover:scale-110 hover:bg-emerald-600 active:scale-95 [bottom:max(1rem,env(safe-area-inset-bottom))] sm:right-6 sm:size-14 sm:[bottom:max(1.5rem,env(safe-area-inset-bottom))] cursor-pointer"
-      >
-        <MessageCircle className="size-6 sm:size-7" />
-      </a>
     </footer>
   );
 }

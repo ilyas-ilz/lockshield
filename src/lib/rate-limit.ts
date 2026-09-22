@@ -14,6 +14,8 @@
  * without touching call sites — same `checkRateLimit()` signature.
  */
 
+import { ApiError } from "./http";
+
 interface Bucket {
   timestamps: number[];
 }
@@ -63,6 +65,28 @@ export const RATE_LIMITS = {
   leadSubmit: { max: 5, windowMs: 10 * 60 * 1000 }, // 5 submissions / 10 min / IP
   apiWrite: { max: 60, windowMs: 60 * 1000 }, // 60 writes / min / user, generic abuse ceiling
 } as const;
+
+/**
+ * The per-actor write ceiling every authenticated write endpoint shares.
+ *
+ * WHY a helper rather than the two-line check inlined at each call site: the
+ * check lived only inside createCrudHandlers, so the hand-written routes
+ * that deliberately bypass the factory (/api/users, /api/media) had no write
+ * limit at all — user creation, the most sensitive write in the system, was
+ * completely unthrottled. Routing every caller through one function means a
+ * new hand-written route cannot silently miss it, and the limit and message
+ * can only be changed in one place.
+ *
+ * Deliberately NOT applied to DELETE: the admin table's bulk delete fires
+ * one request per selected row in parallel, so a 60/min ceiling would make
+ * deleting a large selection fail halfway through. Matches the factory.
+ */
+export function assertWriteBudget(actorId: string): void {
+  const result = checkRateLimit(`write:${actorId}`, RATE_LIMITS.apiWrite.max, RATE_LIMITS.apiWrite.windowMs);
+  // ApiError so handleApi turns this into a real 429; any other error shape
+  // would fall through to its generic 500 branch.
+  if (!result.allowed) throw new ApiError(429, "Too many write requests — slow down");
+}
 
 export function getClientIp(headers: Headers): string {
   // WHY: Vercel/most proxies set x-forwarded-for as "client, proxy1, proxy2"

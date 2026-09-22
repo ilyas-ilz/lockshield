@@ -6,7 +6,7 @@ import { changePasswordSchema } from "@/lib/validation/user";
 import { User } from "@/models/User";
 import { hashPassword, verifyPassword, isPasswordStrong } from "@/lib/password";
 import { writeAudit } from "@/lib/audit";
-import { getClientIp } from "@/lib/rate-limit";
+import { checkRateLimit, getClientIp, RATE_LIMITS } from "@/lib/rate-limit";
 
 // WHY separate from PATCH /api/users/[id]: self-service password change
 // requires proving the *current* password even for an ADMIN acting on their
@@ -15,6 +15,15 @@ import { getClientIp } from "@/lib/rate-limit";
 export async function POST(req: NextRequest) {
   return handleApi(async () => {
     const actor = await requireSession();
+
+    // WHY the login preset, not the generic write budget: this endpoint
+    // verifies `currentPassword`, so it is a password oracle. Anyone who gets
+    // hold of a session could otherwise guess the current password at full
+    // speed to escalate into a permanent credential. 10 attempts / 15 min per
+    // account matches the sign-in form's ceiling.
+    const rl = checkRateLimit(`password-change:${actor.id}`, RATE_LIMITS.login.max, RATE_LIMITS.login.windowMs);
+    if (!rl.allowed) throw new ApiError(429, "Too many password attempts — try again later");
+
     await connectDB();
     const input = changePasswordSchema.parse(await req.json());
 
@@ -23,6 +32,12 @@ export async function POST(req: NextRequest) {
 
     const valid = await verifyPassword(input.currentPassword, user.passwordHash);
     if (!valid) throw new ApiError(401, "Current password is incorrect");
+
+    // Rotating to the same value is almost always a mistake, and it makes the
+    // "your password was changed" audit entry a lie.
+    if (input.currentPassword === input.newPassword) {
+      throw new ApiError(400, "New password must be different from your current one");
+    }
 
     const strength = isPasswordStrong(input.newPassword);
     if (!strength.ok) throw new ApiError(400, strength.reason);

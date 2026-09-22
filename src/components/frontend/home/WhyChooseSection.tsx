@@ -1,6 +1,13 @@
+"use client";
+
 import Image from "next/image";
+import * as React from "react";
 import { ShieldCheck, HardHat, BadgeCheck, Headset } from "lucide-react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Reveal } from "../Reveal";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const WHY_ITEMS = [
   { icon: ShieldCheck, title: "DCD Approved Contractor", desc: "Company licensed by Dubai Civil Defence; systems designed to DCD regulations and approved standards." },
@@ -10,15 +17,34 @@ const WHY_ITEMS = [
 ] as const;
 
 /**
- * Restores the legacy "Why Choose Lock Shield" section - dropped entirely
- * from the port. Trust-media image on the right (top on mobile) with a slow
- * Ken Burns drift and a pulsing "live" label, matching the legacy recipe.
+ * "Why Choose Lock Shield" — trust-media image with clip reveal +
+ * subtle scroll parallax, copy column fades up. Content unchanged.
  */
 export function WhyChooseSection() {
+  const imgWrapRef = React.useRef<HTMLDivElement>(null);
+  const imgRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (!imgWrapRef.current || !imgRef.current) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        imgRef.current,
+        { yPercent: -6 },
+        {
+          yPercent: 6,
+          ease: "none",
+          scrollTrigger: { trigger: imgWrapRef.current, start: "top bottom", end: "bottom top", scrub: true },
+        }
+      );
+    });
+    return () => ctx.revert();
+  }, []);
+
   return (
     <section className="section-y blueprint-grid">
       <div className="wrap grid grid-cols-1 gap-10 lg:grid-cols-[1fr_1.15fr] lg:items-center lg:gap-14">
-        <Reveal className="order-2 lg:order-1">
+        <Reveal variant="fade-right" className="order-2 lg:order-1">
           <span className="eyebrow">Why Choose Lock Shield?</span>
           <h2 className="font-tech mt-3 text-[clamp(1.6rem,5vw,2.6rem)] font-bold uppercase leading-tight tracking-tight text-navy-900">
             Engineered trust,
@@ -40,9 +66,9 @@ export function WhyChooseSection() {
           </div>
         </Reveal>
 
-        <Reveal delayMs={100} className="order-1 lg:order-2">
-          <div className="relative aspect-[4/3] overflow-hidden rounded-3xl shadow-[0_30px_70px_rgba(13,18,32,0.25)]">
-            <div className="absolute inset-0 [animation:kenburns_9s_ease-in-out_infinite_alternate]">
+        <Reveal delayMs={100} variant="clip" className="order-1 lg:order-2">
+          <div ref={imgWrapRef} className="relative aspect-[4/3] overflow-hidden rounded-3xl shadow-[0_30px_70px_rgba(13,18,32,0.25)]">
+            <div ref={imgRef} className="absolute -inset-y-[7%] inset-x-0 will-change-transform">
               <Image
                 src="/assets/images/why-choose-lockshield.webp"
                 alt="Lock Shield technicians installing a smoke detector and checking the fire alarm control panel on site in Dubai"

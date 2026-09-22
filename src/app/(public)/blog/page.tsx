@@ -7,10 +7,12 @@ import { Section } from "@/components/frontend/Section";
 import { Reveal } from "@/components/frontend/Reveal";
 import { ButtonLink } from "@/components/frontend/Button";
 import { BlogGrid, type BlogPostSummary } from "@/components/frontend/BlogGrid";
+import { Pagination } from "@/components/frontend/Pagination";
+import { PUBLIC_PAGE_SIZE, parsePage, totalPagesFor, type PublicSearchParams } from "@/lib/public-listing";
 
-// Content is editable from the admin, so pages must not be frozen at build
-// time. Revalidate every 5 minutes.
-export const revalidate = 300;
+// Rendered per request because the page reads ?page= from the URL. See the
+// matching note in app/(public)/projects/page.tsx.
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Fire Safety Blog & Knowledge Center | Lock Shield UAE",
@@ -27,25 +29,28 @@ interface PostSummary {
   publishedAt?: string | number | Date;
 }
 
-const PAGE_SIZE = 9;
+export default async function BlogPage({ searchParams }: { searchParams: Promise<PublicSearchParams> }) {
+  const sp = await searchParams;
 
-export default async function BlogPage() {
   let posts: PostSummary[] = [];
   let total = 0;
+  let page = 1;
+  let totalPages = 1;
 
   try {
     await connectDB();
-    // First page only - the rest loads on demand via /api/blog so the
-    // listing never becomes an endless 11,000px scroll.
-    const [foundPosts, count] = await Promise.all([
-      Post.find({ status: "published" })
-        .sort({ publishedAt: -1, createdAt: -1 })
-        .limit(PAGE_SIZE)
-        .lean(),
-      Post.countDocuments({ status: "published" }),
-    ]);
+
+    const filter = { status: "published" };
+    total = await Post.countDocuments(filter);
+    totalPages = totalPagesFor(total, PUBLIC_PAGE_SIZE);
+    page = parsePage(sp.page, totalPages);
+
+    const foundPosts = await Post.find(filter)
+      .sort({ publishedAt: -1, createdAt: -1 })
+      .skip((page - 1) * PUBLIC_PAGE_SIZE)
+      .limit(PUBLIC_PAGE_SIZE)
+      .lean();
     posts = (foundPosts as unknown as PostSummary[]) || [];
-    total = count;
   } catch {
     // DB error fallback
   }
@@ -77,7 +82,16 @@ export default async function BlogPage() {
             </div>
           </Reveal>
         ) : (
-          <BlogGrid initialPosts={posts as BlogPostSummary[]} total={total} />
+          <>
+            <BlogGrid posts={posts as BlogPostSummary[]} />
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              total={total}
+              basePath="/blog"
+              label="articles"
+            />
+          </>
         )}
       </Section>
     </>

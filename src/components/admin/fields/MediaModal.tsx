@@ -6,6 +6,7 @@ import { Search, Upload, X, Loader2, Image as ImageIcon, Check } from "lucide-re
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { api } from "@/lib/admin/api-client";
+import { toast } from "sonner";
 import { type PickedImage } from "./ImagePicker";
 
 interface MediaItem {
@@ -46,37 +47,45 @@ export function MediaModal({
   const [uploading, setUploading] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-  const fetchMedia = React.useCallback(async (targetPage = 1) => {
-    setLoading(true);
-    try {
-      const res = await api.get<PaginatedMedia>(
-        `/api/media?page=${targetPage}&pageSize=18&sort=createdAt&order=desc`
-      );
-      setItems(res.items || []);
-      setPage(res.page);
-      setTotalPages(res.totalPages);
-    } catch {
-      // Ignore initial error if DB empty
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  // WHY the search goes to the server: this used to filter `items` in the
+  // browser, which only ever saw the 18 assets on the current page — so
+  // searching a 200-image library silently missed everything on pages 2+.
+  // /api/media now filters on alt + url, so the query covers the whole
+  // library and the result is paginated like any other listing.
+  const fetchMedia = React.useCallback(
+    async (targetPage = 1, query = "") => {
+      setLoading(true);
+      try {
+        const params = new URLSearchParams({
+          page: String(targetPage),
+          pageSize: "18",
+          sort: "createdAt",
+          order: "desc",
+        });
+        const trimmed = query.trim();
+        if (trimmed) params.set("search", trimmed);
 
+        const res = await api.get<PaginatedMedia>(`/api/media?${params}`);
+        setItems(res.items || []);
+        setPage(res.page);
+        setTotalPages(res.totalPages);
+      } catch {
+        // Ignore initial error if DB empty
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
+
+  // Debounced so a keystroke does not fire a request per character; always
+  // returns to page 1, since page 4 of the old result is meaningless once
+  // the query changes.
   React.useEffect(() => {
-    if (open) {
-      void fetchMedia(1);
-    }
-  }, [open, fetchMedia]);
-
-  const filteredItems = React.useMemo(() => {
-    if (!search.trim()) return items;
-    const q = search.toLowerCase();
-    return items.filter(
-      (m) =>
-        m.alt?.toLowerCase().includes(q) ||
-        m.url?.toLowerCase().includes(q)
-    );
-  }, [items, search]);
+    if (!open) return;
+    const timer = setTimeout(() => void fetchMedia(1, search), 300);
+    return () => clearTimeout(timer);
+  }, [open, search, fetchMedia]);
 
   const handleUploadNew = async (file: File) => {
     setUploading(true);
@@ -107,7 +116,10 @@ export function MediaModal({
       onSelect(newMedia);
       onOpenChange(false);
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Upload failed");
+      // WHY toast, not alert(): a native alert blocks the whole tab and, worse,
+      // steals focus from this Radix dialog — dismissing it left the modal in a
+      // half-closed state. The toast also survives the dialog closing.
+      toast.error(err instanceof Error ? err.message : "Upload failed");
     } finally {
       setUploading(false);
     }
@@ -183,15 +195,27 @@ export function MediaModal({
                 <Loader2 className="size-8 animate-spin text-brand mb-2" />
                 <p className="text-xs">Loading media assets…</p>
               </div>
-            ) : filteredItems.length === 0 ? (
+            ) : items.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-64 text-muted border-2 border-dashed border-app rounded-xl">
                 <ImageIcon className="size-10 text-muted/50 mb-2" />
-                <p className="text-sm font-medium text-foreground">No media assets found</p>
-                <p className="text-xs text-muted mt-1">Upload an image to start building your library.</p>
+                {search.trim() ? (
+                  <>
+                    <p className="text-sm font-medium text-foreground">No assets match “{search.trim()}”</p>
+                    <p className="text-xs text-muted mt-1">Searches alt text and filename across the whole library.</p>
+                    <Button variant="secondary" size="sm" className="mt-3" onClick={() => setSearch("")}>
+                      Clear search
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-sm font-medium text-foreground">No media assets found</p>
+                    <p className="text-xs text-muted mt-1">Upload an image to start building your library.</p>
+                  </>
+                )}
               </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                {filteredItems.map((item) => (
+                {items.map((item) => (
                   <div
                     key={item._id}
                     onClick={() => {
@@ -246,7 +270,7 @@ export function MediaModal({
                   variant="secondary"
                   size="sm"
                   disabled={page <= 1 || loading}
-                  onClick={() => fetchMedia(page - 1)}
+                  onClick={() => fetchMedia(page - 1, search)}
                   className="text-xs h-8"
                 >
                   Previous
@@ -255,7 +279,7 @@ export function MediaModal({
                   variant="secondary"
                   size="sm"
                   disabled={page >= totalPages || loading}
-                  onClick={() => fetchMedia(page + 1)}
+                  onClick={() => fetchMedia(page + 1, search)}
                   className="text-xs h-8"
                 >
                   Next

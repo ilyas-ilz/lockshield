@@ -1,9 +1,14 @@
 "use client";
 
+import * as React from "react";
 import { MessageSquare, Compass, FileCheck2, Hammer, Handshake } from "lucide-react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useInView } from "@/lib/hooks/useInView";
 import { Reveal } from "../Reveal";
 import { cn } from "@/lib/utils";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const STEPS = [
   { num: "01", icon: MessageSquare, title: "Consultation", desc: "Understanding your requirements" },
@@ -14,15 +19,50 @@ const STEPS = [
 ] as const;
 
 /**
- * Restores the legacy process timeline - dropped entirely from the port.
- * The key mobile-first behaviour: this is a 5-column horizontal rail on
- * desktop and a vertical rail on mobile, not the same layout shrunk down.
+ * Process timeline — 5-col rail on desktop, vertical on mobile.
+ * Fill line now scrubs with scroll (draws as you scroll); step cards
+ * still stagger in once. Copy + layout unchanged.
  */
 export function ProcessTimelineSection() {
   const [ref, go] = useInView<HTMLDivElement>({ threshold: 0.3 });
+  const sectionRef = React.useRef<HTMLElement>(null);
+  const fillHRef = React.useRef<HTMLDivElement>(null);
+  const fillVRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (!sectionRef.current) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const ctx = gsap.context(() => {
+      if (fillHRef.current) {
+        gsap.fromTo(
+          fillHRef.current,
+          { scaleX: 0 },
+          {
+            scaleX: 1,
+            transformOrigin: "left center",
+            ease: "none",
+            scrollTrigger: { trigger: sectionRef.current, start: "top 75%", end: "center 45%", scrub: 0.6 },
+          }
+        );
+      }
+      if (fillVRef.current) {
+        gsap.fromTo(
+          fillVRef.current,
+          { scaleY: 0 },
+          {
+            scaleY: 1,
+            transformOrigin: "top center",
+            ease: "none",
+            scrollTrigger: { trigger: sectionRef.current, start: "top 70%", end: "bottom 60%", scrub: 0.6 },
+          }
+        );
+      }
+    });
+    return () => ctx.revert();
+  }, []);
 
   return (
-    <section className="section-y bg-paper-soft">
+    <section ref={sectionRef} className="section-y bg-paper-soft">
       <div className="wrap">
         <Reveal className="mb-10 sm:mb-14">
           <span className="eyebrow">Our Work Process</span>
@@ -38,12 +78,12 @@ export function ProcessTimelineSection() {
           <div className="absolute left-7 top-0 hidden h-full w-0.5 bg-[var(--marketing-line)] lg:top-7 lg:left-[10%] lg:right-[10%] lg:block lg:h-0.5 lg:w-auto" />
           <div className="absolute left-7 top-0 bottom-0 w-0.5 bg-[var(--marketing-line)] lg:hidden" />
           <div
-            className="absolute left-7 top-0 w-0.5 rounded-full bg-gradient-to-b from-brand-500 to-[#ff5a60] shadow-[0_0_14px_rgba(224,27,36,0.6)] transition-[height] duration-[1.8s] [transition-timing-function:var(--ease-brand)] lg:hidden"
-            style={{ height: go ? "100%" : "0%" }}
+            ref={fillVRef}
+            className="absolute left-7 top-0 bottom-0 w-0.5 rounded-full bg-gradient-to-b from-brand-500 to-[#ff5a60] shadow-[0_0_14px_rgba(224,27,36,0.6)] lg:hidden"
           />
           <div
-            className="absolute top-7 left-[10%] hidden h-0.5 rounded-full bg-gradient-to-r from-brand-500 to-[#ff5a60] shadow-[0_0_14px_rgba(224,27,36,0.6)] transition-[width] duration-[1.8s] [transition-timing-function:var(--ease-brand)] lg:block"
-            style={{ width: go ? "80%" : "0%" }}
+            ref={fillHRef}
+            className="absolute top-7 left-[10%] hidden h-0.5 w-[80%] rounded-full bg-gradient-to-r from-brand-500 to-[#ff5a60] shadow-[0_0_14px_rgba(224,27,36,0.6)] lg:block"
           />
 
           {STEPS.map((step, i) => (

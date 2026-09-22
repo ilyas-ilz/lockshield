@@ -24,6 +24,7 @@ export function StatsSection() {
             <Reveal
               key={stat.label}
               delayMs={i * 80}
+              variant="scale"
               className="flex items-center gap-3 rounded-2xl border border-[var(--marketing-line)] bg-white p-4 transition-all duration-300 [transition-timing-function:var(--ease-brand)] hover:-translate-y-1.5 hover:shadow-[0_18px_44px_rgba(13,18,32,0.1)] sm:gap-4 sm:p-6"
             >
               <span className="flex size-11 shrink-0 items-center justify-center rounded-full border-[1.5px] border-brand-500 text-brand-500 sm:size-13">

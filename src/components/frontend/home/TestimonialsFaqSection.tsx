@@ -62,6 +62,7 @@ export function TestimonialsFaqSection({ faqs }: { faqs: FAQItem[] }) {
   );
 
   const pauseRef = React.useRef(false);
+  const touchX = React.useRef<number | null>(null);
   React.useEffect(() => {
     const timer = setInterval(() => {
       if (!pauseRef.current) setActive((i) => (i + 1) % TESTIMONIALS.length);
@@ -89,9 +90,18 @@ export function TestimonialsFaqSection({ faqs }: { faqs: FAQItem[] }) {
               bottom, controls below - a true 50/50. min-h keeps it from
               collapsing when the FAQ column is short (all rows closed). */}
           <div
-            className="relative mt-6 flex flex-1 flex-col"
+            className="relative mt-6 flex flex-1 flex-col touch-pan-y"
             onMouseEnter={() => (pauseRef.current = true)}
             onMouseLeave={() => (pauseRef.current = false)}
+            onTouchStart={(e) => {
+              touchX.current = e.touches[0]?.clientX ?? null;
+            }}
+            onTouchEnd={(e) => {
+              if (touchX.current == null) return;
+              const dx = (e.changedTouches[0]?.clientX ?? 0) - touchX.current;
+              if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+              touchX.current = null;
+            }}
           >
             {/* Fixed floor stops the rotating quotes from shifting layout. */}
             <div className="relative grid flex-1 min-h-[340px] sm:min-h-[300px]">

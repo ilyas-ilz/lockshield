@@ -6,9 +6,10 @@ import { requireRole, STAFF } from "@/lib/rbac";
 import { paginate, resolveSort } from "@/lib/pagination";
 import { listQuerySchema } from "@/lib/validation/common";
 import { SORTABLE_FIELDS } from "@/lib/sortable-fields";
-import { Media } from "@/models/Media";
+import { Media, type IMedia } from "@/models/Media";
 import { writeAudit } from "@/lib/audit";
-import { getClientIp } from "@/lib/rate-limit";
+import { assertWriteBudget, getClientIp } from "@/lib/rate-limit";
+import { buildSearchFilter } from "@/lib/search-filter";
 
 // WHY POST here doesn't upload a file itself: the browser already uploaded
 // directly to Cloudinary using the signature from /api/upload/sign. This
@@ -26,14 +27,18 @@ const mediaRecordSchema = z.object({
   bytes: z.number().optional(),
 });
 
+/** Matches the `media` entry in admin/server-data.ts — see USER_SEARCH_FIELDS. */
+const MEDIA_SEARCH_FIELDS = ["alt", "url"] as const;
+
 export async function GET(req: NextRequest) {
   return handleApi(async () => {
     await requireRole(...STAFF);
     await connectDB();
     const { searchParams } = new URL(req.url);
     const query = listQuerySchema.parse(Object.fromEntries(searchParams));
+    const filter = buildSearchFilter<IMedia>(query.search, MEDIA_SEARCH_FIELDS);
     const sort = resolveSort(query.sort, query.order, SORTABLE_FIELDS.media, { createdAt: -1 });
-    const result = await paginate(Media, {}, { page: query.page, pageSize: query.pageSize, sort });
+    const result = await paginate(Media, filter, { page: query.page, pageSize: query.pageSize, sort });
     return ok(result);
   });
 }
@@ -41,6 +46,8 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   return handleApi(async () => {
     const actor = await requireRole(...STAFF);
+    assertWriteBudget(actor.id);
+
     await connectDB();
     const input = mediaRecordSchema.parse(await req.json());
     const media = await Media.create({ ...input, uploadedBy: actor.id });

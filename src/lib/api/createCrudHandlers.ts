@@ -7,7 +7,9 @@ import { requireRole, type SessionUser } from "@/lib/rbac";
 import { paginate, resolveSort } from "@/lib/pagination";
 import { listQuerySchema, objectIdSchema } from "@/lib/validation/common";
 import { writeAudit } from "@/lib/audit";
-import { checkRateLimit, RATE_LIMITS, getClientIp } from "@/lib/rate-limit";
+import { assertWriteBudget, getClientIp } from "@/lib/rate-limit";
+import { buildSearchFilter } from "@/lib/search-filter";
+import { revalidateResource } from "@/lib/revalidate";
 import type { UserRole } from "@/models/User";
 
 /**
@@ -43,13 +45,6 @@ export interface CrudConfig<TDoc, TCreate, TUpdate> {
     existing: TDoc,
     actor: SessionUser
   ) => Promise<Record<string, unknown>> | Record<string, unknown>;
-}
-
-function buildSearchFilter<TDoc>(q: string | undefined, fields: string[] | undefined): FilterQuery<TDoc> {
-  if (!q || !fields || fields.length === 0) return {};
-  const escaped = q.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, (char) => "\\" + char);
-  const regex = new RegExp(escaped, "i"); // WHY: escape regex metachars in user input — an unescaped `.` or `(` from a search box must never be interpreted as regex syntax against the DB
-  return { $or: fields.map((f) => ({ [f]: regex })) } as FilterQuery<TDoc>;
 }
 
 export function createCollectionHandlers<TDoc, TCreate, TUpdate>(cfg: CrudConfig<TDoc, TCreate, TUpdate>) {
@@ -90,9 +85,7 @@ export function createCollectionHandlers<TDoc, TCreate, TUpdate>(cfg: CrudConfig
   async function POST(req: NextRequest) {
     return handleApi(async () => {
       const actor = await requireRole(...cfg.writeRoles);
-
-      const rl = checkRateLimit(`write:${actor.id}`, RATE_LIMITS.apiWrite.max, RATE_LIMITS.apiWrite.windowMs);
-      if (!rl.allowed) throw new ApiError(429, "Too many write requests — slow down");
+      assertWriteBudget(actor.id);
 
       await connectDB();
       const body = await req.json();
@@ -107,6 +100,7 @@ export function createCollectionHandlers<TDoc, TCreate, TUpdate>(cfg: CrudConfig
         resourceId: String(doc._id),
         ip: getClientIp(req.headers),
       });
+      revalidateResource(cfg.resourceName);
       return created(doc);
     });
   }
@@ -130,8 +124,7 @@ export function createItemHandlers<TDoc, TCreate, TUpdate>(cfg: CrudConfig<TDoc,
   async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     return handleApi(async () => {
       const actor = await requireRole(...cfg.writeRoles);
-      const rl = checkRateLimit(`write:${actor.id}`, RATE_LIMITS.apiWrite.max, RATE_LIMITS.apiWrite.windowMs);
-      if (!rl.allowed) throw new ApiError(429, "Too many write requests — slow down");
+      assertWriteBudget(actor.id);
 
       await connectDB();
       const { id } = await params;
@@ -154,6 +147,7 @@ export function createItemHandlers<TDoc, TCreate, TUpdate>(cfg: CrudConfig<TDoc,
         meta: { fields: Object.keys(input as object) },
         ip: getClientIp(req.headers),
       });
+      revalidateResource(cfg.resourceName);
       return ok(doc);
     });
   }
@@ -175,6 +169,7 @@ export function createItemHandlers<TDoc, TCreate, TUpdate>(cfg: CrudConfig<TDoc,
         resourceId: id,
         ip: getClientIp(req.headers),
       });
+      revalidateResource(cfg.resourceName);
       return noContent();
     });
   }

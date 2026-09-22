@@ -7,10 +7,13 @@ import { Service } from "@/models";
 import { PageHero } from "@/components/frontend/PageHero";
 import { Section } from "@/components/frontend/Section";
 import { Reveal } from "@/components/frontend/Reveal";
+import { Pagination } from "@/components/frontend/Pagination";
+import { CardGrid } from "@/components/frontend/CardGrid";
+import { PUBLIC_PAGE_SIZE, parsePage, totalPagesFor, type PublicSearchParams } from "@/lib/public-listing";
 
-// Content is editable from the admin, so pages must not be frozen at build
-// time. Revalidate every 5 minutes.
-export const revalidate = 300;
+// Rendered per request because the page reads ?page= from the URL. See the
+// matching note in app/(public)/projects/page.tsx.
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Fire Protection Services | Lock Shield UAE",
@@ -57,18 +60,48 @@ const DEFAULT_SERVICES: ServiceItem[] = [
   },
 ];
 
-export default async function ServicesPage() {
+export default async function ServicesPage({ searchParams }: { searchParams: Promise<PublicSearchParams> }) {
+  const sp = await searchParams;
+
   let servicesList: ServiceItem[] = [];
+  let total = 0;
+  let page = 1;
+  let totalPages = 1;
+  let usingFallback = false;
+
   try {
     await connectDB();
-    const services = await Service.find({ status: "published" }).sort({ order: 1, title: 1 }).lean();
-    servicesList = (services as unknown as ServiceItem[]) || [];
+
+    const filter = { status: "published" };
+    total = await Service.countDocuments(filter);
+    totalPages = totalPagesFor(total, PUBLIC_PAGE_SIZE);
+    page = parsePage(sp.page, totalPages);
+
+    const services = await Service.find(filter)
+      .sort({ order: 1, title: 1 })
+      .skip((page - 1) * PUBLIC_PAGE_SIZE)
+      .limit(PUBLIC_PAGE_SIZE)
+      .lean();
+    servicesList = ((services as unknown as Array<Record<string, unknown>>) ?? []).map((s) => ({
+      title: String(s["title"] ?? ""),
+      slug: String(s["slug"] ?? ""),
+      summary: String(s["summary"] ?? ""),
+    }));
   } catch {
     // Fallback
     void 0;
   }
 
-  const items = servicesList.length > 0 ? servicesList : DEFAULT_SERVICES;
+  // Hardcoded defaults are the "database unreachable" net, not content, so
+  // they are shown whole rather than paginated.
+  if (total === 0 && servicesList.length === 0) {
+    usingFallback = true;
+    servicesList = DEFAULT_SERVICES;
+    total = DEFAULT_SERVICES.length;
+    totalPages = 1;
+  }
+
+  const items = servicesList;
 
   return (
     <>
@@ -80,7 +113,7 @@ export default async function ServicesPage() {
       />
 
       <Section className="blueprint-grid bg-paper-soft">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+        <CardGrid>
           {items.map((service, idx) => {
             const Icon = serviceIcon(service.slug);
             return (
@@ -107,7 +140,17 @@ export default async function ServicesPage() {
             </Reveal>
             );
           })}
-        </div>
+        </CardGrid>
+
+        {!usingFallback && (
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            total={total}
+            basePath="/services"
+            label="services"
+          />
+        )}
       </Section>
     </>
   );

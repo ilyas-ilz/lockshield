@@ -6,6 +6,7 @@ import { Settings } from "@/models/Settings";
 import { getSettings } from "@/lib/settings";
 import { writeAudit } from "@/lib/audit";
 import { getClientIp } from "@/lib/rate-limit";
+import { revalidateSettings } from "@/lib/revalidate";
 
 // WHY a hand-written singleton route, not the CRUD factory: there is
 // exactly one Settings document and no list/create/delete makes sense for
@@ -35,6 +36,9 @@ export async function PATCH(req: NextRequest) {
       meta: { fields: Object.keys(input) },
       ip: getClientIp(req.headers),
     });
+    // Navbar + Footer render from these values on every public page, so this
+    // is the one write that legitimately invalidates the whole public tree.
+    revalidateSettings();
     return ok(updated);
   });
 }

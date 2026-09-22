@@ -6,7 +6,7 @@ import { objectIdSchema } from "@/lib/validation/common";
 import { userUpdateSchema } from "@/lib/validation/user";
 import { User } from "@/models/User";
 import { writeAudit } from "@/lib/audit";
-import { getClientIp } from "@/lib/rate-limit";
+import { assertWriteBudget, getClientIp } from "@/lib/rate-limit";
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return handleApi(async () => {
@@ -23,6 +23,8 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return handleApi(async () => {
     const actor = await requireRole(...ADMIN_ONLY);
+    assertWriteBudget(actor.id);
+
     await connectDB();
     const { id } = await params;
     objectIdSchema.parse(id);

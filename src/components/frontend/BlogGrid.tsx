@@ -1,10 +1,8 @@
-"use client";
-
-import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Calendar, Flame, Loader2 } from "lucide-react";
+import { ArrowRight, Calendar, Flame } from "lucide-react";
 import { Reveal } from "./Reveal";
+import { CardGrid } from "./CardGrid";
 
 export interface BlogPostSummary {
   _id: string;
@@ -14,8 +12,6 @@ export interface BlogPostSummary {
   coverImage?: { url: string; alt?: string };
   publishedAt?: string | number | Date;
 }
-
-const PAGE_SIZE = 9;
 
 function PostCard({ post, idx }: { post: BlogPostSummary; idx: number }) {
   return (
@@ -71,63 +67,21 @@ function PostCard({ post, idx }: { post: BlogPostSummary; idx: number }) {
 }
 
 /**
- * Paginated blog grid - renders the first page server-side, further pages
- * load on demand so the listing never becomes an 11,000px endless scroll.
+ * Blog card grid.
+ *
+ * WHY this no longer owns pagination: it used to hold the posts in state and
+ * append to them from /api/blog on "Load More". That made pages 2+ invisible
+ * to crawlers, unreachable by URL (you could not link someone to a post's
+ * page), lost on back-navigation, and a failed fetch was swallowed in silence.
+ * The page now queries the page it needs server-side and renders real
+ * `<Pagination>` links; this component just draws the cards.
  */
-export function BlogGrid({ initialPosts, total }: { initialPosts: BlogPostSummary[]; total: number }) {
-  const [posts, setPosts] = React.useState(initialPosts);
-  const [loading, setLoading] = React.useState(false);
-
-  const hasMore = posts.length < total;
-
-  async function loadMore() {
-    if (loading || !hasMore) return;
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/blog?skip=${posts.length}&limit=${PAGE_SIZE}`);
-      if (!res.ok) throw new Error("load failed");
-      const data = (await res.json()) as { posts: BlogPostSummary[] };
-      setPosts((prev) => [...prev, ...(data.posts || [])]);
-    } catch {
-      // Silent fail - the button stays so the user can retry.
-    } finally {
-      setLoading(false);
-    }
-  }
-
+export function BlogGrid({ posts }: { posts: BlogPostSummary[] }) {
   return (
-    <>
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
-        {posts.map((post, idx) => (
-          <PostCard key={post._id} post={post} idx={idx} />
-        ))}
-      </div>
-
-      {hasMore && (
-        <div className="mt-10 text-center sm:mt-12">
-          <p className="mb-4 text-xs text-ink/45">
-            Showing {posts.length} of {total} articles
-          </p>
-          <button
-            type="button"
-            onClick={loadMore}
-            disabled={loading}
-            className="btn-pill inline-flex min-h-11 items-center gap-2 border border-[var(--marketing-line)] bg-white px-6 py-3 text-sm font-semibold text-navy-900 shadow-xs transition-all hover:border-brand-500 hover:text-brand-500 active:scale-95 disabled:opacity-60 cursor-pointer"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="size-4 animate-spin" />
-                Loading…
-              </>
-            ) : (
-              <>
-                Load More Articles
-                <ArrowRight className="size-4" />
-              </>
-            )}
-          </button>
-        </div>
-      )}
-    </>
+    <CardGrid>
+      {posts.map((post, idx) => (
+        <PostCard key={post._id} post={post} idx={idx} />
+      ))}
+    </CardGrid>
   );
 }

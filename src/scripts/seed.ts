@@ -20,11 +20,34 @@ import { Category } from "../models/Category";
 import { Post } from "../models/Post";
 import { hashPassword } from "../lib/password";
 
+/**
+ * WHY: SEED_ADMIN_EMAIL is copied by hand into .env and a bare username
+ * ("admin") sails past this script only to die inside Mongoose as a raw
+ * ValidationError stack — which says nothing about which env var to fix.
+ * Check it here and name the variable in the message instead.
+ */
+function resolveAdminEmail(): string {
+  const raw = process.env.SEED_ADMIN_EMAIL?.trim();
+  if (!raw) return "admin@lockshield.ae";
+
+  const email = raw.toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    throw new Error(
+      `SEED_ADMIN_EMAIL in .env is "${raw}", which is not a valid email address. ` +
+        `Admin accounts sign in by email — set it to something like admin@lockshield.ae, or remove the line to use that default.`
+    );
+  }
+  return email;
+}
+
 async function main() {
+  // Validated before connecting so a bad .env fails instantly, not after
+  // a 30s Mongo connection timeout.
+  const adminEmail = resolveAdminEmail();
+
   await connectDB();
 
   // 1. Admin User
-  const adminEmail = (process.env.SEED_ADMIN_EMAIL || "admin@lockshield.ae").trim().toLowerCase();
   const adminPassword = process.env.SEED_ADMIN_PASSWORD || "lockshield-secure-2026";
   const adminName = process.env.SEED_ADMIN_NAME ?? "Lock Shield Admin";
 
@@ -378,7 +401,11 @@ async function main() {
   process.exit(0);
 }
 
-main().catch((err) => {
-  console.error("[seed] failed:", err);
+main().catch((err: unknown) => {
+  // A one-line reason beats a 40-line Mongoose/Mongo stack for the common
+  // causes here (bad .env value, Mongo not running). Full stack stays
+  // available behind SEED_DEBUG=1.
+  console.error(`[seed] failed: ${err instanceof Error ? err.message : String(err)}`);
+  if (process.env.SEED_DEBUG === "1") console.error(err);
   process.exit(1);
 });

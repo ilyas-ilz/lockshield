@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { api, ApiClientError } from "@/lib/admin/api-client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input, Field } from "@/components/ui/input";
+import { Input, Field, PasswordInput } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { PageHeader } from "@/components/shared/page-header";
 
@@ -32,9 +32,10 @@ export default function NewUserPage() {
   }
 
   return (
-    <>
+    // Centred to match the Edit user page — see the note there.
+    <div className="mx-auto w-full max-w-lg">
       <PageHeader title="New user" description="Give a colleague access to the admin." />
-      <form onSubmit={handleSubmit} className="max-w-lg">
+      <form onSubmit={handleSubmit}>
         <Card>
           <CardContent className="space-y-5">
             <Field label="Name" htmlFor="name" required>
@@ -46,6 +47,7 @@ export default function NewUserPage() {
                 id="email"
                 type="email"
                 required
+                autoComplete="off"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
               />
@@ -55,13 +57,16 @@ export default function NewUserPage() {
               label="Temporary password"
               htmlFor="password"
               required
-              help="At least 10 characters with upper and lower case letters and a number. Share it with them out of band — they can change it after signing in."
+              help="At least 10 characters with upper and lower case letters and a number. Share it with them out of band — they can change it themselves under My account after signing in."
             >
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
                 required
                 minLength={10}
+                // WHY new-password: with the default the browser offered the
+                // signed-in admin's OWN saved credentials here, so creating a
+                // colleague could silently submit your email and password.
+                autoComplete="new-password"
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
               />
@@ -92,6 +97,6 @@ export default function NewUserPage() {
           </Button>
         </div>
       </form>
-    </>
+    </div>
   );
 }

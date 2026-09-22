@@ -26,6 +26,12 @@ export async function connectDB(): Promise<typeof mongoose> {
     cache.promise = mongoose.connect(MONGODB_URI, {
       bufferCommands: false,
       maxPoolSize: 10,
+      // WHY: without this the driver retries server selection for 30s
+      // (default) before throwing. With local Mongo stopped, every public
+      // page stalled ~30s before falling back to defaults. 5s keeps the
+      // fallback path usable in dev while staying generous for Atlas cold
+      // starts in production.
+      serverSelectionTimeoutMS: 5000,
     });
   }
 

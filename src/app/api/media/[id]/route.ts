@@ -7,7 +7,7 @@ import { mediaUpdateSchema } from "@/lib/validation/user";
 import { Media } from "@/models/Media";
 import { deleteStoredFile } from "@/lib/storage";
 import { writeAudit } from "@/lib/audit";
-import { getClientIp } from "@/lib/rate-limit";
+import { assertWriteBudget, getClientIp } from "@/lib/rate-limit";
 import { logger } from "@/lib/logger";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -25,6 +25,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return handleApi(async () => {
     const actor = await requireRole(...STAFF);
+    assertWriteBudget(actor.id);
+
     await connectDB();
     const { id } = await params;
     objectIdSchema.parse(id);

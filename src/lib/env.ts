@@ -1,20 +1,46 @@
 import { z } from "zod";
 
+/**
+ * WHY: a key that is present-but-blank in .env (`CLOUDINARY_API_KEY=`) is the
+ * same thing as "not configured", but zod sees `""` and fails `.min(1)` even
+ * behind `.optional()`. That turned a half-filled .env into a hard boot crash
+ * — `npm run seed` could not run without dummy Cloudinary credentials. Blank
+ * now collapses to undefined so the optional keys behave as intended, and
+ * hasCloudinary()/hasSmtp() keep gating the features that actually need them.
+ */
+const optionalString = z.preprocess(
+  (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
+  z.string().min(1).optional()
+);
+
+const optionalPort = z.preprocess(
+  (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
+  z.coerce.number().int().positive().optional()
+);
+
+const optionalUrl = z.preprocess(
+  (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
+  z.string().url().optional()
+);
+
 // WHY: fail fast at boot with a clear message instead of a cryptic
 // "Cannot read properties of undefined" three layers deep at request time.
 const envSchema = z.object({
   MONGODB_URI: z.string().min(1, "MONGODB_URI is required"),
   AUTH_SECRET: z.string().min(32, "AUTH_SECRET must be at least 32 chars (openssl rand -base64 32)"),
-  AUTH_URL: z.string().url().optional(),
-  CLOUDINARY_CLOUD_NAME: z.string().min(1).optional(),
-  CLOUDINARY_API_KEY: z.string().min(1).optional(),
-  CLOUDINARY_API_SECRET: z.string().min(1).optional(),
-  SMTP_HOST: z.string().min(1).optional(),
-  SMTP_PORT: z.coerce.number().int().positive().optional(),
-  SMTP_USER: z.string().min(1).optional(),
-  SMTP_PASSWORD: z.string().min(1).optional(),
-  SMTP_FROM: z.string().min(1).optional(),
-  SITE_URL: z.string().url().default("https://lockshield.ae"),
+  AUTH_URL: optionalUrl,
+  CLOUDINARY_CLOUD_NAME: optionalString,
+  CLOUDINARY_API_KEY: optionalString,
+  CLOUDINARY_API_SECRET: optionalString,
+  SMTP_HOST: optionalString,
+  SMTP_PORT: optionalPort,
+  SMTP_USER: optionalString,
+  SMTP_PASSWORD: optionalString,
+  SMTP_FROM: optionalString,
+  SITE_URL: z.preprocess(
+    (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
+    z.string().url().default("https://lockshield.ae")
+  ),
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
 });
 

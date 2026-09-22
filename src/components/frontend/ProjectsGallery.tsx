@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, MapPin } from "lucide-react";
 import { useProjectMotion } from "@/lib/hooks/useProjectMotion";
+import { CardGrid } from "./CardGrid";
 
 export interface ProjectItem {
   _id?: string;
@@ -18,50 +19,67 @@ export interface ProjectItem {
   image?: { url: string; alt?: string };
 }
 
-export function ProjectsGallery({ projects }: { projects: ProjectItem[] }) {
-  const [selectedSector, setSelectedSector] = React.useState<string>("All");
-
-  const sectors = React.useMemo(() => {
-    const s = new Set<string>();
-    projects.forEach((p) => {
-      if (p.sector) s.add(p.sector);
-    });
-    return ["All", ...Array.from(s)];
-  }, [projects]);
-
-  const filtered = React.useMemo(() => {
-    if (selectedSector === "All") return projects;
-    return projects.filter((p) => p.sector === selectedSector);
-  }, [projects, selectedSector]);
+/**
+ * WHY the sector filter is server-driven links rather than local state: once
+ * the listing is paginated, filtering in the browser would only ever filter
+ * the nine projects already on screen, so "Retail" on page 1 silently hid
+ * every retail project on pages 2+. The page now queries Mongo by sector and
+ * these tabs are just links that set `?sector=`, which also makes each filtered
+ * view a real, shareable, crawlable URL.
+ */
+export function ProjectsGallery({
+  projects,
+  sectors,
+  activeSector,
+  basePath = "/projects",
+}: {
+  projects: ProjectItem[];
+  /** Every sector across the whole collection, not just the current page. */
+  sectors?: string[];
+  activeSector?: string;
+  basePath?: string;
+}) {
+  const tabs = React.useMemo(() => ["All", ...(sectors ?? [])], [sectors]);
+  const current = activeSector ?? "All";
 
   const gridRef = React.useRef<HTMLDivElement>(null);
-  useProjectMotion(gridRef, [filtered]);
+  useProjectMotion(gridRef, [projects]);
 
   return (
     <div className="space-y-8 sm:space-y-10">
-      {/* Filter Tabs */}
-      {sectors.length > 2 && (
-        <div className="-mx-4 flex snap-x gap-2 overflow-x-auto px-4 pb-1 scrollbar-none sm:mx-0 sm:flex-wrap sm:justify-center sm:overflow-visible sm:px-0">
-          {sectors.map((sector) => (
-            <button
-              key={sector}
-              type="button"
-              onClick={() => setSelectedSector(sector)}
-              className={`flex min-h-11 shrink-0 snap-start cursor-pointer items-center rounded-full px-5 text-xs font-semibold transition-all sm:text-sm ${
-                selectedSector === sector
-                  ? "bg-brand-500 text-white shadow-md shadow-brand-500/20"
-                  : "border border-[var(--marketing-line)] bg-white text-ink/70 hover:border-ink/30"
-              }`}
-            >
-              {sector}
-            </button>
-          ))}
+      {/* Filter Tabs — centred wrapping row on every viewport (never a
+          full-bleed scroll strip, so the first pill can never clip at the
+          screen edge). Compact on phones, roomier from sm up. */}
+      {tabs.length > 2 && (
+        <div className="flex flex-wrap justify-center gap-2 sm:gap-2.5">
+          {tabs.map((sector) => {
+            const isActive = current === sector;
+            // Changing the filter always returns to page 1 — landing on
+            // "?sector=Retail&page=4" of a one-page result is an empty grid.
+            const href = sector === "All" ? basePath : `${basePath}?sector=${encodeURIComponent(sector)}`;
+            return (
+              <Link
+                key={sector}
+                href={href}
+                scroll={false}
+                aria-current={isActive ? "page" : undefined}
+                className={`flex min-h-10 cursor-pointer items-center rounded-full px-4 text-[11px] font-semibold transition-all sm:min-h-11 sm:px-5 sm:text-sm ${
+                  isActive
+                    ? "bg-brand-500 text-white shadow-md shadow-brand-500/20"
+                    : "border border-[var(--marketing-line)] bg-white text-ink/70 hover:border-ink/30"
+                }`}
+              >
+                {sector}
+              </Link>
+            );
+          })}
         </div>
       )}
 
       {/* Grid */}
-      <div ref={gridRef} className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
-        {filtered.map((project, idx) => (
+      <div ref={gridRef}>
+        <CardGrid>
+        {projects.map((project, idx) => (
           <div key={project.slug || idx} data-project-card>
             <Link
               href={`/projects/${project.slug}`}
@@ -105,6 +123,7 @@ export function ProjectsGallery({ projects }: { projects: ProjectItem[] }) {
             </Link>
           </div>
         ))}
+        </CardGrid>
       </div>
     </div>
   );

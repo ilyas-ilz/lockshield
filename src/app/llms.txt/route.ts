@@ -11,24 +11,45 @@ import { getEnv } from "@/lib/env";
 // hand-maintained one would.
 export const revalidate = 3600;
 
-export async function GET() {
-  await connectDB();
-  const { SITE_URL } = getEnv();
-  const settings = await getSettings();
+type ContentDoc = Record<string, unknown>;
 
-  const [services, projects, posts] = await Promise.all([
-    Service.find({ status: "published" }).select("title summary slug").sort({ order: 1 }).lean(),
-    Project.find({ publishStatus: "published" }).select("title client sector emirate slug").sort({ order: 1 }).limit(20).lean(),
-    Post.find({ status: "published" }).select("title excerpt slug").sort({ publishedAt: -1 }).limit(20).lean(),
-  ]);
+export async function GET() {
+  const { SITE_URL } = getEnv();
+
+  // WHY the try/catch: an unreachable database used to fail the whole
+  // `next build` here at the prerender step, the same way it did for
+  // /sitemap.xml. Degrade to the site-level header instead — a short
+  // llms.txt is fine, a broken build is not.
+  let settings: Awaited<ReturnType<typeof getSettings>> | null = null;
+  let services: ContentDoc[] = [];
+  let projects: ContentDoc[] = [];
+  let posts: ContentDoc[] = [];
+
+  try {
+    await connectDB();
+    settings = await getSettings();
+
+    [services, projects, posts] = await Promise.all([
+      Service.find({ status: "published" }).select("title summary slug").sort({ order: 1 }).lean() as Promise<ContentDoc[]>,
+      Project.find({ publishStatus: "published" }).select("title client sector emirate slug").sort({ order: 1 }).limit(20).lean() as Promise<ContentDoc[]>,
+      Post.find({ status: "published" }).select("title excerpt slug").sort({ publishedAt: -1 }).limit(20).lean() as Promise<ContentDoc[]>,
+    ]);
+  } catch {
+    void 0;
+  }
+
+  const siteName = settings?.siteName ?? "Lock Shield";
+  const legalName = settings?.legalName ?? "Lock Shield Firefighting & Safety Equipment Installation LLC";
+  const email = settings?.emails?.[0] ?? "";
+  const phone = settings?.phones?.[0] ?? "";
 
   const lines: string[] = [
-    `# ${settings.siteName}`,
+    `# ${siteName}`,
     "",
-    `> ${settings.legalName} — Civil Defence approved fire protection systems across the UAE: design, installation, testing and 24/7 annual maintenance.`,
+    `> ${legalName} — Civil Defence approved fire protection systems across the UAE: design, installation, testing and 24/7 annual maintenance.`,
     "",
     `Website: ${SITE_URL}`,
-    `Contact: ${settings.emails[0] ?? ""}${settings.phones[0] ? ` | ${settings.phones[0]}` : ""}`,
+    `Contact: ${email}${phone ? ` | ${phone}` : ""}`,
     "",
     "## Services",
     "",

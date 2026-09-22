@@ -26,6 +26,7 @@ import {
   Plus,
   Image as ImageIcon,
   type LucideIcon,
+  KeyRound,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/card";
@@ -84,6 +85,7 @@ const ROUTE_NAMES: Record<string, string> = {
   leads: "Leads",
   redirects: "Redirects",
   settings: "Settings",
+  account: "My Account",
   users: "Users",
   new: "Create New",
 };
@@ -210,7 +212,11 @@ export function AdminShell({
 
   const userBlock = (
     <div className="border-t border-app p-3.5 shrink-0 space-y-2 bg-surface">
-      <div className="flex items-center gap-2.5 px-2 py-1">
+      <Link
+        href="/admin/account"
+        onClick={() => setMobileOpen(false)}
+        className="flex items-center gap-2.5 rounded-xl px-2 py-1 transition-colors hover:bg-surface-2"
+      >
         <div className="flex size-8.5 shrink-0 items-center justify-center rounded-full bg-surface-2 border border-app text-xs font-bold uppercase text-foreground">
           {(user.name ?? user.email ?? "?").slice(0, 2)}
         </div>
@@ -222,7 +228,20 @@ export function AdminShell({
             </Badge>
           </div>
         </div>
-      </div>
+      </Link>
+
+      {/* WHY here and not under System: /admin/account is the one settings-ish
+          page every role can open, and System is admin-only. Editors are
+          exactly who needs it — they arrive with a temporary password. */}
+      <Link
+        href="/admin/account"
+        onClick={() => setMobileOpen(false)}
+        className="flex items-center gap-2 rounded-xl px-2 py-1.5 text-xs font-medium text-muted transition-colors hover:bg-surface-2 hover:text-foreground"
+      >
+        <KeyRound className="size-3.5" aria-hidden />
+        Change password
+      </Link>
+
       {onSignOut}
     </div>
   );

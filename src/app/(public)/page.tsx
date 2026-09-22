@@ -1,6 +1,3 @@
-import Link from "next/link";
-import Image from "next/image";
-import { ArrowRight } from "lucide-react";
 import { connectDB } from "@/lib/db";
 import { Service, Project } from "@/models";
 import { getSettings } from "@/lib/settings";
@@ -10,14 +7,13 @@ import { HeroSlider } from "@/components/frontend/HeroSlider";
 import type { FAQItem } from "@/components/frontend/FAQAccordion";
 import { Section, SectionHead } from "@/components/frontend/Section";
 import { Reveal } from "@/components/frontend/Reveal";
-import { ButtonLink } from "@/components/frontend/Button";
+import { ServicesExpandingGrid } from "@/components/frontend/home/ServicesExpandingGrid";
 import { ProjectsCarousel, type CarouselProject } from "@/components/frontend/ProjectsCarousel";
 import { WhyChooseSection } from "@/components/frontend/home/WhyChooseSection";
 import { StatsSection } from "@/components/frontend/home/StatsSection";
 import { TestimonialsFaqSection } from "@/components/frontend/home/TestimonialsFaqSection";
 import { ProcessTimelineSection } from "@/components/frontend/home/ProcessTimelineSection";
 import { ClientsMarquee } from "@/components/frontend/home/ClientsMarquee";
-import { serviceIcon, serviceImage } from "@/components/frontend/serviceMeta";
 
 // Content is editable from the admin, so pages must not be frozen at build
 // time. Revalidate every 5 minutes.
@@ -93,9 +89,9 @@ const DEFAULT_SERVICES: PublicService[] = [
 ];
 
 const DEFAULT_PROJECTS: CarouselProject[] = [
-  { title: "Al Manara Pharmacy Fit-out", client: "Al Manara Pharmacy", sector: "Retail", emirate: "Dubai", slug: "al-manara-pharmacy", image: { url: "/assets/images/commercial.webp" } },
-  { title: "Emirates NBD Corporate Facility", client: "Emirates NBD", sector: "Banking", emirate: "Dubai", slug: "emirates-nbd", image: { url: "/assets/images/about-img1.webp" } },
-  { title: "Farsi Restaurant Suppression", client: "Farsi Restaurant", sector: "F&B", emirate: "Dubai", slug: "farsi-restaurant", image: { url: "/assets/images/restaurants.webp" } },
+  { title: "Al Manara Pharmacy Fit-out", client: "Al Manara Pharmacy", sector: "Retail", emirate: "Dubai", slug: "al-manara-pharmacy", image: { url: "/assets/images/projects/al-manara-pharmacy.webp" } },
+  { title: "Emirates NBD Corporate Facility", client: "Emirates NBD", sector: "Banking", emirate: "Dubai", slug: "emirates-nbd", image: { url: "/assets/images/projects/emirates-nbd.webp" } },
+  { title: "Farsi Restaurant Suppression", client: "Farsi Restaurant", sector: "F&B", emirate: "Dubai", slug: "farsi-restaurant", image: { url: "/assets/images/projects/farsi-restaurant.webp" } },
 ];
 
 export default async function HomePage() {
@@ -111,8 +107,28 @@ export default async function HomePage() {
       getSettings(),
     ]);
 
-    liveServices = (services as unknown as PublicService[]) || [];
-    liveProjects = (projects as unknown as CarouselProject[]) || [];
+    // Next.js: only plain objects can go from Server -> Client Components.
+    // Mongoose lean() still returns ObjectId/Date instances (have toJSON),
+    // which throws. Map to plain strings/objects with only the fields
+    // the carousels actually need.
+    liveServices = ((services as unknown as Array<Record<string, unknown>>) ?? []).map((s) => ({
+      title: String(s["title"] ?? ""),
+      slug: String(s["slug"] ?? ""),
+      summary: String(s["summary"] ?? ""),
+    }));
+    liveProjects = ((projects as unknown as Array<Record<string, unknown>>) ?? []).map((p) => {
+      const cover = p["coverImage"] as { url?: unknown; alt?: unknown } | undefined;
+      return {
+        title: String(p["title"] ?? ""),
+        slug: String(p["slug"] ?? ""),
+        client: typeof p["client"] === "string" ? (p["client"] as string) : "",
+        sector: typeof p["sector"] === "string" ? (p["sector"] as string) : "",
+        emirate: typeof p["emirate"] === "string" ? (p["emirate"] as string) : "",
+        coverImage: cover?.url
+          ? { url: String(cover.url), alt: typeof cover.alt === "string" ? cover.alt : "" }
+          : undefined,
+      } as CarouselProject;
+    });
 
     // WHY sourced from Settings, not hardcoded: one place (admin > Settings)
     // to correct the phone/address/socials that show up here AND in the
@@ -160,10 +176,15 @@ export default async function HomePage() {
       )}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFAQ) }} />
 
-      {/* 1. Hero */}
+      {/* 1. Hero — sticky pinned, covered on scroll by .page-body below */}
       <HeroSlider />
 
-      {/* 2. Core Services */}
+      {/* Sheet that slides up over the pinned hero (see .hero-pin/.page-body
+          in globals.css). Opaque bg + higher z-index does the covering;
+          rounded top + negative margin reveals it as a sheet. */}
+      <div className="page-body -mt-6 overflow-clip rounded-t-[1.5rem] shadow-[0_-24px_60px_-20px_rgba(13,18,32,0.45)] sm:-mt-8 sm:rounded-t-[2rem]">
+      {/* 2. Core Services — interactive expanding row on desktop, plain grid on touch.
+          Links/slugs/copy unchanged; only the motion changes. */}
       <Section className="blueprint-grid bg-paper-soft">
         <SectionHead
           eyebrow="Complete Protection"
@@ -177,45 +198,7 @@ export default async function HomePage() {
           action={{ label: "View All Services", href: "/services" }}
         />
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4 lg:gap-5">
-          {displayServices.map((service, idx) => {
-            const Icon = serviceIcon(service.slug);
-            return (
-            <Reveal key={service.slug || idx} delayMs={(idx % 4) * 80} className="group">
-              <Link
-                href={`/services/${service.slug}`}
-                className="relative flex h-full flex-col overflow-hidden rounded-3xl border border-[var(--marketing-line)] bg-white transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_22px_50px_rgba(224,27,36,0.16)]"
-              >
-                <div className="border-beam" aria-hidden />
-                <div className="flex flex-1 flex-col p-5 sm:p-6">
-                  <div className="flex size-11 items-center justify-center rounded-xl bg-brand-500/10 text-brand-500 transition-all group-hover:scale-110 group-hover:bg-brand-500 group-hover:text-white">
-                    <Icon className="size-5" aria-hidden />
-                  </div>
-                  <h3 className="font-tech mt-3 text-base font-bold uppercase tracking-wide text-navy-900 transition-colors group-hover:text-brand-500">
-                    {service.title}
-                  </h3>
-                  <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-ink/62">
-                    {service.summary || "Complete engineering design, testing and certified installation compliant with Dubai Civil Defence."}
-                  </p>
-                  <span className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-ink/50 transition-colors group-hover:text-brand-500">
-                    Learn More
-                    <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" />
-                  </span>
-                </div>
-                <div className="relative aspect-[16/9] overflow-hidden">
-                  <Image
-                    src={serviceImage(service.slug)}
-                    alt={service.title}
-                    fill
-                    sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                    className="object-cover transition-transform duration-700 [transition-timing-function:var(--ease-brand)] group-hover:scale-[1.06]"
-                  />
-                </div>
-              </Link>
-            </Reveal>
-            );
-          })}
-        </div>
+        <ServicesExpandingGrid services={displayServices} />
       </Section>
 
       {/* 3. Projects carousel */}
@@ -253,28 +236,16 @@ export default async function HomePage() {
           /contact and job applications on /career, so home just routes. */}
       <section className="section-y-sm relative overflow-hidden bg-ink">
         <div className="blueprint-grid-dark pointer-events-none absolute inset-0 opacity-20" />
-        <div className="wrap relative z-10 flex flex-col items-center gap-5 text-center sm:gap-6 lg:flex-row lg:justify-between lg:text-left">
+        <div className="wrap relative z-10 flex flex-col items-center gap-5 text-center">
           <Reveal>
             <span className="eyebrow">Schedule a Site Inspection</span>
             <h2 className="font-tech mt-2 text-[clamp(1.5rem,4.5vw,2.4rem)] font-bold uppercase leading-tight tracking-tight text-white">
               Secure your facility — <span className="text-brand-500">get a quote today</span>
             </h2>
           </Reveal>
-
-          <Reveal delayMs={100} className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
-            <ButtonLink href="/contact" variant="red" className="w-full sm:w-auto">
-              Get a Free Quote
-            </ButtonLink>
-            {/* Was "Explore Careers", which is not part of this page's
-                conversion path and already sits in the navbar and the footer
-                link list. Services is the natural second step for a visitor
-                who isn't ready to request a quote yet. */}
-            <ButtonLink href="/services" variant="ghost" className="w-full sm:w-auto">
-              View Services
-            </ButtonLink>
-          </Reveal>
         </div>
       </section>
+      </div>
     </>
   );
 }

@@ -25,6 +25,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/input";
+import { PromptDialog } from "@/components/ui/prompt-dialog";
+import { MediaModal } from "./MediaModal";
 
 export interface RichTextEditorProps {
   value?: JSONContent | string | null;
@@ -112,23 +114,40 @@ export function RichTextEditor({
     }
   }, [value, editor]);
 
-  const addImage = () => {
-    const url = window.prompt("Enter image URL:");
-    if (url && editor) {
-      editor.chain().focus().setImage({ src: url }).run();
-    }
+  // WHY dialogs instead of window.prompt(): prompt() blocks the tab, cannot be
+  // styled or validated, and is ignored outright in sandboxed iframes — the
+  // toolbar buttons appeared to do nothing there. Images now go through the
+  // real media library rather than asking an editor to paste a raw URL.
+  const [linkDialogOpen, setLinkDialogOpen] = React.useState(false);
+  const [mediaOpen, setMediaOpen] = React.useState(false);
+
+  const currentLinkHref: string = editor?.getAttributes("link").href ?? "";
+
+  const applyLink = (url: string) => {
+    if (!editor) return;
+    editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
   };
 
-  const setLink = () => {
+  const removeLink = () => {
     if (!editor) return;
-    const previousUrl = editor.getAttributes("link").href;
-    const url = window.prompt("Enter link URL:", previousUrl);
-    if (url === null) return;
-    if (url === "") {
-      editor.chain().focus().extendMarkRange("link").unsetLink().run();
-      return;
+    editor.chain().focus().extendMarkRange("link").unsetLink().run();
+  };
+
+  const validateUrl = (url: string): string | null => {
+    if (!url) return "Enter a URL.";
+    // Relative in-site links are legitimate here, so only absolute URLs get
+    // parsed — and only http(s), because a javascript: href in published
+    // content is a stored XSS vector.
+    if (url.startsWith("/") || url.startsWith("#")) return null;
+    try {
+      const { protocol } = new URL(url);
+      if (protocol !== "http:" && protocol !== "https:") {
+        return "Only http:// and https:// links are allowed.";
+      }
+      return null;
+    } catch {
+      return "That is not a valid URL. Try https://example.com or /about.";
     }
-    editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
   };
 
   if (!editor) {
@@ -220,7 +239,7 @@ export function RichTextEditor({
           <ToolbarButton
             title="Insert / Edit Link"
             active={editor.isActive("link")}
-            onClick={setLink}
+            onClick={() => setLinkDialogOpen(true)}
           >
             <LinkIcon className="size-4" />
           </ToolbarButton>
@@ -234,7 +253,7 @@ export function RichTextEditor({
             </ToolbarButton>
           )}
 
-          <ToolbarButton title="Insert Image" onClick={addImage}>
+          <ToolbarButton title="Insert Image" onClick={() => setMediaOpen(true)}>
             <ImageIcon className="size-4" />
           </ToolbarButton>
 
@@ -306,6 +325,30 @@ export function RichTextEditor({
           <EditorContent editor={editor} />
         </div>
       )}
+
+      <PromptDialog
+        open={linkDialogOpen}
+        onOpenChange={setLinkDialogOpen}
+        title={currentLinkHref ? "Edit link" : "Insert link"}
+        description="Point the selected text at a page. Use a full https:// address for external sites, or a path like /services for this site."
+        label="Link URL"
+        placeholder="https://example.com"
+        initialValue={currentLinkHref}
+        confirmLabel={currentLinkHref ? "Update link" : "Insert link"}
+        removeLabel={currentLinkHref ? "Remove link" : undefined}
+        inputMode="url"
+        validate={validateUrl}
+        onSubmit={applyLink}
+        onRemove={removeLink}
+      />
+
+      <MediaModal
+        open={mediaOpen}
+        onOpenChange={setMediaOpen}
+        onSelect={(picked) => {
+          editor.chain().focus().setImage({ src: picked.url, alt: picked.alt || undefined }).run();
+        }}
+      />
     </div>
   );
 }
