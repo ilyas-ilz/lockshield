@@ -9,6 +9,7 @@ import { BlockRenderer } from "@/components/frontend/BlockRenderer";
 import { Reveal } from "@/components/frontend/Reveal";
 import { ButtonLink } from "@/components/frontend/Button";
 import { getEnv } from "@/lib/env";
+import { sanitizeRichHtml } from "@/lib/sanitize-html";
 import { buildArticleSchema, buildBreadcrumbSchema } from "@/lib/seo/jsonld";
 
 // Content is editable from the admin, so pages must not be frozen at build
@@ -168,7 +169,7 @@ export default async function BlogPostPage({ params }: PageProps) {
           <Reveal delayMs={100} className="prose prose-lg max-w-none space-y-6 leading-relaxed text-ink/85">
             {post.body ? (
               typeof post.body === "string" ? (
-                <div dangerouslySetInnerHTML={{ __html: post.body }} />
+                <div dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(post.body) }} />
               ) : (
                 <BlockRenderer blocks={[{ type: "richText", body: post.body, id: "body" }]} />
               )

@@ -252,7 +252,7 @@ export default function SettingsPage() {
               </Card>
 
               {/* Sticky Save Bar */}
-              <div className="sticky bottom-0 z-10 -mx-4 border-t border-app bg-surface/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+              <div className="sticky bottom-(--admin-bottom-nav) z-10 -mx-4 border-t border-app bg-surface px-4 py-3 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-muted hidden sm:inline">
                     Changes apply instantly across all pages and footer structured data.

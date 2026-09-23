@@ -575,6 +575,26 @@
     animation: drawerItem 0.45s var(--ease-brand) both;
   }
 
+  /* Modal backdrop fade. Pairs with .drawer-sheet on the modal card. */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+  }
+  .fade-in {
+    animation: fadeIn 0.2s ease-out both;
+  }
+
+  /* Admin mobile "More" bottom sheet slides up from the bottom bar. */
+  @keyframes sheetUp {
+    from {
+      transform: translateY(100%);
+    }
+  }
+  .sheet-up {
+    animation: sheetUp 0.32s var(--ease-brand) both;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -592,6 +612,7 @@
     .rise,
     .drawer-item,
     .drawer-sheet,
+    .sheet-up,
     .hero-line > span {
       opacity: 1 !important;
       transform: none !important;

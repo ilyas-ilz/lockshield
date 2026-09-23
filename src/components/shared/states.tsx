@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Inbox, type LucideIcon } from "lucide-react";
 import { Skeleton } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 export { ErrorState } from "./error-state";
 
@@ -238,14 +239,21 @@ export function EmptyState({
   title,
   description,
   action,
+  className,
 }: {
   icon?: LucideIcon;
   title: string;
   description?: string;
   action?: React.ReactNode;
+  className?: string;
 }) {
   return (
-    <div className="rounded-2xl border border-dashed border-app bg-surface/50 px-6 py-14 text-center transition-all hover:bg-surface/80">
+    <div
+      className={cn(
+        "rounded-2xl border border-dashed border-app bg-surface/50 px-6 py-14 text-center transition-all hover:bg-surface/80",
+        className
+      )}
+    >
       <div className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-surface-2 border border-app shadow-2xs">
         <Icon className="size-5 text-[var(--brand-red,#e01b24)]" aria-hidden />
       </div>

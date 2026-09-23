@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth, signOut } from "@/lib/auth";
-import { AdminShell, SignOutButton } from "@/components/admin/admin-shell";
+import { AdminShell } from "@/components/admin/admin-shell";
 import { connectDB } from "@/lib/db";
 import { Lead } from "@/models/Lead";
 
@@ -23,16 +23,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <AdminShell
       user={session.user}
       newLeadsCount={newLeadsCount}
-      onSignOut={
-        <form
-          action={async () => {
-            "use server";
-            await signOut({ redirectTo: "/admin/login" });
-          }}
-        >
-          <SignOutButton />
-        </form>
-      }
+      signOutAction={async () => {
+        "use server";
+        await signOut({ redirectTo: "/admin/login" });
+      }}
     >
       {children}
     </AdminShell>

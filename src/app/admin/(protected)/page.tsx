@@ -136,14 +136,14 @@ export default async function DashboardPage() {
   });
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4 sm:space-y-5">
       {/* 1. Header Area: Clean, Uncluttered */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+          <h1 className="text-xl font-bold tracking-tight text-foreground sm:text-3xl">
             Dashboard
           </h1>
-          <p className="mt-1 text-xs sm:text-sm text-muted">
+          <p className="mt-0.5 sm:mt-1 text-[11px] sm:text-sm text-muted">
             {currentDate} · Manage website content, portfolio, and customer enquiries.
           </p>
         </div>
@@ -180,31 +180,31 @@ export default async function DashboardPage() {
       )}
 
       {/* 3. Four Compact Metric Cards (No large empty areas, no noisy status pills) */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5">
         {stats.map((stat) => (
           <Link key={stat.label} href={stat.href} className="group">
             <Card
               hover
-              className={`border-app bg-surface p-4 transition-all ${
+              className={`border-app bg-surface rounded-xl sm:rounded-2xl p-3 sm:p-4 transition-all ${
                 stat.isAlert ? "ring-1 ring-[var(--color-brand-500)]/30" : ""
               }`}
             >
               <div className="flex items-center justify-between gap-2">
-                <span className="text-xs font-medium text-muted truncate">
+                <span className="text-[11px] sm:text-xs font-medium text-muted truncate">
                   {stat.label}
                 </span>
                 <div
-                  className={`flex size-7 shrink-0 items-center justify-center rounded-lg border ${stat.iconBg} ${stat.iconColor} transition-transform group-hover:scale-105`}
+                  className={`flex size-6 sm:size-7 shrink-0 items-center justify-center rounded-md sm:rounded-lg border ${stat.iconBg} ${stat.iconColor} transition-transform group-hover:scale-105`}
                 >
-                  <stat.icon className="size-3.5" aria-hidden />
+                  <stat.icon className="size-3 sm:size-3.5" aria-hidden />
                 </div>
               </div>
 
-              <div className="mt-2">
-                <p className="text-2xl sm:text-3xl font-bold tabular-nums text-foreground tracking-tight">
+              <div className="mt-1 sm:mt-2">
+                <p className="text-xl sm:text-3xl font-bold leading-tight tabular-nums text-foreground tracking-tight">
                   {stat.value}
                 </p>
-                <p className="text-[11px] text-muted truncate mt-0.5">
+                <p className="text-[10px] sm:text-[11px] text-muted truncate sm:mt-0.5">
                   {stat.subtext}
                 </p>
               </div>
@@ -214,13 +214,13 @@ export default async function DashboardPage() {
       </div>
 
       {/* 4. Main Section: 2 Columns (Recent Enquiries + Quick Actions) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-start">
         {/* Left Column: Recent Customer Enquiries (Main Activity Panel) */}
         <div className="lg:col-span-8">
-          <Card className="border-app overflow-hidden">
-            <CardHeader className="flex flex-row items-center justify-between px-4 sm:px-5 py-3.5 border-b border-app">
+          <Card className="border-app overflow-hidden rounded-xl sm:rounded-2xl">
+            <CardHeader className="flex flex-row items-center justify-between px-3.5 sm:px-5 py-3 sm:py-3.5 border-b border-app">
               <div className="flex items-center gap-2">
-                <CardTitle className="text-sm font-bold">Recent Customer Enquiries</CardTitle>
+                <CardTitle className="text-[13px] sm:text-sm font-bold">Recent Customer Enquiries</CardTitle>
                 {newLeadsTotal > 0 && (
                   <Badge tone="brand" className="text-[10px] font-bold py-0">
                     {newLeadsTotal} New
@@ -237,11 +237,12 @@ export default async function DashboardPage() {
             </CardHeader>
             <CardContent className="p-0">
               {recentLeads.length === 0 ? (
-                <div className="p-8">
+                <div className="p-3 sm:p-8">
                   <EmptyState
                     icon={Inbox}
                     title="No enquiries yet"
                     description="When visitors submit the quote or contact form on the public site, their details will appear here."
+                    className="rounded-xl px-4 py-6 sm:rounded-2xl sm:px-6 sm:py-14"
                   />
                 </div>
               ) : (
@@ -252,7 +253,7 @@ export default async function DashboardPage() {
                       <li key={String(lead._id)}>
                         <Link
                           href="/admin/leads"
-                          className="group flex items-center justify-between gap-3 px-4 sm:px-5 py-3 hover:bg-surface-2/60 transition-colors"
+                          className="group flex items-center justify-between gap-3 px-3.5 sm:px-5 py-2.5 sm:py-3 hover:bg-surface-2/60 transition-colors"
                         >
                           <div className="flex items-start gap-3 min-w-0">
                             {/* Status Indicator Dot */}
@@ -323,19 +324,19 @@ export default async function DashboardPage() {
 
         {/* Right Column: Quick Actions (Directly alongside Recent Activity) */}
         <div className="lg:col-span-4">
-          <Card className="border-app overflow-hidden">
-            <CardHeader className="px-4 sm:px-5 py-3.5 border-b border-app">
+          <Card className="border-app overflow-hidden rounded-xl sm:rounded-2xl">
+            <CardHeader className="px-3.5 sm:px-5 py-2.5 sm:py-3.5 border-b border-app">
               <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted">
                 Quick Actions
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-3 space-y-1.5">
+            <CardContent className="p-1.5 sm:p-3 space-y-0.5 sm:space-y-1.5">
               <Link
                 href="/admin/posts/new"
-                className="flex items-center justify-between p-2.5 rounded-xl border border-transparent hover:border-app hover:bg-surface-2/70 transition-all group"
+                className="flex items-center justify-between p-2 sm:p-2.5 rounded-lg sm:rounded-xl border border-transparent hover:border-app hover:bg-surface-2/70 transition-all group"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="size-7.5 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-500/20 shrink-0">
+                  <div className="size-7 sm:size-7.5 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-500/20 shrink-0">
                     <Plus className="size-3.5" />
                   </div>
                   <div className="min-w-0">
@@ -350,10 +351,10 @@ export default async function DashboardPage() {
 
               <Link
                 href="/admin/projects/new"
-                className="flex items-center justify-between p-2.5 rounded-xl border border-transparent hover:border-app hover:bg-surface-2/70 transition-all group"
+                className="flex items-center justify-between p-2 sm:p-2.5 rounded-lg sm:rounded-xl border border-transparent hover:border-app hover:bg-surface-2/70 transition-all group"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="size-7.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-500/20 shrink-0">
+                  <div className="size-7 sm:size-7.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-500/20 shrink-0">
                     <Plus className="size-3.5" />
                   </div>
                   <div className="min-w-0">
@@ -368,10 +369,10 @@ export default async function DashboardPage() {
 
               <Link
                 href="/admin/services/new"
-                className="flex items-center justify-between p-2.5 rounded-xl border border-transparent hover:border-app hover:bg-surface-2/70 transition-all group"
+                className="flex items-center justify-between p-2 sm:p-2.5 rounded-lg sm:rounded-xl border border-transparent hover:border-app hover:bg-surface-2/70 transition-all group"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="size-7.5 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border border-indigo-500/20 shrink-0">
+                  <div className="size-7 sm:size-7.5 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border border-indigo-500/20 shrink-0">
                     <Plus className="size-3.5" />
                   </div>
                   <div className="min-w-0">
@@ -386,10 +387,10 @@ export default async function DashboardPage() {
 
               <Link
                 href="/admin/leads"
-                className="flex items-center justify-between p-2.5 rounded-xl border border-transparent hover:border-app hover:bg-surface-2/70 transition-all group"
+                className="flex items-center justify-between p-2 sm:p-2.5 rounded-lg sm:rounded-xl border border-transparent hover:border-app hover:bg-surface-2/70 transition-all group"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="size-7.5 rounded-lg bg-[var(--color-brand-500)]/10 text-[var(--color-brand-600)] dark:text-[var(--color-brand-400)] flex items-center justify-center border border-[var(--color-brand-500)]/20 shrink-0">
+                  <div className="size-7 sm:size-7.5 rounded-lg bg-[var(--color-brand-500)]/10 text-[var(--color-brand-600)] dark:text-[var(--color-brand-400)] flex items-center justify-center border border-[var(--color-brand-500)]/20 shrink-0">
                     <Inbox className="size-3.5" />
                   </div>
                   <div className="min-w-0">

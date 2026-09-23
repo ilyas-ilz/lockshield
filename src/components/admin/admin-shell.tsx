@@ -4,74 +4,22 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard,
-  FileText,
-  FolderTree,
-  Tags,
-  Files,
-  Wrench,
-  Building2,
-  Briefcase,
-  Signpost,
-  Inbox,
-  Settings as SettingsIcon,
-  Users,
-  Menu,
-  X,
   LogOut,
   Moon,
   Sun,
   ShieldCheck,
   ChevronRight,
   Plus,
-  Image as ImageIcon,
-  type LucideIcon,
   KeyRound,
+  Globe,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-
-interface NavItem {
-  href: string;
-  label: string;
-  icon: LucideIcon;
-  adminOnly?: boolean;
-}
-
-const NAV_GROUPS: { heading: string; items: NavItem[] }[] = [
-  {
-    heading: "Overview",
-    items: [{ href: "/admin", label: "Dashboard", icon: LayoutDashboard }],
-  },
-  {
-    heading: "Content",
-    items: [
-      { href: "/admin/posts", label: "Blog Posts", icon: FileText },
-      { href: "/admin/categories", label: "Categories", icon: FolderTree },
-      { href: "/admin/tags", label: "Tags", icon: Tags },
-      { href: "/admin/pages", label: "Pages", icon: Files },
-      { href: "/admin/media", label: "Media Library", icon: ImageIcon },
-    ],
-  },
-  {
-    heading: "Business",
-    items: [
-      { href: "/admin/services", label: "Services", icon: Wrench },
-      { href: "/admin/projects", label: "Projects", icon: Building2 },
-      { href: "/admin/jobs", label: "Careers", icon: Briefcase },
-      { href: "/admin/leads", label: "Leads", icon: Inbox },
-    ],
-  },
-  {
-    heading: "System",
-    items: [
-      { href: "/admin/redirects", label: "Redirects", icon: Signpost, adminOnly: true },
-      { href: "/admin/settings", label: "Settings", icon: SettingsIcon, adminOnly: true },
-      { href: "/admin/users", label: "Users", icon: Users, adminOnly: true },
-    ],
-  },
-];
+import { MobileBottomNav } from "./mobile-bottom-nav";
+import { MobileMenuSheet } from "./mobile-menu-sheet";
+import { NAV_GROUPS, isNavActive } from "./nav-config";
+import { SignOutDialog } from "./sign-out-dialog";
 
 const ROUTE_NAMES: Record<string, string> = {
   posts: "Blog Posts",
@@ -93,28 +41,31 @@ const ROUTE_NAMES: Record<string, string> = {
 export function AdminShell({
   user,
   newLeadsCount = 0,
-  onSignOut,
+  signOutAction,
   children,
 }: {
   user: { name?: string | null; email?: string | null; role: string };
   newLeadsCount?: number;
-  onSignOut: React.ReactNode;
+  signOutAction: () => Promise<void>;
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [signOutOpen, setSignOutOpen] = React.useState(false);
   const isAdmin = user.role === "ADMIN";
 
   React.useEffect(() => {
     setMobileOpen(false);
   }, [pathname]);
 
+  // The sheet is lg:hidden - if the viewport grows past lg while it's open
+  // (tablet rotation), close it so an invisible dialog doesn't trap focus.
   React.useEffect(() => {
-    document.body.style.overflow = mobileOpen ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [mobileOpen]);
+    const mq = window.matchMedia("(min-width: 64rem)");
+    const onChange = () => mq.matches && setMobileOpen(false);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
 
   // Generate breadcrumb items from pathname
   const breadcrumbs = React.useMemo(() => {
@@ -147,7 +98,7 @@ export function AdminShell({
             </p>
             <ul className="space-y-0.5">
               {items.map((item) => {
-                const active = item.href === "/admin" ? pathname === "/admin" : pathname.startsWith(item.href);
+                const active = isNavActive(pathname, item.href);
                 const isLeads = item.href === "/admin/leads";
                 const showLeadBadge = isLeads && newLeadsCount > 0;
 
@@ -214,7 +165,6 @@ export function AdminShell({
     <div className="border-t border-app p-3.5 shrink-0 space-y-2 bg-surface">
       <Link
         href="/admin/account"
-        onClick={() => setMobileOpen(false)}
         className="flex items-center gap-2.5 rounded-xl px-2 py-1 transition-colors hover:bg-surface-2"
       >
         <div className="flex size-8.5 shrink-0 items-center justify-center rounded-full bg-surface-2 border border-app text-xs font-bold uppercase text-foreground">
@@ -235,19 +185,39 @@ export function AdminShell({
           exactly who needs it — they arrive with a temporary password. */}
       <Link
         href="/admin/account"
-        onClick={() => setMobileOpen(false)}
         className="flex items-center gap-2 rounded-xl px-2 py-1.5 text-xs font-medium text-muted transition-colors hover:bg-surface-2 hover:text-foreground"
       >
         <KeyRound className="size-3.5" aria-hidden />
         Change password
       </Link>
 
-      {onSignOut}
+      <Link
+        href="/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-2 rounded-xl px-2 py-1.5 text-xs font-medium text-muted transition-colors hover:bg-surface-2 hover:text-foreground"
+      >
+        <Globe className="size-3.5" aria-hidden />
+        View website
+      </Link>
+
+      <Button
+        type="button"
+        variant="secondary"
+        size="sm"
+        onClick={() => setSignOutOpen(true)}
+        className="w-full justify-start text-xs rounded-xl"
+      >
+        <LogOut className="size-3.5 mr-1 text-muted" aria-hidden />
+        Sign out
+      </Button>
     </div>
   );
 
   return (
-    <div className="min-h-dvh bg-app">
+    // WHY the CSS var: the mobile bottom nav is fixed, so page padding and the
+    // sticky save bars in forms both need to clear it; 0 on desktop.
+    <div className="min-h-dvh bg-app [--admin-bottom-nav:calc(3.5rem_+_1px_+_env(safe-area-inset-bottom))] lg:[--admin-bottom-nav:0px]">
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex fixed inset-y-0 left-0 z-30 w-62 flex-col border-r border-app bg-surface shadow-2xs">
         {brand}
@@ -255,50 +225,17 @@ export function AdminShell({
         {userBlock}
       </aside>
 
-      {/* Mobile drawer */}
-      {mobileOpen && (
-        <>
-          <div
-            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-xs lg:hidden transition-opacity"
-            onClick={() => setMobileOpen(false)}
-            aria-hidden
-          />
-          <aside
-            className="fixed inset-y-0 left-0 z-50 flex w-[min(18rem,85vw)] flex-col border-r border-app bg-surface shadow-2xl lg:hidden"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Navigation"
-          >
-            <div className="flex h-15 items-center justify-between border-b border-app px-4 shrink-0">
-              <div className="flex items-center gap-2.5">
-                <div className="flex size-8 items-center justify-center rounded-xl bg-[var(--color-brand-500)] text-white shadow-xs">
-                  <ShieldCheck className="size-4.5" aria-hidden />
-                </div>
-                <span className="font-bold text-sm">Lock Shield Admin</span>
-              </div>
-              <Button variant="ghost" size="icon" onClick={() => setMobileOpen(false)} aria-label="Close navigation">
-                <X className="size-4" aria-hidden />
-              </Button>
-            </div>
-            {nav}
-            {userBlock}
-          </aside>
-        </>
-      )}
-
-      <div className="lg:pl-62">
+      <div className="lg:pl-62 pb-(--admin-bottom-nav)">
         {/* Top Header */}
         <header className="sticky top-0 z-20 flex h-15 items-center justify-between gap-3 border-b border-app bg-surface/85 backdrop-blur-md px-4 sm:px-6">
           <div className="flex items-center gap-3 min-w-0">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="lg:hidden shrink-0"
-              onClick={() => setMobileOpen(true)}
-              aria-label="Open navigation"
-            >
-              <Menu className="size-4.5" aria-hidden />
-            </Button>
+            {/* Phone: brand mark in place of breadcrumbs; the menu lives in the bottom nav */}
+            <Link href="/admin" className="flex items-center gap-2 sm:hidden">
+              <div className="flex size-8 items-center justify-center rounded-xl bg-[var(--color-brand-500)] text-white shadow-xs">
+                <ShieldCheck className="size-4.5" aria-hidden />
+              </div>
+              <span className="font-bold text-sm tracking-tight text-foreground">Lock Shield</span>
+            </Link>
 
             {/* Breadcrumb Trail */}
             <nav aria-label="Breadcrumb" className="hidden sm:flex items-center gap-1.5 text-xs text-muted truncate">
@@ -335,8 +272,23 @@ export function AdminShell({
           </div>
         </header>
 
-        <main className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8 max-w-7xl mx-auto">{children}</main>
+        <main className="px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8 max-w-7xl mx-auto">{children}</main>
       </div>
+
+      <MobileBottomNav
+        newLeadsCount={newLeadsCount}
+        menuOpen={mobileOpen}
+        onOpenMenu={() => setMobileOpen(true)}
+      />
+
+      <MobileMenuSheet
+        open={mobileOpen}
+        onOpenChange={setMobileOpen}
+        user={user}
+        onSignOut={() => setSignOutOpen(true)}
+      />
+
+      <SignOutDialog open={signOutOpen} onOpenChange={setSignOutOpen} action={signOutAction} user={user} />
     </div>
   );
 }
@@ -369,15 +321,6 @@ function ThemeToggle() {
       className="size-8.5 rounded-xl border-app shadow-2xs"
     >
       {dark ? <Sun className="size-4 text-amber-400" aria-hidden /> : <Moon className="size-4 text-slate-700" aria-hidden />}
-    </Button>
-  );
-}
-
-export function SignOutButton() {
-  return (
-    <Button type="submit" variant="secondary" size="sm" className="w-full justify-start text-xs rounded-xl">
-      <LogOut className="size-3.5 mr-1 text-muted" aria-hidden />
-      Sign out
     </Button>
   );
 }

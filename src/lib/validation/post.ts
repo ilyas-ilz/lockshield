@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { sanitizeRichHtml } from "@/lib/sanitize-html";
 import { slugSchema, objectIdSchema, seoInputSchema, imageInputSchema, localeSchema, statusSchema } from "./common";
 
 // WHY: `author` is never accepted from the client — it's set server-side
@@ -13,7 +14,12 @@ export const postCreateSchema = z.object({
   // optional, but Post.body is `required: true` in Mongoose - so omitting it
   // sailed past this boundary and died in the driver as an opaque 500
   // instead of a 400 naming the field.
-  body: z.unknown().refine((v) => v !== undefined && v !== null, { message: "Required" }),
+  body: z
+    .unknown()
+    .refine((v) => v !== undefined && v !== null, { message: "Required" })
+    // WHY: the editor sends Tiptap JSON, but a raw HTML string sent straight
+    // to the API would otherwise be stored and rendered as-is on the blog.
+    .transform((v) => (typeof v === "string" ? sanitizeRichHtml(v) : v)),
   coverImage: imageInputSchema.optional(),
   category: objectIdSchema.optional(),
   tags: z.array(objectIdSchema).default([]),

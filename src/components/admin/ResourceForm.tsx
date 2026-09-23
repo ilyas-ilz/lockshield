@@ -123,7 +123,7 @@ export function ResourceForm({
       </div>
 
       {/* Sticky action bar: always reachable on a long form, on any screen */}
-      <div className="sticky bottom-0 z-20 -mx-4 border-t border-app bg-surface/90 px-4 py-3 backdrop-blur-md sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 shadow-lg">
+      <div className="sticky bottom-(--admin-bottom-nav) z-20 -mx-4 border-t border-app bg-surface px-4 py-3 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 shadow-lg">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           <span className="text-xs text-muted hidden sm:inline">
             {id ? `Editing ${singular(config.label)}` : `Creating new ${singular(config.label)}`}

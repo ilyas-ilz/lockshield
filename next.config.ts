@@ -55,6 +55,7 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  poweredByHeader: false, // don't advertise the framework (X-Powered-By: Next.js)
   serverExternalPackages: ["sharp"],
   images: {
     remotePatterns: [
