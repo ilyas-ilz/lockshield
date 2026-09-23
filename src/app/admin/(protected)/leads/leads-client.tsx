@@ -27,9 +27,10 @@ export interface LeadRow {
   _id: string;
   source: "contact" | "amc" | "career";
   name: string;
-  email: string;
+  email?: string; // phone-only quote requests have no email
   phone?: string;
   message?: string;
+  serviceInterest?: string;
   status: "new" | "contacted" | "qualified" | "closed" | "spam";
   createdAt: string;
   ip?: string;
@@ -37,6 +38,13 @@ export interface LeadRow {
 }
 
 const STATUSES = ["new", "contacted", "qualified", "closed", "spam"] as const;
+// WHY "all" not "": Radix Select reserves the empty string for "no value".
+const SOURCE_OPTIONS = [
+  { value: "all", label: "All sources" },
+  { value: "contact", label: "Quotes / contact" },
+  { value: "amc", label: "AMC" },
+  { value: "career", label: "Job applications" },
+];
 const STATUS_TONES: Record<string, "brand" | "warning" | "success" | "neutral" | "danger"> = {
   new: "brand",
   contacted: "warning",
@@ -53,7 +61,9 @@ export function LeadsClientTable({ initialData }: { initialData?: PageResult<Lea
   const page = Math.max(1, Number(searchParams.get("page") ?? 1));
   const pageSize = Number(searchParams.get("pageSize") ?? 20);
   const status = searchParams.get("status") ?? "";
+  const source = searchParams.get("source") ?? "";
   const search = searchParams.get("search") ?? "";
+  const hasFilters = Boolean(status || source || search);
 
   const [data, setData] = React.useState<PageResult<LeadRow> | null>(initialData ?? null);
   const [loading, setLoading] = React.useState(!initialData);
@@ -89,6 +99,7 @@ export function LeadsClientTable({ initialData }: { initialData?: PageResult<Lea
     try {
       const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
       if (status) params.set("status", status);
+      if (source) params.set("source", source);
       if (search) params.set("search", search);
       setData(await api.get<PageResult<LeadRow>>(`/api/leads?${params}`));
     } catch (err) {
@@ -96,7 +107,7 @@ export function LeadsClientTable({ initialData }: { initialData?: PageResult<Lea
     } finally {
       setLoading(false);
     }
-  }, [page, pageSize, status, search]);
+  }, [page, pageSize, status, source, search]);
 
   const isFirstMount = React.useRef(true);
   React.useEffect(() => {
@@ -160,6 +171,16 @@ export function LeadsClientTable({ initialData }: { initialData?: PageResult<Lea
           })}
         </div>
 
+        {/* Source filter - lets HR see only job applications (source=career) */}
+        <div className="w-full sm:w-40 sm:shrink-0">
+          <Select
+            value={source || "all"}
+            onValueChange={(v) => setParams({ source: v === "all" ? null : v })}
+            options={SOURCE_OPTIONS}
+            className="h-9.5 text-xs rounded-xl"
+          />
+        </div>
+
         {/* Search Box */}
         <div className="relative w-full sm:max-w-xs">
           <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted/70" aria-hidden />
@@ -191,15 +212,15 @@ export function LeadsClientTable({ initialData }: { initialData?: PageResult<Lea
       ) : !data || data.items.length === 0 ? (
         <EmptyState
           icon={Mail}
-          title={status || search ? "No matching leads found" : "No customer leads yet"}
+          title={hasFilters ? "No matching leads found" : "No customer leads yet"}
           description={
-            status || search
-              ? "Try adjusting your search query or status filter."
+            hasFilters
+              ? "Try adjusting your search, status or source filter."
               : "Submissions from the public website quote and contact forms will appear here."
           }
           action={
-            status || search ? (
-              <Button variant="secondary" size="sm" onClick={() => setParams({ status: null, search: null })}>
+            hasFilters ? (
+              <Button variant="secondary" size="sm" onClick={() => setParams({ status: null, source: null, search: null })}>
                 Clear filters
               </Button>
             ) : undefined
@@ -250,27 +271,29 @@ export function LeadsClientTable({ initialData }: { initialData?: PageResult<Lea
 
                         {/* Contact details with Copy buttons */}
                         <div className="mt-2 flex flex-wrap items-center gap-3 text-xs">
-                          <div className="inline-flex items-center gap-1.5 rounded-lg border border-app/60 bg-surface-2/40 px-2 py-1">
-                            <a
-                              href={`mailto:${lead.email}`}
-                              className="font-medium text-foreground hover:underline flex items-center gap-1"
-                            >
-                              <Mail className="size-3 text-muted" />
-                              {lead.email}
-                            </a>
-                            <button
-                              type="button"
-                              onClick={() => handleCopy(lead.email, "Email")}
-                              className="p-1 text-muted hover:text-foreground cursor-pointer rounded"
-                              aria-label="Copy email"
-                            >
-                              {copiedField === lead.email ? (
-                                <Check className="size-3 text-emerald-500" />
-                              ) : (
-                                <Copy className="size-3" />
-                              )}
-                            </button>
-                          </div>
+                          {lead.email && (
+                            <div className="inline-flex items-center gap-1.5 rounded-lg border border-app/60 bg-surface-2/40 px-2 py-1">
+                              <a
+                                href={`mailto:${lead.email}`}
+                                className="font-medium text-foreground hover:underline flex items-center gap-1"
+                              >
+                                <Mail className="size-3 text-muted" />
+                                {lead.email}
+                              </a>
+                              <button
+                                type="button"
+                                onClick={() => handleCopy(lead.email!, "Email")}
+                                className="p-1 text-muted hover:text-foreground cursor-pointer rounded"
+                                aria-label="Copy email"
+                              >
+                                {copiedField === lead.email ? (
+                                  <Check className="size-3 text-emerald-500" />
+                                ) : (
+                                  <Copy className="size-3" />
+                                )}
+                              </button>
+                            </div>
+                          )}
 
                           {lead.phone && (
                             <div className="inline-flex items-center gap-1.5 rounded-lg border border-app/60 bg-surface-2/40 px-2 py-1">
@@ -366,8 +389,9 @@ export function LeadsClientTable({ initialData }: { initialData?: PageResult<Lea
             <div className="p-5 space-y-4 text-xs">
               <div className="flex flex-wrap gap-3 pb-3 border-b border-app text-muted">
                 <span><strong>Source:</strong> {selectedLead.source}</span>
-                <span><strong>Email:</strong> {selectedLead.email}</span>
+                {selectedLead.email && <span><strong>Email:</strong> {selectedLead.email}</span>}
                 {selectedLead.phone && <span><strong>Phone:</strong> {selectedLead.phone}</span>}
+                {selectedLead.serviceInterest && <span><strong>Service:</strong> {selectedLead.serviceInterest}</span>}
               </div>
 
               <div>
@@ -381,12 +405,21 @@ export function LeadsClientTable({ initialData }: { initialData?: PageResult<Lea
                 <Button variant="secondary" size="sm" onClick={() => setSelectedLead(null)}>
                   Close
                 </Button>
-                <Button variant="primary" size="sm" asChild>
-                  <a href={`mailto:${selectedLead.email}`}>
-                    <Mail className="size-3.5 mr-1" />
-                    Reply by Email
-                  </a>
-                </Button>
+                {selectedLead.email ? (
+                  <Button variant="primary" size="sm" asChild>
+                    <a href={`mailto:${selectedLead.email}`}>
+                      <Mail className="size-3.5 mr-1" />
+                      Reply by Email
+                    </a>
+                  </Button>
+                ) : selectedLead.phone ? (
+                  <Button variant="primary" size="sm" asChild>
+                    <a href={`tel:${selectedLead.phone}`}>
+                      <Phone className="size-3.5 mr-1" />
+                      Call
+                    </a>
+                  </Button>
+                ) : null}
               </div>
             </div>
           </Card>

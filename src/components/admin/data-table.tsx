@@ -650,7 +650,8 @@ function renderCell(row: Row, col: ColumnConfig): React.ReactNode {
   if (
     col.key === "url" &&
     typeof value === "string" &&
-    (value.startsWith("/uploads/") || value.startsWith("/assets/") || value.includes("cloudinary.com"))
+    // https covers the Spaces CDN, a custom CDN domain and legacy Cloudinary URLs.
+    (value.startsWith("/uploads/") || value.startsWith("/assets/") || value.startsWith("https://"))
   ) {
     return (
       <div className="size-9 rounded-md border border-app overflow-hidden bg-surface-2 flex items-center justify-center">

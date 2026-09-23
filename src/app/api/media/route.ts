@@ -11,14 +11,14 @@ import { writeAudit } from "@/lib/audit";
 import { assertWriteBudget, getClientIp } from "@/lib/rate-limit";
 import { buildSearchFilter } from "@/lib/search-filter";
 
-// WHY POST here doesn't upload a file itself: the browser already uploaded
-// directly to Cloudinary using the signature from /api/upload/sign. This
-// just records the resulting asset (url/publicId/dimensions) + required alt
-// text in our own registry so the media library can list/search it later.
+// WHY POST here doesn't upload a file itself: uploads go through
+// /api/upload (validated + sanitized, then stored on Spaces or local disk).
+// This only registers an already-hosted asset (url/publicId/dimensions) +
+// required alt text so the media library can list/search it later.
 const mediaRecordSchema = z.object({
   url: z.string().min(1),
   publicId: z.string().optional(),
-  storage: z.enum(["local", "cloudinary"]).default("local"),
+  storage: z.enum(["local", "spaces"]).default("local"),
   alt: z.string().min(1, "alt text is required"),
   mimeType: z.string().optional(),
   width: z.number().optional(),

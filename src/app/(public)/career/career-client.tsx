@@ -3,15 +3,24 @@
 import * as React from "react";
 import { MapPin, Clock, CheckCircle2, ChevronDown } from "lucide-react";
 import { CareerApplicationForm } from "@/components/frontend/CareerApplicationForm";
+import { TiptapRenderer, type TiptapNode } from "@/components/frontend/BlockRenderer";
+import type { JobOpening } from "@/lib/jobs";
 
-export interface JobOpening {
-  _id?: string;
-  title: string;
-  department: string;
-  location: string;
-  employmentType: string;
-  description: unknown;
-  requirements?: string[];
+/**
+ * WHY both shapes: the admin's rich-text field saves Tiptap JSON. Only
+ * plain strings used to render, so every admin-created job showed a
+ * "details available upon enquiry" placeholder instead of its description.
+ */
+function JobDescription({ description }: { description: unknown }) {
+  if (!description) return null;
+  if (typeof description === "string") {
+    return <p className="mt-4 text-sm leading-relaxed text-ink/65">{description}</p>;
+  }
+  return (
+    <div className="mt-4 text-sm leading-relaxed text-ink/65 [&_p]:mb-2 [&_p]:text-sm [&_p]:text-ink/65 [&_ul]:mb-2 [&_ul]:text-sm [&_ol]:mb-2 [&_ol]:text-sm">
+      <TiptapRenderer content={description as TiptapNode} />
+    </div>
+  );
 }
 
 export function CareerJobList({ jobs }: { jobs: JobOpening[] }) {
@@ -19,12 +28,11 @@ export function CareerJobList({ jobs }: { jobs: JobOpening[] }) {
 
   return (
     <div className="space-y-5 sm:space-y-6">
-      {jobs.map((job, idx) => {
-        const key = job._id ? String(job._id) : `job-${idx}`;
-        const isOpen = openJob === key;
+      {jobs.map((job) => {
+        const isOpen = openJob === job._id;
         return (
           <div
-            key={key}
+            key={job._id}
             className="rounded-3xl border border-[var(--marketing-line)] bg-white p-5 shadow-xs transition-all hover:border-brand-500/50 hover:shadow-md sm:p-8"
           >
             <div className="flex flex-wrap items-start justify-between gap-3">
@@ -44,11 +52,9 @@ export function CareerJobList({ jobs }: { jobs: JobOpening[] }) {
               </div>
             </div>
 
-            <p className="mt-4 text-sm leading-relaxed text-ink/65">
-              {typeof job.description === "string" ? job.description : "Position details available upon enquiry."}
-            </p>
+            <JobDescription description={job.description} />
 
-            {job.requirements && job.requirements.length > 0 && (
+            {job.requirements.length > 0 && (
               <div className="mt-4 space-y-2 border-t border-[var(--marketing-line)] pt-4">
                 <h4 className="text-xs font-bold uppercase text-ink/70">Key Requirements:</h4>
                 <ul className="space-y-1.5">
@@ -65,7 +71,7 @@ export function CareerJobList({ jobs }: { jobs: JobOpening[] }) {
             <div className="mt-6 border-t border-[var(--marketing-line)] pt-4">
               <button
                 type="button"
-                onClick={() => setOpenJob(isOpen ? null : key)}
+                onClick={() => setOpenJob(isOpen ? null : job._id)}
                 aria-expanded={isOpen}
                 className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-brand-500 px-5 py-2 text-xs font-semibold text-white transition-all hover:bg-brand-600 cursor-pointer"
               >
@@ -81,5 +87,28 @@ export function CareerJobList({ jobs }: { jobs: JobOpening[] }) {
         );
       })}
     </div>
+  );
+}
+
+/**
+ * "Don't see your role?" used to link to /contact — the quote form, with AMC
+ * preselected — so open applications arrived looking like AMC enquiries.
+ * This keeps them in the career pipeline (source "career").
+ */
+export function OpenApplication({ buttonLabel = "Send an Open Application" }: { buttonLabel?: string }) {
+  const [open, setOpen] = React.useState(false);
+
+  if (open) {
+    return <CareerApplicationForm jobTitle="Open application" onClose={() => setOpen(false)} />;
+  }
+  return (
+    <button
+      type="button"
+      onClick={() => setOpen(true)}
+      aria-expanded={false}
+      className="mt-4 inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-full bg-brand-500 px-5 py-2 text-sm font-semibold text-white transition-all hover:bg-brand-600 cursor-pointer"
+    >
+      {buttonLabel}
+    </button>
   );
 }

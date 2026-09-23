@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+import { NextRequest, after } from "next/server";
 import { connectDB } from "@/lib/db";
 import { handleApi, ok, created, ApiError } from "@/lib/http";
 import { requireRole, STAFF } from "@/lib/rbac";
@@ -38,7 +38,10 @@ export async function POST(req: NextRequest) {
     delete data.honeypot;
     const lead = await Lead.create({ ...data, ip, userAgent: req.headers.get("user-agent") ?? undefined });
 
-    void notifyNewLead(lead); // fire-and-forget — never delay/fail the visitor's response on email
+    // WHY after(), not fire-and-forget: the visitor's response must not wait
+    // on SMTP, but on Vercel a bare un-awaited promise can be frozen with the
+    // function once the response is sent, silently dropping the email.
+    after(() => notifyNewLead(lead));
 
     return created({ message: "Thank you — we'll be in touch." });
   });

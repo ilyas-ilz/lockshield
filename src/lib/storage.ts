@@ -1,8 +1,9 @@
 import path from "node:path";
 import fs from "node:fs";
 import { nanoid } from "nanoid";
-import { getEnv, hasCloudinary } from "./env";
-import { v2 as cloudinary } from "cloudinary";
+import { hasSpaces } from "./env";
+import { putPublicObject, deleteSpacesObject } from "./spaces";
+import { logger } from "./logger";
 
 export const ALLOWED_MIME_TYPES = [
   "image/jpeg",
@@ -24,10 +25,13 @@ const MIME_TO_EXT: Record<string, string> = {
 
 export const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
 
+// "cloudinary" only survives on records uploaded before the move to Spaces.
+export type StorageProvider = "local" | "spaces" | "cloudinary";
+
 export interface UploadResult {
   url: string;
-  publicId?: string;
-  storage: "local" | "cloudinary";
+  publicId?: string; // Spaces object key
+  storage: Exclude<StorageProvider, "cloudinary">;
   width?: number;
   height?: number;
   format?: string;
@@ -49,9 +53,11 @@ export function sanitizeSvg(svgContent: string): string {
 
 /**
  * Single entry point for file uploads across Lock Shield.
- * Auto-detects whether Cloudinary is configured via environment variables.
- * If yes -> uploads to Cloudinary with secure delivery.
- * If no  -> writes to local disk (public/uploads/{year}/{month}/{nanoid}.ext)
+ * Auto-detects whether DigitalOcean Spaces is configured via environment variables.
+ * If yes -> uploads to Spaces ({folder}/{year}/{month}/{nanoid}.ext), served via its CDN.
+ * If no  -> writes to local disk (public/uploads/{year}/{month}/{nanoid}.ext).
+ * WHY Spaces in production: Vercel's filesystem is not persistent, so the
+ * local fallback only suits dev and disk-backed hosts.
  */
 export async function uploadFile(
   file: File,
@@ -96,54 +102,32 @@ export async function uploadFile(
     }
   }
 
-  if (hasCloudinary()) {
-    const env = getEnv();
-    cloudinary.config({
-      cloud_name: env.CLOUDINARY_CLOUD_NAME,
-      api_key: env.CLOUDINARY_API_KEY,
-      api_secret: env.CLOUDINARY_API_SECRET,
-      secure: true,
-    });
-
-    return new Promise<UploadResult>((resolve, reject) => {
-      const stream = cloudinary.uploader.upload_stream(
-        {
-          folder,
-          resource_type: "auto",
-        },
-        (error, result) => {
-          if (error || !result) {
-            return reject(
-              error || new Error("Cloudinary upload failed with empty response")
-            );
-          }
-          resolve({
-            url: result.secure_url,
-            publicId: result.public_id,
-            storage: "cloudinary",
-            width: result.width,
-            height: result.height,
-            format: result.format,
-            bytes: result.bytes,
-            mimeType: file.type,
-          });
-        }
-      );
-      stream.end(buffer);
-    });
-  }
-
-  // Local storage fallback (Zero external keys required)
   const now = new Date();
   const year = String(now.getFullYear());
   const month = String(now.getMonth() + 1).padStart(2, "0");
-  const uploadDir = path.join(process.cwd(), "public", "uploads", year, month);
-
-  await fs.promises.mkdir(uploadDir, { recursive: true });
-
   const ext = MIME_TO_EXT[file.type] || "webp";
   const id = nanoid(16);
   const filename = `${id}.${ext}`;
+
+  if (hasSpaces()) {
+    const key = `${folder}/${year}/${month}/${filename}`;
+    const url = await putPublicObject(key, buffer, file.type);
+    return {
+      url,
+      publicId: key,
+      storage: "spaces",
+      width,
+      height,
+      format,
+      bytes: buffer.length,
+      mimeType: file.type,
+    };
+  }
+
+  // Local storage fallback (Zero external keys required)
+  const uploadDir = path.join(process.cwd(), "public", "uploads", year, month);
+
+  await fs.promises.mkdir(uploadDir, { recursive: true });
   const filePath = path.join(uploadDir, filename);
 
   await fs.promises.writeFile(filePath, buffer);
@@ -160,16 +144,19 @@ export async function uploadFile(
 }
 
 /**
- * Safely delete an asset from either local storage or Cloudinary.
+ * Safely delete an asset from Spaces or local storage.
  */
 export async function deleteStoredFile(media: {
-  storage: "local" | "cloudinary";
+  storage: StorageProvider;
   url: string;
   publicId?: string;
 }): Promise<void> {
-  if (media.storage === "cloudinary" && media.publicId) {
-    const { destroyCloudinaryAsset } = await import("./cloudinary");
-    await destroyCloudinaryAsset(media.publicId);
+  if (media.storage === "spaces" && media.publicId) {
+    await deleteSpacesObject(media.publicId);
+  } else if (media.storage === "cloudinary") {
+    // Pre-Spaces upload; the Cloudinary SDK is gone, so only the registry
+    // entry is removed. Delete the remote copy in the Cloudinary console.
+    logger.warn("legacy Cloudinary asset not deleted remotely", { url: media.url, publicId: media.publicId });
   } else if (media.storage === "local" && media.url.startsWith("/uploads/")) {
     const relativePath = media.url.replace(/^\//, "");
     const fullPath = path.join(process.cwd(), "public", relativePath);

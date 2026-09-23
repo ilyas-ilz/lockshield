@@ -47,7 +47,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     const media = await Media.findById(id);
     if (!media) throw new ApiError(404, "Media not found");
 
-    // WHY best-effort: if Cloudinary is briefly unreachable we still want
+    // WHY best-effort: if Spaces is briefly unreachable we still want
     // the library entry gone so it stops showing as "available" — an
     // orphaned remote asset is a cheaper failure than a stuck admin UI.
     try {

@@ -11,6 +11,7 @@ import {
   Media,
   User,
   Lead,
+  LEAD_SOURCES,
 } from "@/models";
 import { paginate, resolveSort, type PageResult } from "@/lib/pagination";
 import { SORTABLE_FIELDS, type SortableResource } from "@/lib/sortable-fields";
@@ -92,6 +93,7 @@ export interface QueryParams {
   sort?: string;
   order?: "asc" | "desc";
   status?: string;
+  source?: string;
 }
 
 export async function fetchResourceSSR(
@@ -155,6 +157,12 @@ export async function fetchLeadsSSR<T = Record<string, unknown>>(
 
     if (status && status !== "all") {
       filter.status = status;
+    }
+
+    // WHY whitelist: an unknown ?source= should show everything, not an empty list.
+    const source = (params.source ?? "").trim();
+    if ((LEAD_SOURCES as readonly string[]).includes(source)) {
+      filter.source = source;
     }
 
     if (search) {

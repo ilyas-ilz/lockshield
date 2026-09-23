@@ -2,14 +2,7 @@ import nodemailer from "nodemailer";
 import { logger } from "./logger";
 import { getEnv, hasSmtp } from "./env";
 import { getSettings } from "./settings";
-
-interface LeadNotification {
-  source: string;
-  name: string;
-  email: string;
-  phone?: string;
-  message?: string;
-}
+import { buildLeadEmail, type LeadNotification } from "./lead-email";
 
 let transporter: ReturnType<typeof nodemailer.createTransport> | undefined;
 
@@ -27,37 +20,6 @@ function getTransporter() {
     auth: { user: env.SMTP_USER, pass: env.SMTP_PASSWORD },
   });
   return transporter;
-}
-
-// WHY escape: every value here is public, unauthenticated visitor input
-// (the leads form has no auth) rendered as HTML in a real email client -
-// without this, a lead's name or message becomes a stored-XSS/HTML
-// injection vector against whoever reads the notification inbox.
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
-
-function renderLeadEmail(lead: LeadNotification): string {
-  const rows: [string, string | undefined][] = [
-    ["Source", lead.source],
-    ["Name", lead.name],
-    ["Email", lead.email],
-    ["Phone", lead.phone],
-    ["Message", lead.message],
-  ];
-  const rowsHtml = rows
-    .filter(([, value]) => Boolean(value))
-    .map(
-      ([label, value]) =>
-        `<tr><td style="padding:6px 12px;font-weight:600;color:#333">${escapeHtml(label)}</td><td style="padding:6px 12px;color:#333">${escapeHtml(value!)}</td></tr>`
-    )
-    .join("");
-  return `<table style="border-collapse:collapse;font-family:sans-serif;font-size:14px">${rowsHtml}</table>`;
 }
 
 /**
@@ -80,8 +42,7 @@ export async function notifyNewLead(lead: LeadNotification): Promise<void> {
     await getTransporter().sendMail({
       from: env.SMTP_FROM || env.SMTP_USER,
       to: recipients.join(", "),
-      subject: `New ${lead.source} lead: ${lead.name.replace(/[\r\n]+/g, " ")}`,
-      html: renderLeadEmail(lead),
+      ...buildLeadEmail(lead),
     });
   } catch (err) {
     logger.error("failed to email new lead notification", err);

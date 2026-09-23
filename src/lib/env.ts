@@ -1,12 +1,12 @@
 import { z } from "zod";
 
 /**
- * WHY: a key that is present-but-blank in .env (`CLOUDINARY_API_KEY=`) is the
+ * WHY: a key that is present-but-blank in .env (`DO_SPACES_KEY=`) is the
  * same thing as "not configured", but zod sees `""` and fails `.min(1)` even
  * behind `.optional()`. That turned a half-filled .env into a hard boot crash
- * — `npm run seed` could not run without dummy Cloudinary credentials. Blank
+ * — `npm run seed` could not run without dummy storage credentials. Blank
  * now collapses to undefined so the optional keys behave as intended, and
- * hasCloudinary()/hasSmtp() keep gating the features that actually need them.
+ * hasSpaces()/hasSmtp() keep gating the features that actually need them.
  */
 const optionalString = z.preprocess(
   (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
@@ -29,9 +29,14 @@ const envSchema = z.object({
   MONGODB_URI: z.string().min(1, "MONGODB_URI is required"),
   AUTH_SECRET: z.string().min(32, "AUTH_SECRET must be at least 32 chars (openssl rand -base64 32)"),
   AUTH_URL: optionalUrl,
-  CLOUDINARY_CLOUD_NAME: optionalString,
-  CLOUDINARY_API_KEY: optionalString,
-  CLOUDINARY_API_SECRET: optionalString,
+  // DigitalOcean Spaces (S3-compatible) for admin uploads. REGION is the
+  // Spaces datacenter slug, e.g. "sgp1", "fra1", "ams3". CDN_URL is optional:
+  // a custom CDN domain; without it the bucket's built-in DO CDN is used.
+  DO_SPACES_KEY: optionalString,
+  DO_SPACES_SECRET: optionalString,
+  DO_SPACES_BUCKET: optionalString,
+  DO_SPACES_REGION: optionalString,
+  DO_SPACES_CDN_URL: optionalUrl,
   SMTP_HOST: optionalString,
   SMTP_PORT: optionalPort,
   SMTP_USER: optionalString,
@@ -64,11 +69,12 @@ export function getEnv(): Env {
   return cached;
 }
 
-export function hasCloudinary(): boolean {
+export function hasSpaces(): boolean {
   return Boolean(
-    process.env.CLOUDINARY_CLOUD_NAME &&
-    process.env.CLOUDINARY_API_KEY &&
-    process.env.CLOUDINARY_API_SECRET
+    process.env.DO_SPACES_KEY?.trim() &&
+    process.env.DO_SPACES_SECRET?.trim() &&
+    process.env.DO_SPACES_BUCKET?.trim() &&
+    process.env.DO_SPACES_REGION?.trim()
   );
 }
 

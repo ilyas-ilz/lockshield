@@ -49,7 +49,15 @@ async function main() {
   else if (secret.length < 32) problem(`AUTH_SECRET is too short (${secret.length} chars, needs 32+)`);
   else ok(`AUTH_SECRET ${mask(secret)}`);
 
-  ok(`CLOUDINARY_CLOUD_NAME ${process.env.CLOUDINARY_CLOUD_NAME ? "set" : "NOT SET (uploads go to local disk - fine for dev and disk-backed hosts)"}`);
+  const spacesVars = ["DO_SPACES_KEY", "DO_SPACES_SECRET", "DO_SPACES_BUCKET", "DO_SPACES_REGION"] as const;
+  const missingSpaces = spacesVars.filter((name) => !process.env[name]?.trim());
+  if (missingSpaces.length === 0) {
+    ok(`DigitalOcean Spaces set (bucket ${process.env.DO_SPACES_BUCKET}, region ${process.env.DO_SPACES_REGION}, CDN ${process.env.DO_SPACES_CDN_URL || "built-in DO CDN"})`);
+  } else if (missingSpaces.length === spacesVars.length) {
+    ok("DigitalOcean Spaces NOT SET (uploads go to local disk - fine for dev, NOT persistent on Vercel)");
+  } else {
+    problem(`DigitalOcean Spaces partly set - missing ${missingSpaces.join(", ")} (uploads fall back to local disk)`);
+  }
 
   results.push("\nDatabase");
   if (!uri) {

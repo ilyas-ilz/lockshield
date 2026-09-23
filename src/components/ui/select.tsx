@@ -16,6 +16,8 @@ export function Select({
   options,
   placeholder,
   className,
+  contentClassName,
+  itemClassName,
   id,
   disabled,
 }: {
@@ -24,6 +26,9 @@ export function Select({
   options: readonly { value: string; label: string }[];
   placeholder?: string;
   className?: string;
+  /** Overrides for the popup panel / rows, e.g. the light public-site look. */
+  contentClassName?: string;
+  itemClassName?: string;
   id?: string;
   disabled?: boolean;
 }) {
@@ -45,14 +50,20 @@ export function Select({
         <SelectPrimitive.Content
           position="popper"
           sideOffset={4}
-          className="z-50 max-h-72 min-w-[var(--radix-select-trigger-width)] overflow-hidden rounded-lg border border-app bg-surface shadow-lg"
+          className={cn(
+            "z-50 max-h-72 min-w-[var(--radix-select-trigger-width)] overflow-hidden rounded-lg border border-app bg-surface shadow-lg",
+            contentClassName
+          )}
         >
           <SelectPrimitive.Viewport className="p-1">
             {options.map((opt) => (
               <SelectPrimitive.Item
                 key={opt.value}
                 value={opt.value}
-                className="relative flex cursor-pointer select-none items-center rounded-md py-2 pl-8 pr-2 text-sm text-app outline-none data-[highlighted]:bg-surface-2 data-[state=checked]:font-medium"
+                className={cn(
+                  "relative flex cursor-pointer select-none items-center rounded-md py-2 pl-8 pr-2 text-sm text-app outline-none data-[highlighted]:bg-surface-2 data-[state=checked]:font-medium",
+                  itemClassName
+                )}
               >
                 <span className="absolute left-2 flex size-4 items-center justify-center">
                   <SelectPrimitive.ItemIndicator>

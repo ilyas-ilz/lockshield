@@ -15,7 +15,11 @@ system) is a separate, later phase that consumes this same API. See
 - **Auth.js v5 (next-auth beta)**, Credentials provider, JWT sessions,
   bcrypt, account lockout, per-IP+email rate limiting.
 - **Zod** — every write validated at `src/lib/validation/*`.
-- **Cloudinary** — signed direct browser upload for images.
+- **DigitalOcean Spaces** (S3-compatible, via `@aws-sdk/client-s3`) — admin
+  image uploads, served from its CDN. Uploads go through `/api/upload`
+  (type/size check, image validation, SVG sanitizing) and fall back to
+  `public/uploads` when Spaces isn't configured (dev only — Vercel's disk
+  isn't persistent).
 - **Tailwind v4** — admin UI only (utility classes, no component library).
 - **Vitest + mongodb-memory-server** — real-Mongo integration tests, not mocks.
 
@@ -23,7 +27,7 @@ system) is a separate, later phase that consumes this same API. See
 
 ```bash
 npm install
-cp .env.example .env   # fill in MONGODB_URI, AUTH_SECRET (openssl rand -base64 32), Cloudinary keys
+cp .env.example .env   # fill in MONGODB_URI, AUTH_SECRET (openssl rand -base64 32), DO_SPACES_* keys
 npm run seed            # creates the first ADMIN user + Settings singleton
 npm run dev              # http://localhost:3000/admin
 ```

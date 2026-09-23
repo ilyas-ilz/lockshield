@@ -1,7 +1,7 @@
 import { handleApi, ok } from "@/lib/http";
 import { requireRole, STAFF } from "@/lib/rbac";
 import { connectDB } from "@/lib/db";
-import { hasCloudinary, getEnv } from "@/lib/env";
+import { hasSpaces, getEnv } from "@/lib/env";
 import mongoose from "mongoose";
 
 export async function GET() {
@@ -21,7 +21,7 @@ export async function GET() {
       dbStatus = "error";
     }
 
-    const isCloudinary = hasCloudinary();
+    const isCdn = hasSpaces();
     const env = getEnv();
 
     return ok({
@@ -32,8 +32,8 @@ export async function GET() {
         name: mongoose.connection.name || "lockshield",
       },
       storage: {
-        provider: isCloudinary ? "Cloudinary CDN" : "Local Disk (uploads)",
-        isCloudinary,
+        provider: isCdn ? "DigitalOcean Spaces CDN" : "Local Disk (uploads)",
+        isCdn,
       },
       system: {
         nodeVersion: process.version,

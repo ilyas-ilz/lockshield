@@ -3,18 +3,21 @@
 import * as React from "react";
 import { Send, CheckCircle2, Loader2, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
+import { ServiceSelect } from "./ServiceSelect";
 
-export function QuickQuoteForm() {
+interface QuickQuoteFormProps {
+  /** Preselects the service dropdown, e.g. the service page this form sits on. */
+  defaultService?: string;
+}
+
+export function QuickQuoteForm({ defaultService = "" }: QuickQuoteFormProps) {
   const [submitting, setSubmitting] = React.useState(false);
   const [success, setSuccess] = React.useState(false);
 
-  const [form, setForm] = React.useState({
-    name: "",
-    phone: "",
-    email: "",
-    serviceInterest: "Annual Maintenance Contract (AMC)",
-    message: "",
-  });
+  // WHY no AMC default: most visitors never touch the dropdown, so a
+  // preselected AMC labelled every quote from every page as an AMC enquiry.
+  const emptyForm = { name: "", phone: "", email: "", serviceInterest: defaultService, message: "", honeypot: "" };
+  const [form, setForm] = React.useState(emptyForm);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,9 +35,10 @@ export function QuickQuoteForm() {
           name: form.name,
           phone: form.phone,
           email: form.email || undefined,
-          serviceInterest: form.serviceInterest,
+          serviceInterest: form.serviceInterest || undefined,
           message: form.message || undefined,
           source: "contact",
+          honeypot: form.honeypot,
         }),
       });
 
@@ -42,13 +46,7 @@ export function QuickQuoteForm() {
 
       setSuccess(true);
       toast.success("Enquiry received! Our engineers will call you shortly.");
-      setForm({
-        name: "",
-        phone: "",
-        email: "",
-        serviceInterest: "Annual Maintenance Contract (AMC)",
-        message: "",
-      });
+      setForm(emptyForm);
       setTimeout(() => setSuccess(false), 4000);
     } catch {
       toast.error("Could not send enquiry. Please call us directly.");
@@ -81,6 +79,18 @@ export function QuickQuoteForm() {
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Honeypot - hidden from real users, catches bots */}
+          <input
+            type="text"
+            name="company"
+            value={form.honeypot}
+            onChange={(e) => setForm({ ...form, honeypot: e.target.value })}
+            className="hidden"
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+          />
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1">
@@ -123,19 +133,11 @@ export function QuickQuoteForm() {
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1">Service Required</label>
-              <select
-                value={form.serviceInterest}
-                onChange={(e) => setForm({ ...form, serviceInterest: e.target.value })}
-                className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm text-gray-900 bg-white focus:border-[#e01b24] focus:outline-none focus:ring-1 focus:ring-[#e01b24] transition-all cursor-pointer"
-              >
-                <option value="Annual Maintenance Contract (AMC)">Annual Maintenance Contract (AMC)</option>
-                <option value="Civil Defence Approval & Drawing">Civil Defence Approval & Drawing</option>
-                <option value="FM-200 / Clean Agent System">FM-200 / Clean Agent System</option>
-                <option value="Kitchen Fire Suppression System">Kitchen Fire Suppression System</option>
-                <option value="Fire Extinguisher Refilling & Supply">Fire Extinguisher Refilling & Supply</option>
-                <option value="Fire Alarm & Detection Systems">Fire Alarm & Detection Systems</option>
-                <option value="Fire Fighting Sprinklers & Pumps">Fire Fighting Sprinklers & Pumps</option>
-              </select>
+              <ServiceSelect
+                  value={form.serviceInterest}
+                  onValueChange={(v) => setForm({ ...form, serviceInterest: v })}
+                  defaultService={defaultService}
+                />
             </div>
           </div>
 

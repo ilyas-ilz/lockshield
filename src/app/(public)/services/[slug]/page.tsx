@@ -230,7 +230,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
             {/* Right Sidebar - static below lg, sticky alongside content on desktop */}
             <div className="lg:col-span-4">
               <div className="space-y-6 lg:sticky lg:top-28 lg:space-y-8">
-                <QuickQuoteForm />
+                <QuickQuoteForm defaultService={title} />
 
                 {/* Other Services List */}
                 <div className="space-y-4 rounded-3xl border border-[var(--marketing-line)] bg-paper-soft p-6">

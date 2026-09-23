@@ -4,6 +4,7 @@ import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X, Send, ShieldCheck, CheckCircle2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { ServiceSelect } from "./ServiceSelect";
 
 export interface QuoteModalProps {
   open: boolean;
@@ -21,6 +22,7 @@ export function QuoteModal({ open, onOpenChange, defaultService }: QuoteModalPro
     phone: "",
     serviceInterest: defaultService || "",
     message: "",
+    honeypot: "",
   });
 
   React.useEffect(() => {
@@ -48,12 +50,19 @@ export function QuoteModal({ open, onOpenChange, defaultService }: QuoteModalPro
           serviceInterest: formData.serviceInterest || undefined,
           message: formData.message || undefined,
           source: "contact",
+          honeypot: formData.honeypot,
         }),
       });
 
       if (!res.ok) {
+        // WHY not the raw server text: a 500 showed visitors "Internal server
+        // error". Only the rate-limit message is written for visitors.
         const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData?.error || "Failed to send enquiry");
+        throw new Error(
+          res.status === 429 && errorData?.error
+            ? errorData.error
+            : "Could not send your request. Please try again or call us directly."
+        );
       }
 
       setSuccess(true);
@@ -65,8 +74,9 @@ export function QuoteModal({ open, onOpenChange, defaultService }: QuoteModalPro
           name: "",
           email: "",
           phone: "",
-          serviceInterest: "",
+          serviceInterest: defaultService || "",
           message: "",
+          honeypot: "",
         });
       }, 2000);
     } catch (err) {
@@ -115,6 +125,18 @@ export function QuoteModal({ open, onOpenChange, defaultService }: QuoteModalPro
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+              {/* Honeypot - hidden from real users, catches bots */}
+              <input
+                type="text"
+                name="company"
+                value={formData.honeypot}
+                onChange={(e) => setFormData({ ...formData, honeypot: e.target.value })}
+                className="hidden"
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+              />
+
               <div>
                 <label className="block text-xs font-semibold text-gray-700 mb-1">
                   Full Name <span className="text-[#e01b24]">*</span>
@@ -162,21 +184,11 @@ export function QuoteModal({ open, onOpenChange, defaultService }: QuoteModalPro
                 <label className="block text-xs font-semibold text-gray-700 mb-1">
                   Service of Interest
                 </label>
-                <select
+                <ServiceSelect
                   value={formData.serviceInterest}
-                  onChange={(e) => setFormData({ ...formData, serviceInterest: e.target.value })}
-                  className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm text-gray-900 bg-white focus:border-[#e01b24] focus:outline-none focus:ring-1 focus:ring-[#e01b24] transition-all cursor-pointer"
-                >
-                  <option value="">Select a service category</option>
-                  <option value="Annual Maintenance Contract (AMC)">Annual Maintenance Contract (AMC)</option>
-                  <option value="Civil Defence Approval & Drawing">Civil Defence Approval & Drawing</option>
-                  <option value="FM-200 / Clean Agent System">FM-200 / Clean Agent System</option>
-                  <option value="Kitchen Fire Suppression System">Kitchen Fire Suppression System</option>
-                  <option value="Fire Extinguisher Refilling & Supply">Fire Extinguisher Refilling & Supply</option>
-                  <option value="Fire Alarm & Detection Systems">Fire Alarm & Detection Systems</option>
-                  <option value="Fire Fighting Sprinklers & Pumps">Fire Fighting Sprinklers & Pumps</option>
-                  <option value="Emergency Lights & Exit Signs">Emergency Lights & Exit Signs</option>
-                </select>
+                  onValueChange={(v) => setFormData({ ...formData, serviceInterest: v })}
+                  defaultService={defaultService}
+                />
               </div>
 
               <div>

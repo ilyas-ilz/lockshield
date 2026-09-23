@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import { handleApi, created, ApiError } from "@/lib/http";
 import { requireRole, STAFF } from "@/lib/rbac";
@@ -6,6 +7,10 @@ import { uploadFile } from "@/lib/storage";
 import { Media } from "@/models/Media";
 import { writeAudit } from "@/lib/audit";
 import { getClientIp } from "@/lib/rate-limit";
+
+// WHY a fixed folder set: the folder becomes the Spaces object key prefix,
+// so a free-form value would let a staff session write anywhere in the bucket.
+const folderSchema = z.enum(["posts", "pages", "services", "projects", "jobs", "media"]).catch("media");
 
 export async function POST(req: NextRequest) {
   return handleApi(async () => {
@@ -21,7 +26,7 @@ export async function POST(req: NextRequest) {
       throw new ApiError(400, "No valid file found in 'file' field");
     }
 
-    const folder = (formData.get("folder") as string) || "media";
+    const folder = folderSchema.parse(formData.get("folder") ?? "media");
     const rawAlt = (formData.get("alt") as string) || "";
     // Default alt text to human-readable filename if not provided
     const alt =

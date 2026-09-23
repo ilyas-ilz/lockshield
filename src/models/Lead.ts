@@ -10,12 +10,12 @@ export { LEAD_SOURCES, LEAD_STATUSES, type LeadSource, type LeadStatus } from "@
 export interface ILead extends Document {
   source: LeadSource;
   name: string;
-  email: string;
+  email?: string; // optional: quote forms are phone-first; validation requires email or phone
   phone?: string;
   message?: string;
   serviceInterest?: string; // for contact/amc: which service they asked about
   jobId?: string; // for career: which Job._id they applied to
-  resumeUrl?: string; // Cloudinary raw-file URL, career only
+  resumeUrl?: string; // career only; unused while CVs are sent by email
   status: LeadStatus;
   ip?: string;
   userAgent?: string;
@@ -29,7 +29,6 @@ const leadSchema = new Schema(
     name: { type: String, required: true, trim: true, maxlength: 150 },
     email: {
       type: String,
-      required: true,
       trim: true,
       lowercase: true,
       match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "invalid email"],

@@ -274,7 +274,7 @@ export default function SettingsPage() {
 function SystemHealthSection() {
   const [health, setHealth] = useState<{
     database?: { status: string; provider: string; pingMs: number; name: string };
-    storage?: { provider: string; isCloudinary: boolean };
+    storage?: { provider: string; isCdn: boolean };
     system?: { nodeVersion: string; environment: string; timestamp: string };
   } | null>(null);
   const [loading, setLoading] = useState(true);
@@ -284,7 +284,7 @@ function SystemHealthSection() {
     try {
       const res = await api.get<{
         database: { status: string; provider: string; pingMs: number; name: string };
-        storage: { provider: string; isCloudinary: boolean };
+        storage: { provider: string; isCdn: boolean };
         system: { nodeVersion: string; environment: string; timestamp: string };
       }>("/api/admin/health");
       setHealth(res);
@@ -361,7 +361,7 @@ function SystemHealthSection() {
             <div className="p-4 rounded-xl border border-app bg-surface-2/40 space-y-2.5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-foreground text-sm font-semibold">
-                  {health?.storage?.isCloudinary ? (
+                  {health?.storage?.isCdn ? (
                     <Cloud className="size-4 text-blue-500" />
                   ) : (
                     <HardDrive className="size-4 text-amber-500" />
@@ -373,8 +373,8 @@ function SystemHealthSection() {
                 </span>
               </div>
               <div className="text-xs text-muted space-y-1 pt-1">
-                <p className="font-medium text-foreground">{health?.storage?.provider ?? "Cloudinary CDN"}</p>
-                <p>{health?.storage?.isCloudinary ? "Multi-region CDN delivery" : "Local uploads storage"}</p>
+                <p className="font-medium text-foreground">{health?.storage?.provider ?? "Unknown"}</p>
+                <p>{health?.storage?.isCdn ? "Global CDN delivery" : "Local uploads storage (not persistent on Vercel)"}</p>
                 <p>Assets served: <span className="text-foreground">Optimized</span></p>
               </div>
             </div>

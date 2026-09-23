@@ -25,7 +25,7 @@ describe("Storage system (Local first fallback)", () => {
     await expect(uploadFile(file)).rejects.toThrow(/exceeds maximum limit/);
   });
 
-  it("saves valid image to local uploads directory when Cloudinary is not set", async () => {
+  it("saves valid image to local uploads directory when DigitalOcean Spaces is not set", async () => {
     // 1x1 transparent PNG data
     const pngBase64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
     const pngBuffer = Buffer.from(pngBase64, "base64");

@@ -187,7 +187,7 @@ export function BlockRenderer({ blocks }: { blocks: BlockData[] | Record<string,
   );
 }
 
-interface TiptapNode {
+export interface TiptapNode {
   type?: string;
   text?: string;
   content?: TiptapNode[];
@@ -196,7 +196,7 @@ interface TiptapNode {
   [key: string]: unknown;
 }
 
-function TiptapRenderer({ content }: { content: TiptapNode | TiptapNode[] | string | null | undefined }) {
+export function TiptapRenderer({ content }: { content: TiptapNode | TiptapNode[] | string | null | undefined }) {
   if (!content) return null;
 
   // Simple recursive renderer for Tiptap JSON nodes
