@@ -1,138 +1,25 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import {
-  Save,
-  Building,
-  PhoneCall,
-  Link2,
-  Share2,
-  Search as SearchIcon,
-  BarChart3,
-  Activity,
-  Database,
-  Server,
-  Cloud,
-  HardDrive,
-  RefreshCw,
-} from "lucide-react";
+import { Save, Database, Server, Cloud, HardDrive, RefreshCw, Activity } from "lucide-react";
 import { toast } from "sonner";
 import { FieldInput } from "@/components/admin/fields/FieldInput";
 import { getPath, setPath } from "@/lib/admin/object-path";
-import { api, ApiClientError } from "@/lib/admin/api-client";
-import type { FieldConfig } from "@/lib/admin/field-types";
+import { api, ApiClientError, validationIssues } from "@/lib/admin/api-client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, Skeleton } from "@/components/ui/card";
 import { Field } from "@/components/ui/input";
 import { PageHeader } from "@/components/shared/page-header";
 import { ErrorState } from "@/components/shared/states";
 import { cn } from "@/lib/utils";
-
-const SECTIONS: {
-  id: string;
-  title: string;
-  description?: string;
-  icon: typeof Building;
-  fields: FieldConfig[];
-}[] = [
-  {
-    id: "identity",
-    title: "Business Identity",
-    description: "Legal brand details, registered company name, and official logo.",
-    icon: Building,
-    fields: [
-      { name: "siteName", label: "Site Name", type: "text", required: true },
-      { name: "legalName", label: "Legal (Registered) Name", type: "text", required: true },
-      { name: "logoUrl", label: "Brand Logo", type: "image" },
-    ],
-  },
-  {
-    id: "contact",
-    title: "Contact & NAP Details",
-    description:
-      "Official Name-Address-Phone (NAP) details used in footer, contact page, and Google LocalBusiness schema.",
-    icon: PhoneCall,
-    fields: [
-      { name: "phones", label: "Phone Numbers", type: "stringArray" },
-      { name: "whatsapp", label: "WhatsApp Number", type: "text" },
-      { name: "emails", label: "Email Addresses", type: "stringArray" },
-      { name: "address.poBox", label: "PO Box", type: "text" },
-      { name: "address.street", label: "Street Address", type: "text" },
-      { name: "address.locality", label: "City / Emirate", type: "text" },
-      { name: "address.country", label: "Country Code", type: "text", help: "Two letters, e.g. AE" },
-    ],
-  },
-  {
-    id: "backlinks",
-    title: "Partner Backlinks",
-    description:
-      "Strategic backlinks to lockshieldcart.com with varied anchor text to maintain healthy search rankings.",
-    icon: Link2,
-    fields: [
-      {
-        name: "partnerLinks",
-        label: "Links",
-        type: "objectArray",
-        itemFields: [
-          { name: "label", label: "Anchor Text", type: "text", required: true },
-          { name: "url", label: "Target URL", type: "text", required: true },
-          { name: "rel", label: "rel Attribute", type: "text", defaultValue: "noopener" },
-        ],
-      },
-    ],
-  },
-  {
-    id: "socials",
-    title: "Social Profiles",
-    description: "Official social media channels displayed in the website footer.",
-    icon: Share2,
-    fields: [
-      {
-        name: "socials",
-        label: "Profiles",
-        type: "objectArray",
-        itemFields: [
-          { name: "platform", label: "Platform (e.g. LinkedIn, Instagram, Facebook)", type: "text", required: true },
-          { name: "url", label: "Profile URL", type: "text", required: true },
-        ],
-      },
-    ],
-  },
-  {
-    id: "seo",
-    title: "Default SEO",
-    description: "Fallback meta title and description used when a page has no custom metadata.",
-    icon: SearchIcon,
-    fields: [
-      { name: "defaultSeo.title", label: "Default SEO Title", type: "text" },
-      { name: "defaultSeo.description", label: "Default Meta Description", type: "textarea" },
-      { name: "footerNote", label: "Footer Copyright / Compliance Note", type: "textarea" },
-    ],
-  },
-  {
-    id: "analytics",
-    title: "Tracking & Analytics",
-    description: "Measurement and tracking tags for Google Analytics and Google Tag Manager.",
-    icon: BarChart3,
-    fields: [
-      { name: "analytics.gaId", label: "Google Analytics ID (GA4)", type: "text", help: "e.g. G-XXXXXXXXXX" },
-      { name: "analytics.gtmId", label: "Google Tag Manager ID", type: "text", help: "e.g. GTM-XXXXXXX" },
-    ],
-  },
-  {
-    id: "system",
-    title: "System & Health",
-    description: "Database connectivity, storage backend, environment status, and runtime diagnostics.",
-    icon: Activity,
-    fields: [],
-  },
-];
+import { SETTINGS_SECTIONS as SECTIONS, findSettingsField } from "./sections";
 
 export default function SettingsPage() {
   const [data, setData] = useState<Record<string, unknown> | null>(null);
   const [activeSection, setActiveSection] = useState<string>("identity");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const load = useCallback(async () => {
     setError(null);
@@ -151,11 +38,24 @@ export default function SettingsPage() {
     e.preventDefault();
     if (!data) return;
     setSaving(true);
+    setFieldErrors({});
     try {
       setData(await api.patch<Record<string, unknown>>("/api/settings", data));
       toast.success("Settings updated successfully");
     } catch (err) {
-      toast.error(err instanceof ApiClientError ? err.message : "Failed to save");
+      // Every tab saves together, so the field at fault is often on another
+      // tab: open it, mark the field, and name it in the toast.
+      const located = validationIssues(err).flatMap((issue) => {
+        const field = findSettingsField(issue.path);
+        return field ? [{ ...field, message: issue.message }] : [];
+      });
+      if (located.length > 0) {
+        setFieldErrors(Object.fromEntries(located.map((f) => [f.fieldName, f.message])));
+        setActiveSection(located[0]!.sectionId);
+        toast.error(`${located[0]!.label}: ${located[0]!.message}`);
+      } else {
+        toast.error(err instanceof ApiClientError ? err.message : "Failed to save");
+      }
     } finally {
       setSaving(false);
     }
@@ -238,6 +138,7 @@ export default function SettingsPage() {
                         htmlFor={fieldId}
                         required={field.required}
                         help={field.help}
+                        error={fieldErrors[field.name]}
                       >
                         <FieldInput
                           id={fieldId}

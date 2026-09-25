@@ -154,7 +154,7 @@ export default async function ProjectsPage({ searchParams }: { searchParams: Pro
         crumbs={[{ label: "Home", href: "/" }, { label: "Projects" }]}
         title="Completed"
         accent="Projects"
-        description="Showcasing over 1,000 certified fire protection installations across healthcare, banking, hospitality, retail, and commercial properties in the UAE."
+        description="Showcasing over 300 certified fire protection installations across healthcare, banking, hospitality, retail, and commercial properties in the UAE."
       />
 
       <Section className="blueprint-grid bg-paper-soft">

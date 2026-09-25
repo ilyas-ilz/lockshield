@@ -35,8 +35,12 @@ export async function handleApi(fn: () => Promise<NextResponse>): Promise<NextRe
       return NextResponse.json({ success: false, error: err.message }, { status: err.statusCode });
     }
     if (err instanceof ZodError) {
+      // WHY `issues` next to flatten(): flatten() keys errors by top-level
+      // field only, so a too-long "defaultSeo.title" reported as "defaultSeo"
+      // and the Settings screen could not say which field (on which tab) to fix.
+      const issues = err.issues.map((issue) => ({ path: issue.path.join("."), message: issue.message }));
       return NextResponse.json(
-        { success: false, error: "Validation failed", details: err.flatten() },
+        { success: false, error: "Validation failed", details: { ...err.flatten(), issues } },
         { status: 400 }
       );
     }

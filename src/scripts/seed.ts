@@ -102,13 +102,16 @@ async function main() {
           { label: "Contact", href: "/contact" },
         ],
         defaultSeo: {
-          title: "Lock Shield — Fire Protection & Safety Equipment Installation LLC | Dubai, UAE",
+          title: "Lock Shield | Fire Protection & Safety Installation, Dubai UAE",
           description:
             "Lock Shield designs, installs, tests and maintains world-class fire protection systems across the UAE. Civil Defence approved. 24/7 support.",
         },
       },
     },
-    { upsert: true, new: true, setDefaultsOnInsert: true }
+    // WHY runValidators: without it this upsert stored a 78-char SEO title
+    // past the 70-char limit, and every later Settings save from the admin
+    // was rejected with "Validation failed" because the form resends it.
+    { upsert: true, new: true, setDefaultsOnInsert: true, runValidators: true }
   );
   console.log("[seed] settings singleton ready");
 

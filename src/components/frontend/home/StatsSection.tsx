@@ -4,10 +4,11 @@ import { Reveal } from "../Reveal";
 
 const STATS = [
   { icon: Users, target: 50, label: "Employees" },
-  { icon: Building2, target: 500, label: "Projects Completed" },
-  { icon: MapPinned, target: 1000, label: "Sites Maintained" },
-  // Single source of truth: 15+ years everywhere (hero, about, stats).
-  { icon: Star, target: 15, label: "Years Experience" },
+  { icon: Building2, target: 300, label: "Projects Completed" },
+  { icon: MapPinned, target: 300, label: "Sites Maintained" },
+  // Keep in step with the copy that repeats these figures: "over 5 years"
+  // on /about and "over 300 installations" on /projects.
+  { icon: Star, target: 5, label: "Years Experience" },
 ] as const;
 
 /** Restores the legacy .stats section - a static "15+/24/7/100%" band in the

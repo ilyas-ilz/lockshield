@@ -31,19 +31,29 @@ function getTransporter() {
 export async function notifyNewLead(lead: LeadNotification): Promise<void> {
   logger.info("new lead received", { source: lead.source, name: lead.name, email: lead.email, phone: lead.phone });
 
-  if (!hasSmtp()) return;
+  // WHY warn on every skip and log every send: "the email never arrived" had
+  // no log line to read either way, so a missing Vercel env var, an empty
+  // recipient list and a message sitting in the wrong inbox all looked alike.
+  if (!hasSmtp()) {
+    logger.warn("lead email skipped: SMTP_HOST/PORT/USER/PASSWORD not all set");
+    return;
+  }
 
   try {
     const settings = await getSettings();
     const recipients = settings.emails;
-    if (recipients.length === 0) return;
+    if (recipients.length === 0) {
+      logger.warn("lead email skipped: Settings > Email Addresses is empty");
+      return;
+    }
 
     const env = getEnv();
-    await getTransporter().sendMail({
+    const info = await getTransporter().sendMail({
       from: env.SMTP_FROM || env.SMTP_USER,
       to: recipients.join(", "),
       ...buildLeadEmail(lead),
     });
+    logger.info("lead email sent", { accepted: info.accepted, rejected: info.rejected });
   } catch (err) {
     logger.error("failed to email new lead notification", err);
   }

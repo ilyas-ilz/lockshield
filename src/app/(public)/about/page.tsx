@@ -38,7 +38,7 @@ export default function AboutPage() {
             <p className="text-sm leading-relaxed text-ink/65 sm:text-base">
               Lock Shield Firefighting &amp; Safety Equipment Installation LLC is an officially
               approved and certified fire protection contracting firm licensed by Dubai Civil
-              Defence (DCD). With over 15 years of hands-on engineering excellence, we specialize
+              Defence (DCD). With over 5 years of hands-on engineering excellence, we specialize
               in turn-key fire protection solutions: design, drawing approval, supply,
               installation, testing, commissioning, and round-the-clock Annual Maintenance
               Contracts (AMC).

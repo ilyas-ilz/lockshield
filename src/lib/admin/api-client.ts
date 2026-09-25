@@ -27,6 +27,18 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return body.data as T;
 }
 
+export interface ValidationIssue {
+  path: string;
+  message: string;
+}
+
+/** The per-field problems behind a 400 "Validation failed" (full dotted paths, see lib/http.ts). */
+export function validationIssues(err: unknown): ValidationIssue[] {
+  if (!(err instanceof ApiClientError)) return [];
+  const issues = (err.details as { issues?: unknown } | undefined)?.issues;
+  return Array.isArray(issues) ? (issues as ValidationIssue[]) : [];
+}
+
 export const api = {
   get: <T>(path: string) => request<T>(path),
   post: <T>(path: string, data: unknown) => request<T>(path, { method: "POST", body: JSON.stringify(data) }),

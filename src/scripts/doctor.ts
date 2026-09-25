@@ -8,9 +8,13 @@
  * you're hitting.
  *
  * Prints metadata only — never the value of a secret.
+ *
+ * `npm run doctor -- --send-test` also sends one real test email to the
+ * Settings "Email Addresses" list, the same recipients a new lead goes to.
  */
 import "dotenv/config";
 import mongoose from "mongoose";
+import nodemailer from "nodemailer";
 
 function mask(value: string | undefined): string {
   if (!value) return "NOT SET";
@@ -37,6 +41,7 @@ async function main() {
     results.push(`  [X] ${msg}`);
   };
   const ok = (msg: string) => results.push(`  [ok] ${msg}`);
+  let leadRecipients: string[] = [];
 
   results.push("\nEnvironment");
   const uri = process.env.MONGODB_URI;
@@ -95,10 +100,68 @@ async function main() {
       const settings = await Settings.findById("global");
       if (!settings) problem("Settings singleton missing — run: npm run seed");
       else ok("Settings singleton present");
+      leadRecipients = settings?.emails ?? [];
     } catch (err) {
       problem(`cannot connect: ${err instanceof Error ? err.message : String(err)}`);
       results.push("        -> is MongoDB running? For a local install, start the mongod service.");
       results.push("        -> for Atlas, check the URI, the password, and your IP allowlist.");
+    }
+  }
+
+  // WHY its own section: notify.ts swallows every SMTP failure (a lead must
+  // never fail because email did) and skips silently when a variable or the
+  // recipient list is missing, so "no email arrived" has no error to read.
+  results.push("\nEmail (new-lead notifications)");
+  const smtpVars = ["SMTP_HOST", "SMTP_PORT", "SMTP_USER", "SMTP_PASSWORD"] as const;
+  const missingSmtp = smtpVars.filter((name) => !process.env[name]?.trim());
+  if (missingSmtp.length > 0) {
+    problem(`SMTP disabled - missing ${missingSmtp.join(", ")}. notify.ts skips every lead email without logging an error.`);
+  } else {
+    const host = process.env.SMTP_HOST!.trim();
+    const port = Number(process.env.SMTP_PORT);
+    const user = process.env.SMTP_USER!.trim();
+    const password = process.env.SMTP_PASSWORD!;
+    const from = process.env.SMTP_FROM?.trim() || user;
+    ok(`SMTP_HOST ${host}, SMTP_PORT ${process.env.SMTP_PORT} (${port === 465 ? "implicit TLS" : "STARTTLS"}), SMTP_USER ${user}`);
+    ok(`SMTP_PASSWORD ${mask(password)}${/\s/.test(password) ? ", contains spaces" : ""}; sending as ${from}`);
+
+    if (!Number.isInteger(port) || port <= 0) problem(`SMTP_PORT is not a number: "${process.env.SMTP_PORT}"`);
+    if (/^["']|["']$/.test(password)) problem("SMTP_PASSWORD is wrapped in quotes - remove them");
+
+    if (leadRecipients.length === 0) {
+      problem("Settings > Email Addresses is empty - notify.ts has nobody to send to and skips silently");
+    } else {
+      ok(`lead emails go to: ${leadRecipients.join(", ")}`);
+      // Gmail files a message you send to your own address under Sent / All
+      // Mail without the Inbox label, so it looks like it never arrived.
+      if (leadRecipients.some((to) => to.toLowerCase() === user.toLowerCase())) {
+        results.push(`  [!] ${user} is both sender and recipient - Gmail shows it in Sent, not Inbox`);
+      }
+    }
+
+    const transport = nodemailer.createTransport({
+      host,
+      port,
+      secure: port === 465,
+      auth: { user, pass: password },
+      connectionTimeout: 10_000,
+    });
+    try {
+      await transport.verify();
+      ok("SMTP login accepted by server");
+
+      if (process.argv.includes("--send-test") && leadRecipients.length > 0) {
+        const info = await transport.sendMail({
+          from,
+          to: leadRecipients.join(", "),
+          subject: "Lock Shield website - SMTP test",
+          text: "This is a test from `npm run doctor -- --send-test`. If you can read it, lead notifications can be delivered.",
+        });
+        ok(`test email accepted for ${info.accepted.join(", ") || "nobody"}; rejected: ${info.rejected.join(", ") || "none"}`);
+      }
+    } catch (err) {
+      problem(`SMTP failed: ${err instanceof Error ? err.message : String(err)}`);
+      results.push("        -> Gmail needs a 16-character App Password (2-Step Verification on), not the normal password.");
     }
   }
 
