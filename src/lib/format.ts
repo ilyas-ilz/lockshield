@@ -1,3 +1,27 @@
+export interface AddressParts {
+  street?: string;
+  locality?: string;
+  country?: string;
+}
+
+// Settings stores the ISO code (schema.org addressCountry wants "AE"), but
+// visitors read "UAE".
+const COUNTRY_NAMES: Record<string, string> = { AE: "UAE" };
+
+/**
+ * The one-line address shown in the footer and on the contact page. Each part
+ * falls back to the head office so the line stays whole when Settings is
+ * unreachable or a field was left blank.
+ */
+export function formatAddressLine(address: AddressParts | undefined): string {
+  const country = address?.country?.trim() || "AE";
+  return [
+    address?.street?.trim() || "Hor Al Anz, Deira",
+    address?.locality?.trim() || "Dubai",
+    COUNTRY_NAMES[country.toUpperCase()] ?? country,
+  ].join(", ");
+}
+
 /**
  * Display-format a UAE phone number.
  *

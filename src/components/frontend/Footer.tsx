@@ -2,20 +2,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { Phone, Mail, MapPin, Download } from "lucide-react";
 import type { ISettings } from "@/models/Settings";
-import { formatPhoneDisplay } from "@/lib/format";
+import { formatAddressLine, formatPhoneDisplay } from "@/lib/format";
 
 export function Footer({ settings }: { settings: Partial<ISettings> }) {
   const currentYear = new Date().getFullYear();
   const phone = settings.phones?.[0] || "+971 4 272 7333";
   const email = settings.emails?.[0] || "info@lockshield.ae";
 
-  const fullAddress = [
-    settings.address?.street || "Al Qusais Industrial Area",
-    settings.address?.locality || "Dubai",
-    settings.address?.country || "United Arab Emirates",
-  ]
-    .filter(Boolean)
-    .join(", ");
+  const fullAddress = formatAddressLine(settings.address);
 
   return (
     <footer className="relative overflow-hidden border-t border-gray-800/80 bg-ink pb-3 pt-5 text-gray-300 sm:pt-6">
@@ -142,7 +136,7 @@ export function Footer({ settings }: { settings: Partial<ISettings> }) {
             same viewport. The badges carry that signal better. */}
         <div className="pt-3 text-center text-xs leading-relaxed text-gray-500 sm:pt-2 sm:text-left">
           <p>
-            © {currentYear} {settings.legalName || "Lock Shield Firefighting & Safety Equipment Installation LLC"}. All
+            © {currentYear} {settings.legalName || "LOCK SHIELD Firefighting and Safety Equipment Installation LLC"}. All
             rights reserved.
           </p>
         </div>

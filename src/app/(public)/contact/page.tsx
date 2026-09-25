@@ -5,6 +5,7 @@ import { QuickQuoteForm } from "@/components/frontend/QuickQuoteForm";
 import { PageHero } from "@/components/frontend/PageHero";
 import { Section } from "@/components/frontend/Section";
 import { Reveal } from "@/components/frontend/Reveal";
+import { formatAddressLine } from "@/lib/format";
 
 // Content is editable from the admin, so pages must not be frozen at build
 // time. Revalidate every 5 minutes.
@@ -17,6 +18,7 @@ export const metadata: Metadata = {
 };
 
 interface ContactSettings {
+  legalName?: string;
   phones?: string[];
   emails?: string[];
   whatsapp?: string;
@@ -42,13 +44,12 @@ export default async function ContactPage() {
   const email = settings.emails?.[0] || "info@lockshield.ae";
   const whatsapp = (settings.whatsapp || "+971 50 123 4567").replace(/[^0-9]/g, "");
 
-  const fullAddress = [
-    settings.address?.street || "Al Qusais Industrial Area",
-    settings.address?.locality || "Dubai",
-    settings.address?.country || "United Arab Emirates",
-  ]
-    .filter(Boolean)
-    .join(", ");
+  const legalName = settings.legalName || "LOCK SHIELD Firefighting and Safety Equipment Installation LLC";
+  const fullAddress = formatAddressLine(settings.address);
+  // WHY a query embed, not a fixed pb= URL: the old embed was pinned to a
+  // generic "Dubai" view, so editing the address in Settings never moved the
+  // map. www.google.com/maps keeps it inside the CSP's frame-src.
+  const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(fullAddress)}&z=15&output=embed`;
 
   return (
     <>
@@ -75,8 +76,11 @@ export default async function ContactPage() {
                   </div>
                   <div>
                     <h4 className="text-xs font-bold uppercase text-ink/50">Address</h4>
-                    <p className="mt-0.5 text-sm font-medium text-navy-900">{fullAddress}</p>
-                    {settings.address?.poBox && <p className="mt-0.5 text-xs text-ink/50">P.O. Box: {settings.address.poBox}</p>}
+                    <address className="mt-0.5 text-sm not-italic text-navy-900">
+                      <span className="block font-semibold">{legalName}</span>
+                      {settings.address?.poBox && <span className="block">P.O. Box {settings.address.poBox}</span>}
+                      <span className="block">{fullAddress}</span>
+                    </address>
                   </div>
                 </div>
 
@@ -148,7 +152,7 @@ export default async function ContactPage() {
         <Reveal delayMs={200} className="mt-10 h-72 overflow-hidden rounded-3xl border border-[var(--marketing-line)] bg-gray-100 shadow-xs sm:h-80">
           <iframe
             title="Lock Shield Dubai Office"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d115456.2483861214!2d55.2707828!3d25.2630564!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f5cc114840e67%3A0xa646ceb1d830b555!2sDubai%2C%20United%20Arab%20Emirates!5e0!3m2!1sen!2sae!4v1700000000000!5m2!1sen!2sae"
+            src={mapSrc}
             className="size-full border-0"
             allowFullScreen
             loading="lazy"

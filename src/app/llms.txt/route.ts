@@ -39,7 +39,7 @@ export async function GET() {
   }
 
   const siteName = settings?.siteName ?? "Lock Shield";
-  const legalName = settings?.legalName ?? "Lock Shield Firefighting & Safety Equipment Installation LLC";
+  const legalName = settings?.legalName ?? "LOCK SHIELD Firefighting and Safety Equipment Installation LLC";
   const email = settings?.emails?.[0] ?? "";
   const phone = settings?.phones?.[0] ?? "";
 

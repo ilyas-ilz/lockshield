@@ -66,13 +66,13 @@ async function main() {
     {
       $setOnInsert: {
         siteName: "Lock Shield",
-        legalName: "Lock Shield Firefighting & Safety Equipment Installation LLC",
+        legalName: "LOCK SHIELD Firefighting and Safety Equipment Installation LLC",
         phones: ["+971 4 272 7333", "+971 52 843 4801"],
         whatsapp: "+971 52 843 4801",
         emails: ["info@lockshield.ae", "support@lockshield.ae"],
         address: {
           poBox: "47672",
-          street: "Al Qusais Industrial Area",
+          street: "Hor Al Anz, Deira",
           locality: "Dubai",
           country: "AE",
         },
