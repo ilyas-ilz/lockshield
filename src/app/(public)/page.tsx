@@ -19,13 +19,10 @@ import { ClientsMarquee } from "@/components/frontend/home/ClientsMarquee";
 // time. Revalidate every 5 minutes.
 export const revalidate = 300;
 
-// Questions are kept short enough to sit on ONE line in the accordion at
-// desktop width (455px of text column; the longest here measures 382px).
-// Three of them used to run 459-525px and wrapped to two lines, which made
-// the rows uneven against the testimonial column beside them. The answers
-// still carry the long-tail terms ("sprinkler", "Dubai Civil Defence",
-// "all seven emirates") that the questions dropped, so the FAQ schema built
-// from this array keeps them.
+// Questions are kept short enough to sit on ONE line in the numbered FAQ
+// cards at desktop width. The answers carry the long-tail terms
+// ("Dubai Civil Defence", "all seven emirates", "UL-300") that the
+// questions drop, so the FAQ schema built from this array keeps them.
 const FAQS: FAQItem[] = [
   {
     q: "What is an Annual Maintenance Contract (AMC)?",
@@ -46,6 +43,26 @@ const FAQS: FAQItem[] = [
   {
     q: "Which industries and property types do you work with?",
     a: "We work with commercial towers, residential communities, healthcare facilities, schools, industrial warehouses, factories, retail outlets, and restaurants (including kitchen hood suppression).",
+  },
+  {
+    q: "Do you offer 24/7 emergency support?",
+    a: "Yes. Alongside regular office hours, our field team stays on call 24/7 for emergency breakdowns and repairs across all emirates.",
+  },
+  {
+    q: "How often do extinguishers need refilling and testing?",
+    a: "Extinguishers are checked at every scheduled inspection and must be refilled after any use or when the gauge leaves the green zone. Cylinders also need hydrostatic pressure testing every 3-5 years per Civil Defence code. We test, refill, and certify CO2, DCP, foam, and water extinguishers.",
+  },
+  {
+    q: "What is FM-200 and where is it used?",
+    a: "FM-200 is a waterless clean agent gas that suppresses fire without leaving residue, so it protects spaces where water would cause damage: server rooms, data centres, control rooms, archives, and electrical rooms.",
+  },
+  {
+    q: "Do restaurants need kitchen hood suppression?",
+    a: "Yes. Commercial kitchens need an approved wet chemical suppression system protecting the hood, ducts, and cooking appliances. We design, install, and service UL-300 certified kitchen fire suppression systems.",
+  },
+  {
+    q: "Is the site visit and quotation free?",
+    a: "Yes. We offer a free site visit and engineering consultation, then send a written quotation based on your building, its systems, and its Civil Defence compliance requirements.",
   },
 ];
 

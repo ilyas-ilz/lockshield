@@ -108,8 +108,7 @@ export function HeroSlider() {
 
             {/* Description */}
             <p className="rise d2 max-w-2xl text-sm font-light leading-relaxed text-gray-300 sm:text-lg">
-              We design, install, test, and maintain world-class firefighting and suppression
-              systems across Dubai &amp; the UAE.
+             We design, install, test, and maintain fire alarm, firefighting, and emergency lighting systems across Dubai & the UAE, fully compliant with Civil Defence standards.
             </p>
 
             {/* CTA Buttons — magnetic kept to primary only (see useMagnetic), secondary stays static */}

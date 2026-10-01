@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { Reveal } from "../Reveal";
 import { FAQAccordion, type FAQItem } from "../FAQAccordion";
@@ -48,12 +49,11 @@ const TESTIMONIALS: Testimonial[] = [
   },
 ];
 
-/** Restores the legacy tf-grid section: testimonials carousel paired with
- * the FAQ, dropped as two separate concerns in the port (FAQ survived
- * alone; testimonials were removed entirely). Strict 50/50 split inside one
- * `.wrap` container: both headings top-aligned, both columns ending on the
- * same baseline, and a single centered ‹ dots › control row that stays
- * within the column box so neither half overhangs the other. */
+/** FAQ + testimonials. Desktop: a sticky left rail (FAQ intro on top,
+ * testimonial carousel under it) stays pinned below the floating header
+ * while the numbered FAQ list on the right scrolls past it. Phones: plain
+ * stack - intro, FAQ list, then testimonials - via `contents` + `order`,
+ * so the questions sit directly under their heading. */
 export function TestimonialsFaqSection({ faqs }: { faqs: FAQItem[] }) {
   const [active, setActive] = React.useState(0);
   const go = React.useCallback(
@@ -72,128 +72,142 @@ export function TestimonialsFaqSection({ faqs }: { faqs: FAQItem[] }) {
 
   return (
     <section className="section-y blueprint-grid">
-      <div className="wrap grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-12">
-        {/* Testimonials - top-aligned with the FAQ heading so both 50%
-            columns start on the same baseline */}
-        <Reveal className="flex h-full flex-col">
-          <span className="eyebrow">Testimonials</span>
-          <h2 className="font-tech mt-2 text-[clamp(1.5rem,4.5vw,2.2rem)] font-bold uppercase leading-tight tracking-tight text-navy-900">
-            What our clients say
-          </h2>
-
-          {/* flex-1 on both the wrapper and the stack: the FAQ column runs
-              ~90px taller than a testimonial, and that slack has to go
-              somewhere. Centering the card put it all above and below, so the
-              card's top edge sat ~100px lower than the first FAQ row and the
-              two halves still read as misaligned. Letting the card *grow*
-              instead means card top = accordion top, card bottom = accordion
-              bottom, controls below - a true 50/50. min-h keeps it from
-              collapsing when the FAQ column is short (all rows closed). */}
-          <div
-            className="relative mt-6 flex flex-1 flex-col touch-pan-y"
-            onMouseEnter={() => (pauseRef.current = true)}
-            onMouseLeave={() => (pauseRef.current = false)}
-            onTouchStart={(e) => {
-              touchX.current = e.touches[0]?.clientX ?? null;
-            }}
-            onTouchEnd={(e) => {
-              if (touchX.current == null) return;
-              const dx = (e.changedTouches[0]?.clientX ?? 0) - touchX.current;
-              if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
-              touchX.current = null;
-            }}
-          >
-            {/* Fixed floor stops the rotating quotes from shifting layout. */}
-            <div className="relative grid flex-1 min-h-[340px] sm:min-h-[300px]">
-              {TESTIMONIALS.map((t, i) => (
-                <div
-                  key={t.company}
-                  className="col-start-1 row-start-1 flex flex-col rounded-2xl border border-[var(--marketing-line)] bg-white p-6 transition-[opacity,transform] duration-500 sm:p-8"
-                  style={{
-                    opacity: i === active ? 1 : 0,
-                    transform: i === active ? "none" : "translateY(10px) scale(0.985)",
-                    pointerEvents: i === active ? "auto" : "none",
-                  }}
-                  aria-hidden={i !== active}
-                >
-                  <span className="font-serif text-5xl leading-none text-brand-500">&ldquo;</span>
-                  <p className="mt-2 text-sm leading-relaxed text-ink/78 sm:text-base">{t.quote}</p>
-                  <div className="mt-4 flex gap-0.5 text-brand-500" aria-hidden>
-                    {Array.from({ length: 5 }).map((_, s) => (
-                      <Star key={s} className="size-3.5 fill-current" />
-                    ))}
-                  </div>
-                  {/* mt-auto: the card now stretches to the FAQ column's
-                      height, so the attribution pins to the bottom instead of
-                      leaving a dead gap under it. */}
-                  <div className="mt-auto flex items-center gap-3 pt-4">
-                    <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-brand-500 text-sm font-bold text-white">
-                      {t.initials}
-                    </span>
-                    <span>
-                      <b className="block text-sm text-navy-900">{t.role}</b>
-                      <small className="text-xs text-ink/55">{t.company}</small>
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-          </div>
-
-          {/* Controls row: ‹ dots ›. The steppers used to be absolutely
-              positioned at left-0 / right-0 with a ±translate-x-1/2, which
-              hung 22px of each 44px button outside the column box - so the
-              card's left edge no longer lined up with the section gutter and
-              its right edge pushed into the gap before the FAQ column. Laid
-              out in this row instead, both columns keep the exact same width
-              and x-position. Dots stay small inside 44px tap targets. */}
-          <div className="mt-5 flex items-center justify-center gap-1">
-            <button
-              type="button"
-              onClick={() => go(-1)}
-              aria-label="Previous testimonial"
-              className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[var(--marketing-line)] bg-white text-navy-900 transition-all hover:border-brand-500 hover:text-brand-500 active:scale-95"
-            >
-              <ChevronLeft className="size-5" />
-            </button>
-
-            {TESTIMONIALS.map((t, i) => (
-              <button
-                key={t.company}
-                type="button"
-                onClick={() => setActive(i)}
-                aria-label={`Show testimonial ${i + 1}`}
-                className="group flex h-11 cursor-pointer items-center justify-center px-2"
+      <div className="wrap flex flex-col gap-10 lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-start lg:gap-16">
+        {/* Left rail. `contents` on phones lets its two children interleave
+            with the FAQ list via `order`; from lg it becomes one block that
+            sticks under the floating header. Sticky only on viewports tall
+            enough to show the whole rail (~640px) - on short laptops a
+            pinned rail taller than the screen would cut off the testimonial
+            card, so it scrolls normally there instead.
+            [clip-path:none]! on each Reveal: the global `.reveal.in` rounds
+            its box with a 24px clip, which shaved the corners off the FAQ
+            cards and the first glyph of a wrapped last line. */}
+        <div className="contents lg:block lg:top-[calc(var(--header-h)+1.5rem)] lg:[@media(min-height:760px)]:sticky">
+          <Reveal className="order-1 [clip-path:none]!">
+            <span className="eyebrow">FAQs</span>
+            <h2 className="font-tech mt-2 text-[clamp(1.5rem,4.5vw,2.2rem)] font-bold uppercase leading-tight tracking-tight text-navy-900">
+              Your questions,
+              <br />
+              <span className="text-brand-500">answered.</span>
+            </h2>
+            <p className="mt-4 max-w-md text-sm leading-relaxed text-ink/70 sm:text-base">
+              Straight answers on Civil Defence compliance, maintenance contracts and suppression systems. Can&apos;t
+              find yours?{" "}
+              <Link
+                href="/contact"
+                className="font-semibold text-brand-500 underline-offset-4 transition-colors hover:text-brand-600 hover:underline"
               >
-                <span
-                  className={`block h-2 rounded-full transition-all ${
-                    i === active ? "w-7 bg-brand-500" : "w-2 bg-ink/15 group-hover:bg-ink/30"
-                  }`}
-                />
-              </button>
-            ))}
+                Ask our engineers
+              </Link>
+              .
+            </p>
+          </Reveal>
 
-            <button
-              type="button"
-              onClick={() => go(1)}
-              aria-label="Next testimonial"
-              className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[var(--marketing-line)] bg-white text-navy-900 transition-all hover:border-brand-500 hover:text-brand-500 active:scale-95"
+          <Reveal delayMs={100} className="order-3 [clip-path:none]! lg:mt-10">
+            <span className="eyebrow">Testimonials</span>
+            <h3 className="font-tech mt-2 text-lg font-bold uppercase tracking-tight text-navy-900">
+              What our clients say
+            </h3>
+
+            <div
+              className="relative mt-4 flex flex-col touch-pan-y"
+              onMouseEnter={() => (pauseRef.current = true)}
+              onMouseLeave={() => (pauseRef.current = false)}
+              onTouchStart={(e) => {
+                touchX.current = e.touches[0]?.clientX ?? null;
+              }}
+              onTouchEnd={(e) => {
+                if (touchX.current == null) return;
+                const dx = (e.changedTouches[0]?.clientX ?? 0) - touchX.current;
+                if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+                touchX.current = null;
+              }}
             >
-              <ChevronRight className="size-5" />
-            </button>
-          </div>
-        </Reveal>
+              {/* Stacked grid sizes to the tallest quote, so rotating between
+                  short/long quotes never moves the controls or resizes the
+                  sticky rail. */}
+              <div className="relative grid min-h-[300px] sm:min-h-[260px]">
+                {TESTIMONIALS.map((t, i) => (
+                  <div
+                    key={t.company}
+                    className="col-start-1 row-start-1 flex flex-col rounded-2xl border border-[var(--marketing-line)] bg-white p-6 transition-[opacity,transform] duration-500 sm:p-7"
+                    style={{
+                      opacity: i === active ? 1 : 0,
+                      transform: i === active ? "none" : "translateY(10px) scale(0.985)",
+                      pointerEvents: i === active ? "auto" : "none",
+                    }}
+                    aria-hidden={i !== active}
+                  >
+                    <span className="font-serif text-5xl leading-none text-brand-500">&ldquo;</span>
+                    <p className="mt-1 text-sm leading-relaxed text-ink/78 sm:text-base">{t.quote}</p>
+                    <div className="mt-4 flex gap-0.5 text-brand-500" aria-hidden>
+                      {Array.from({ length: 5 }).map((_, s) => (
+                        <Star key={s} className="size-3.5 fill-current" />
+                      ))}
+                    </div>
+                    {/* mt-auto: pins the attribution to the bottom of the
+                        tallest-quote height so short quotes don't leave the
+                        avatar floating mid-card. */}
+                    <div className="mt-auto flex items-center gap-3 pt-4">
+                      <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-brand-500 text-sm font-bold text-white">
+                        {t.initials}
+                      </span>
+                      <span>
+                        <b className="block text-sm text-navy-900">{t.role}</b>
+                        <small className="text-xs text-ink/55">{t.company}</small>
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
 
-        {/* FAQ */}
-        <Reveal delayMs={100} className="flex h-full flex-col">
-          <span className="eyebrow">FAQs</span>
-          <h2 className="font-tech mt-2 text-[clamp(1.5rem,4.5vw,2.2rem)] font-bold uppercase leading-tight tracking-tight text-navy-900">
-            Quick answers
-          </h2>
-          <div className="mt-6">
-            <FAQAccordion items={faqs} />
-          </div>
+              {/* ‹ dots › sit inside the card's top-right corner, level with
+                  the quote mark, so the card is the last thing in the rail:
+                  when the sticky rail releases, its bottom edge lands on the
+                  same line as the last FAQ card. Dots stay small inside 44px
+                  tap targets. */}
+              <div className="absolute right-3 top-3 z-10 flex items-center sm:right-4 sm:top-4">
+                <button
+                  type="button"
+                  onClick={() => go(-1)}
+                  aria-label="Previous testimonial"
+                  className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[var(--marketing-line)] bg-white text-navy-900 transition-all hover:border-brand-500 hover:text-brand-500 active:scale-95"
+                >
+                  <ChevronLeft className="size-5" />
+                </button>
+
+                {TESTIMONIALS.map((t, i) => (
+                  <button
+                    key={t.company}
+                    type="button"
+                    onClick={() => setActive(i)}
+                    aria-label={`Show testimonial ${i + 1}`}
+                    className="group flex h-11 cursor-pointer items-center justify-center px-1.5"
+                  >
+                    <span
+                      className={`block h-2 rounded-full transition-all ${
+                        i === active ? "w-6 bg-brand-500" : "w-2 bg-ink/15 group-hover:bg-ink/30"
+                      }`}
+                    />
+                  </button>
+                ))}
+
+                <button
+                  type="button"
+                  onClick={() => go(1)}
+                  aria-label="Next testimonial"
+                  className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[var(--marketing-line)] bg-white text-navy-900 transition-all hover:border-brand-500 hover:text-brand-500 active:scale-95"
+                >
+                  <ChevronRight className="size-5" />
+                </button>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+
+        {/* FAQ list - the tall column that scrolls past the pinned rail */}
+        <Reveal delayMs={100} className="order-2 [clip-path:none]!">
+          <FAQAccordion items={faqs} />
         </Reveal>
       </div>
     </section>

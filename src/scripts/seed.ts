@@ -67,7 +67,7 @@ async function main() {
       $setOnInsert: {
         siteName: "Lock Shield",
         legalName: "LOCK SHIELD Firefighting and Safety Equipment Installation LLC",
-        phones: ["+971 4 272 7333", "+971 52 843 4801"],
+        phones: ["+971 4 272 7333", "+971 52 843 4801", "+971 54 581 5314"],
         whatsapp: "+971 52 843 4801",
         emails: ["info@lockshield.ae", "support@lockshield.ae"],
         address: {

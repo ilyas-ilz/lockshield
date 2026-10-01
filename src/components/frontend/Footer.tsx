@@ -6,7 +6,10 @@ import { formatAddressLine, formatPhoneDisplay } from "@/lib/format";
 
 export function Footer({ settings }: { settings: Partial<ISettings> }) {
   const currentYear = new Date().getFullYear();
-  const phone = settings.phones?.[0] || "+971 4 272 7333";
+  const phones =
+    settings.phones?.length && settings.phones.length > 0
+      ? settings.phones
+      : ["+971 4 272 7333", "+971 54 581 5314"];
   const email = settings.emails?.[0] || "info@lockshield.ae";
 
   const fullAddress = formatAddressLine(settings.address);
@@ -110,12 +113,14 @@ export function Footer({ settings }: { settings: Partial<ISettings> }) {
                   {fullAddress}
                 </a>
               </li>
-              <li className="flex items-center gap-3">
-                <Phone className="size-4 shrink-0 text-brand-500" />
-                <a href={`tel:${phone.replace(/\s+/g, "")}`} className="min-h-8 py-1 transition-colors hover:text-white">
-                  {formatPhoneDisplay(phone)}
-                </a>
-              </li>
+              {phones.map((phone) => (
+                <li key={phone} className="flex items-center gap-3">
+                  <Phone className="size-4 shrink-0 text-brand-500" />
+                  <a href={`tel:${phone.replace(/\s+/g, "")}`} className="min-h-8 py-1 transition-colors hover:text-white">
+                    {formatPhoneDisplay(phone)}
+                  </a>
+                </li>
+              ))}
               <li className="flex items-center gap-3">
                 <Mail className="size-4 shrink-0 text-brand-500" />
                 <a href={`mailto:${email}`} className="min-h-8 py-1 transition-colors hover:text-white">
