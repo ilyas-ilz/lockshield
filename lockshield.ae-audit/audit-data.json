@@ -1,0 +1,108 @@
+{
+  "summary": {
+    "health_score": 49,
+    "business_type": "Local service business (hybrid SAB) — fire protection installation & maintenance contractor, Dubai UAE",
+    "audit_date": "2026-10-12",
+    "pages_audited": 77,
+    "top_findings": [
+      "Legacy .html URLs 301 to lockshield-ten.vercel.app instead of www.lockshield.ae (src/middleware.ts:28-30)",
+      "No Google Business Profile found via search; conflicting NAP across site, YellowPages.ae and 2GIS",
+      "Service pages are ~140 unique words each with no FAQs or schema; no pages for fire alarm, sprinklers, pumps",
+      "4 exact-duplicate blog pairs, 17 posts under 300 words, 3 newest 'guides' ~120 words",
+      "sameAs links to linkedin.com/company/lockshield, reported to be an unrelated French VPN company"
+    ],
+    "quick_wins": [
+      "Build legacy redirects from SITE_URL in src/middleware.ts",
+      "Replace the wrong LinkedIn link in Settings → Social Profiles",
+      "Unpublish the four -2 duplicate posts and /blog/test",
+      "Import the site into Bing Webmaster Tools from Search Console",
+      "Fix home H1 spacing and add 'Dubai' + 'Civil Defence'"
+    ]
+  },
+  "categories": [
+    {
+      "name": "Technical SEO", "score": 72, "weight": 0.22,
+      "what_works": ["All 77 URLs 200, no noindex", "Canonicals/og:url/sitemap consistent on www", "Single-hop https/apex redirects", "Full security headers", "Real 404s"],
+      "findings": [
+        {"title": "Legacy .html redirects go to vercel.app host", "severity": "Critical", "description": "78/80 legacy paths 301 to https://lockshield-ten.vercel.app/...", "recommendation": "Use SITE_URL as redirect base in src/middleware.ts"},
+        {"title": "vercel.app host serves a full duplicate", "severity": "High", "description": "lockshield-ten.vercel.app returns 200 and appears in search results", "recommendation": "Redirect or noindex non-www hosts"},
+        {"title": "Duplicate and thin posts indexed", "severity": "High", "description": "4 duplicate pairs, ~16 thin posts in sitemap", "recommendation": "Unpublish/301 duplicates; expand or noindex thin posts"},
+        {"title": "Content routes rendered dynamically", "severity": "Medium", "description": "blog/services/projects return Cache-Control no-store", "recommendation": "ISR with revalidate + generateStaticParams"},
+        {"title": "18 pages without JSON-LD; 22 without og:image", "severity": "Medium", "description": "services, projects, about, contact, career, listings", "recommendation": "Add page schema; keep DEFAULT_OPEN_GRAPH images"}
+      ]
+    },
+    {
+      "name": "Content Quality", "score": 27, "weight": 0.23,
+      "what_works": ["946-word home page with real FAQ", "Four strong long-form posts", "CTAs on every page"],
+      "findings": [
+        {"title": "Thin template service pages", "severity": "Critical", "description": "~140 unique words each, identical skeleton", "recommendation": "800-1,200 words with standards, process, FAQs, projects"},
+        {"title": "Thin/placeholder blog posts", "severity": "Critical", "description": "17/58 under 300 words; newest guides ~120 words", "recommendation": "Expand flagship posts, merge or noindex stubs"},
+        {"title": "Anonymous authorship, no credentials shown", "severity": "High", "description": "'Fire Engineering Desk' author; no DCD/licence numbers", "recommendation": "Named engineers, author pages, show licence + DCD numbers"},
+        {"title": "Brand split with LockShield Cart", "severity": "High", "description": "~25 posts branded as the Cart store", "recommendation": "Pick one public brand; explain relationship once"}
+      ]
+    },
+    {
+      "name": "On-Page SEO", "score": 41, "weight": 0.20,
+      "what_works": ["One H1 per page", "Self-referencing canonicals", "Branded titles"],
+      "findings": [
+        {"title": "Broken internal linking", "severity": "High", "description": "49/58 posts have zero inbound links; posts never link to services", "recommendation": "3-5 contextual links per post, related modules"},
+        {"title": "Keyword cannibalisation", "severity": "High", "description": "~20 overlapping 'supplier in UAE' posts; posts compete with service pages", "recommendation": "One target page per query; pillar pages"},
+        {"title": "Over-long titles, truncated descriptions", "severity": "Medium", "description": "43 titles >60 chars; ~55 descriptions cut mid-word with &#8217;", "recommendation": "50-60 char titles, written 140-155 char descriptions"},
+        {"title": "Home H1 runs together, no keyword", "severity": "Medium", "description": "'CompleteFire ProtectionSolutionsYou Can Trust'", "recommendation": "Add spaces; include Dubai + Civil Defence"}
+      ]
+    },
+    {
+      "name": "Schema / Structured Data", "score": 40, "weight": 0.10,
+      "what_works": ["All JSON-LD valid", "NAP in schema matches page", "Article + BreadcrumbList on posts"],
+      "findings": [
+        {"title": "No schema on service pages", "severity": "High", "description": "buildServiceSchema exists but is never called", "recommendation": "Service + BreadcrumbList on /services/*"},
+        {"title": "Generic LocalBusiness", "severity": "High", "description": "No geo, hours, region; areaServed 'AE'", "recommendation": "HomeAndConstructionBusiness/ProfessionalService with full local fields"},
+        {"title": "sameAs includes wrong LinkedIn and Cart brand", "severity": "Medium", "description": "linkedin.com/company/lockshield, lockshieldcart.com, @lockshield_cart", "recommendation": "Only Lock Shield's own verified profiles + GBP"}
+      ]
+    },
+    {
+      "name": "Performance (CWV)", "score": 70, "weight": 0.10,
+      "what_works": ["CLS 0", "WebP via next/image", "Low TBT", "Brotli compression"],
+      "findings": [
+        {"title": "Render-blocking Google Fonts", "severity": "High", "description": "~2 s FCP saving estimated (Lighthouse mobile)", "recommendation": "Self-host fonts with next/font/local"},
+        {"title": "Mobile LCP 4.1-4.3 s (poor)", "severity": "Medium", "description": "Hero preload lacks fetchpriority; AVIF off", "recommendation": "fetchPriority=high, images.formats AVIF"}
+      ]
+    },
+    {
+      "name": "AI Search Readiness", "score": 43, "weight": 0.10,
+      "what_works": ["All AI crawlers get 200", "Valid llms.txt", "Citable home FAQ"],
+      "findings": [
+        {"title": "Wrong LinkedIn entity", "severity": "Critical", "description": "sameAs points to an unrelated company", "recommendation": "Replace with real company page"},
+        {"title": "Bing indexing unconfirmed", "severity": "High", "description": "No Bing verification or IndexNow", "recommendation": "Bing Webmaster Tools + IndexNow"},
+        {"title": "No off-site entity signals", "severity": "High", "description": "No Wikidata, YouTube, GBP in sameAs", "recommendation": "GBP, YouTube videos, directory listings"}
+      ]
+    },
+    {
+      "name": "Images", "score": 74, "weight": 0.05,
+      "what_works": ["WebP everywhere observed", "No image over 60 KB on audited pages", "Descriptive logo alt"],
+      "findings": [
+        {"title": "Low-res sources upscaled; missing dimensions", "severity": "Low", "description": "185-200px images shown at 341px; 16/30 home images lack width/height", "recommendation": "2x sources and explicit dimensions"}
+      ]
+    },
+    {"name": "Local SEO (supporting)", "score": 36, "weight": 0, "what_works": ["Consistent on-site phone/email", "tel: and wa.me links", "Some map listings"], "findings": [
+      {"title": "No GBP found via search", "severity": "Critical", "description": "No Maps listing surfaced for brand queries", "recommendation": "Claim/verify GBP, category Fire protection service"},
+      {"title": "Conflicting NAP", "severity": "Critical", "description": "Hor Al Anz vs Al Qusais vs '46 Street'; different phones", "recommendation": "One canonical NAP everywhere"},
+      {"title": "Few reviews", "severity": "High", "description": "Competitors 99-346 Google reviews", "recommendation": "Review request programme"}
+    ]},
+    {"name": "Mobile / Visual (supporting)", "score": 76, "weight": 0, "what_works": ["No horizontal scroll", "CLS ~0", "Correct contact links"], "findings": [
+      {"title": "No call CTA above the fold on mobile home", "severity": "High", "description": "Phone links only in footer", "recommendation": "Sticky Call | WhatsApp bar"}
+    ]},
+    {"name": "Sitemap (supporting)", "score": 72, "weight": 0, "what_works": ["Valid XML", "All URLs 200 and canonical"], "findings": [
+      {"title": "Fake lastmod", "severity": "Medium", "description": "new Date() and import timestamps", "recommendation": "Real updatedAt; drop changefreq/priority"}
+    ]}
+  ],
+  "action_plan": {
+    "phases": [
+      {"name": "Phase 1: Critical Fixes", "timeframe": "Week 1", "items": ["Fix middleware redirect host", "Redirect/noindex vercel.app host", "Confirm/claim Google Business Profile", "Unify NAP", "Replace wrong LinkedIn", "Remove duplicate and test posts", "Bing Webmaster Tools"]},
+      {"name": "Phase 2: High-Impact Improvements", "timeframe": "Weeks 2-3", "items": ["Review programme", "Show DCD class/number and licence", "Mobile call bar + DCD badge", "Service + LocalBusiness schema", "Fix home H1", "Self-host fonts, hero priority", "ISR on content routes", "Internal linking", "Titles and descriptions"]},
+      {"name": "Phase 3: Content & Authority", "timeframe": "Month 2", "items": ["Rewrite 6 service pages", "New fire alarm/sprinkler/pump/extinguisher/emergency lighting pages", "Emirate area pages", "Project case studies", "Blog consolidation and rewrites", "Resolve Cart brand split", "Named authors", "Directory citations", "YouTube videos"]},
+      {"name": "Phase 4: Monitoring & Iteration", "timeframe": "Ongoing", "items": ["Search Console Pages + Performance", "Re-audit in 6-8 weeks", "Real sitemap lastmod", "robots.txt groups, llms.txt, HSTS, unused assets"]}
+    ]
+  },
+  "artifacts": {"findings_dir": "findings/", "screenshots_dir": "screenshots/"}
+}

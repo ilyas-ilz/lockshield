@@ -78,7 +78,9 @@ async function main() {
         },
         socials: [
           { platform: "instagram", url: "https://www.instagram.com/lockshield_cart/" },
-          { platform: "linkedin", url: "https://www.linkedin.com/company/lockshield" },
+          // No LinkedIn: linkedin.com/company/lockshield is an unrelated web-security
+          // company, and sameAs would tell Google we are that company. Add the
+          // real page in Settings → Social Profiles once it exists.
         ],
         partnerLinks: [
           {
