@@ -26,13 +26,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const post = await Post.findOne({ slug, status: "published" }).lean().catch(() => null);
 
   if (!post) {
-    return { title: "Article Not Found | Lock Shield" };
+    return { title: "Article Not Found" };
   }
 
   return {
-    title: `${post.title} | Lock Shield Safety Blog`,
+    title: post.title,
     description: post.excerpt || post.seo?.description,
     openGraph: {
+      type: "article",
+      url: "./",
       title: post.title,
       description: post.excerpt,
       images: post.coverImage?.url ? [post.coverImage.url] : undefined,

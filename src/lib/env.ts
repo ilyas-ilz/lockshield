@@ -44,7 +44,7 @@ const envSchema = z.object({
   SMTP_FROM: optionalString,
   SITE_URL: z.preprocess(
     (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
-    z.string().url().default("https://lockshield.ae")
+    z.string().url().default("https://www.lockshield.ae")
   ),
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
 });

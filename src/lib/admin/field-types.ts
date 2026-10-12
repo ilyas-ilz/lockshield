@@ -13,6 +13,8 @@ export type FieldType =
   | "boolean"
   | "select"
   | "multiselect"
+  | "relation"
+  | "relationArray"
   | "image"
   | "imageArray"
   | "stringArray"
@@ -20,6 +22,13 @@ export type FieldType =
   | "objectArray"
   | "object"
   | "blocks";
+
+export interface RelationConfig {
+  /** List endpoint returning a paginated `{ items }` payload, e.g. "/api/categories". */
+  apiPath: string;
+  /** Document key shown as the option label. Defaults to "name", falls back to "title". */
+  labelKey?: string;
+}
 
 export interface FieldConfig {
   name: string;
@@ -30,6 +39,7 @@ export interface FieldConfig {
   help?: string;
   defaultValue?: unknown;
   itemFields?: FieldConfig[]; // for type "objectArray" — shape of each row
+  relation?: RelationConfig; // for types "relation" / "relationArray" — where options come from
 }
 
 export interface ColumnConfig<T = Record<string, unknown>> {

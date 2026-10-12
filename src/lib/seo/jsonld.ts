@@ -8,6 +8,8 @@
 
 export interface OrgInput {
   legalName: string;
+  /** Short/trade names people actually search for ("Lock Shield", "Lockshield") — the legal name alone never matches a brand query. */
+  alternateNames?: string[];
   siteUrl: string;
   logoUrl?: string;
   phones: string[];
@@ -23,7 +25,9 @@ export function buildLocalBusinessSchema(org: OrgInput) {
   return {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
+    "@id": `${org.siteUrl}/#organization`,
     name: org.legalName,
+    ...(org.alternateNames?.length ? { alternateName: org.alternateNames } : {}),
     url: org.siteUrl,
     ...(org.logoUrl ? { logo: org.logoUrl, image: org.logoUrl } : {}),
     telephone: org.phones[0],
@@ -37,7 +41,8 @@ export function buildLocalBusinessSchema(org: OrgInput) {
     },
     ...(org.geo ? { geo: { "@type": "GeoCoordinates", latitude: org.geo.lat, longitude: org.geo.lng } } : {}),
     areaServed: "AE",
-    sameAs: [...org.socials.map((s) => s.url), ...org.partnerLinks.map((p) => p.url)],
+    // Set: the cart domain is entered as both a social and a partner link in Settings.
+    sameAs: [...new Set([...org.socials.map((s) => s.url), ...org.partnerLinks.map((p) => p.url)])],
   };
 }
 

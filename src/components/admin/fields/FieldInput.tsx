@@ -5,6 +5,7 @@ import { ImagePicker, type PickedImage } from "./ImagePicker";
 import { RichTextEditor } from "./RichTextEditor";
 import { StringArrayField, StatsArrayField, ImageArrayField } from "./ArrayFields";
 import { ObjectArrayField } from "./ObjectArrayField";
+import { RelationField, RelationArrayField } from "./RelationField";
 import { ObjectField } from "./ObjectField";
 import { BlockEditor } from "./BlockEditor";
 import type { Block } from "@/lib/blocks/schemas";
@@ -111,9 +112,25 @@ export function FieldInput({
         </div>
       );
     }
+    case "relation":
+      return (
+        <RelationField
+          id={id}
+          value={value}
+          relation={field.relation ?? { apiPath: "" }}
+          onChange={(v) => onChange(v)}
+        />
+      );
+    case "relationArray":
+      return (
+        <RelationArrayField
+          value={value}
+          relation={field.relation ?? { apiPath: "" }}
+          onChange={(v) => onChange(v)}
+        />
+      );
     case "image":
-      return <ImagePicker value={(value as PickedImage) ?? null} onChange={onChange} />;
-    case "imageArray":
+      return <ImagePicker value={(value as PickedImage) ?? null} onChange={onChange} />;    case "imageArray":
       return <ImageArrayField value={(value as PickedImage[]) ?? []} onChange={onChange} />;
     case "stringArray":
       return <StringArrayField value={(value as string[]) ?? []} onChange={onChange} />;

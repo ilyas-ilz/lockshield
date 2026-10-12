@@ -22,7 +22,7 @@ import {
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Completed Projects & Fit-Outs | Lock Shield UAE",
+  title: "Completed Projects & Fit-Outs",
   description:
     "Explore our portfolio of completed fire fighting, alarm, and kitchen suppression installations across commercial, healthcare, and retail sectors in Dubai.",
 };

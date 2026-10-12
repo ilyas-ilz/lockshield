@@ -1,5 +1,5 @@
 import type { ResourceConfig } from "./field-types";
-import { PROJECT_SECTORS, EMIRATES, SCOPE_TAGS } from "@/lib/constants";
+import { PROJECT_SECTORS, EMIRATES, SCOPE_TAGS, LOCALES } from "@/lib/constants";
 
 const seoFields = [
   { name: "seo.title", label: "SEO Title", type: "text" as const, help: "Falls back to the site default when empty" },
@@ -25,6 +25,28 @@ export const RESOURCE_CONFIGS: Record<string, ResourceConfig> = {
       { name: "excerpt", label: "Excerpt", type: "textarea", required: true },
       { name: "body", label: "Body", type: "richtext" },
       { name: "coverImage", label: "Cover Image", type: "image" },
+      {
+        name: "category",
+        label: "Category",
+        type: "relation",
+        relation: { apiPath: "/api/categories" },
+        help: "Optional — leave as None for uncategorized",
+      },
+      {
+        name: "tags",
+        label: "Tags",
+        type: "relationArray",
+        relation: { apiPath: "/api/tags" },
+        help: "Defaults to none — tap to toggle",
+      },
+      {
+        name: "locale",
+        label: "Locale",
+        type: "select",
+        options: [...LOCALES],
+        defaultValue: "en",
+        help: "Auto-defaults to English on the server if omitted",
+      },
       { name: "status", label: "Status", type: "select", options: ["draft", "published"] },
       ...seoFields,
     ],

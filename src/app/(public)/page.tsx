@@ -151,10 +151,14 @@ export default async function HomePage() {
     // to correct the phone/address/socials that show up here AND in the
     // footer AND on the contact page, instead of three copies drifting apart.
     const siteUrl = getEnv().SITE_URL;
+    // Static logo fallback: Google's LocalBusiness rich result wants an
+    // image, and Settings.logoUrl is empty until someone uploads one.
+    const logoPath = settings.logoUrl || "/assets/images/logo-lockshield.png";
     jsonLdLocalBusiness = buildLocalBusinessSchema({
       legalName: settings.legalName,
+      alternateNames: ["Lock Shield", "Lockshield", "Lock Shield Fire Safety"],
       siteUrl,
-      logoUrl: settings.logoUrl ? (settings.logoUrl.startsWith("http") ? settings.logoUrl : `${siteUrl}${settings.logoUrl}`) : undefined,
+      logoUrl: logoPath.startsWith("http") ? logoPath : `${siteUrl}${logoPath}`,
       phones: settings.phones,
       emails: settings.emails,
       address: {

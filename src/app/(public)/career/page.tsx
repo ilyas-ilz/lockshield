@@ -12,7 +12,7 @@ import { CareerJobList, OpenApplication } from "./career-client";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Careers & Job Openings | Lock Shield Fire Protection UAE",
+  title: "Careers & Job Openings",
   description:
     "Join our certified fire engineering team in Dubai. Explore current openings for fire protection engineers, estimation specialists, and technicians.",
 };

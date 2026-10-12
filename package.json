@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e": "playwright test",
     "seed": "tsx src/scripts/seed.ts",
     "import:blog": "tsx src/scripts/import-legacy-blog.ts",
     "doctor": "tsx src/scripts/doctor.ts",
@@ -58,6 +59,7 @@
     "zod": "^3.24.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4.0.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^22.10.0",

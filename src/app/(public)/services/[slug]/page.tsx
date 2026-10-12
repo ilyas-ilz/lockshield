@@ -107,7 +107,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const desc = service?.summary || SERVICE_FALLBACKS[slug]?.summary || "Fire protection service by Lock Shield UAE";
 
   return {
-    title: `${title} | Lock Shield UAE`,
+    title,
     description: desc,
   };
 }

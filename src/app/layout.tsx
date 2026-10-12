@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Toaster } from "sonner";
+import { getEnv } from "@/lib/env";
 import "./globals.css";
 
 // NOTE: Previously used `next/font/google` (Archivo + Chakra Petch).
@@ -12,13 +13,38 @@ import "./globals.css";
 const FONT_ARCHIVO = "'Archivo', ui-sans-serif, system-ui, -apple-system, sans-serif";
 const FONT_CHAKRA = "'Chakra Petch', ui-monospace, monospace";
 
+// WHY a fallback instead of letting getEnv() throw: this layout wraps every
+// route (admin + error pages included), so a bad env var must not take the
+// whole site down just to resolve SEO URLs.
+function siteUrl(): URL {
+  try {
+    return new URL(getEnv().SITE_URL);
+  } catch {
+    return new URL("https://www.lockshield.ae");
+  }
+}
+
 export const metadata: Metadata = {
+  // SITE_URL decides the one host Google indexes; every canonical/og:url
+  // below resolves against it, so apex vs www is a single env var.
+  metadataBase: siteUrl(),
   title: {
-    template: "%s | Lock Shield Fire Safety UAE",
+    // Pages pass the bare topic; the brand is appended once, here.
+    template: "%s | Lock Shield UAE",
     default: "Lock Shield | Certified Firefighting & Safety Equipment Dubai UAE",
   },
   description:
     "Civil Defence Approved Firefighting & Safety Solutions in Dubai & UAE. Annual Maintenance Contracts (AMC), FM-200, Fire Extinguishers, and Fire Suppression Systems.",
+  // "./" is resolved against each page's own pathname, so every page gets a
+  // self-referencing canonical and the www/apex duplicate collapses to one.
+  alternates: { canonical: "./" },
+  openGraph: {
+    type: "website",
+    siteName: "Lock Shield",
+    locale: "en_AE",
+    url: "./",
+    images: [{ url: "/assets/images/banner-1.png", width: 1600, height: 567, alt: "Lock Shield fire protection, Dubai UAE" }],
+  },
   icons: {
     icon: "/assets/images/favicon-32x32.png",
     apple: "/assets/images/logo-shield.png",

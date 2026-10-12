@@ -12,7 +12,7 @@ import { formatAddressLine } from "@/lib/format";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Contact Us | Dubai Fire Protection Specialists | Lock Shield",
+  title: "Contact Us | Dubai Fire Protection Specialists",
   description:
     "Get in touch with certified Dubai Civil Defence approved fire safety consultants. Request a site visit or quote for AMC, suppression systems, and approvals.",
 };

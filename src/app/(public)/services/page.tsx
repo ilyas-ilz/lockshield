@@ -16,7 +16,7 @@ import { PUBLIC_PAGE_SIZE, parsePage, totalPagesFor, type PublicSearchParams } f
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Fire Protection Services | Lock Shield UAE",
+  title: "Fire Protection Services in Dubai",
   description:
     "Explore our complete range of certified fire fighting, suppression, fire alarm, and Civil Defence approval services in Dubai & UAE.",
 };

@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const title = project?.title || slug.replace(/-/g, " ");
   return {
-    title: `${title} | Project Case Study | Lock Shield UAE`,
+    title: `${title} | Project Case Study`,
     description: project?.summary || `Fire safety and protection project case study for ${title} in Dubai, UAE.`,
   };
 }

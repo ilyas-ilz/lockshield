@@ -15,7 +15,7 @@ import { PUBLIC_PAGE_SIZE, parsePage, totalPagesFor, type PublicSearchParams } f
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Fire Safety Blog & Knowledge Center | Lock Shield UAE",
+  title: "Fire Safety Blog & Knowledge Center",
   description:
     "Insights, guidelines, UAE Fire Code updates, and maintenance best practices by certified fire protection specialists.",
 };

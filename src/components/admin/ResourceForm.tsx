@@ -49,12 +49,22 @@ export function ResourceForm({
     e.preventDefault();
     setSaving(true);
     setFieldErrors({});
+    // Optional single relations send undefined (not "") when "None" is
+    // picked — "" would fail the server's objectId check, while an omitted
+    // key lets the server apply its default (e.g. Post.category stays unset,
+    // Post.tags defaults to []).
+    const payload: Record<string, unknown> = { ...formData };
+    for (const f of config.fields) {
+      if (f.type === "relation" && payload[f.name] === "") {
+        delete payload[f.name];
+      }
+    }
     try {
       if (id) {
-        await api.patch(`${config.apiPath}/${id}`, formData);
+        await api.patch(`${config.apiPath}/${id}`, payload);
         toast.success("Changes saved");
       } else {
-        await api.post(config.apiPath, formData);
+        await api.post(config.apiPath, payload);
         toast.success(`${singular(config.label)} created`);
       }
       router.push(`/admin/${config.key}`);
