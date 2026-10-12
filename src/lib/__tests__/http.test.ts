@@ -17,7 +17,7 @@ describe("handleApi validation errors", () => {
     const body = await res.json();
     expect(body.error).toBe("Validation failed");
     expect(body.details.issues).toEqual([
-      { path: "defaultSeo.title", message: "String must contain at most 5 character(s)" },
+      { path: "defaultSeo.title", message: "Must be 5 characters or fewer" },
     ]);
   });
 
@@ -28,6 +28,28 @@ describe("handleApi validation errors", () => {
     });
 
     const body = await res.json();
-    expect(body.details.fieldErrors.defaultSeo).toEqual(["String must contain at most 5 character(s)"]);
+    expect(body.details.fieldErrors.defaultSeo).toEqual(["Must be 5 characters or fewer"]);
+  });
+
+  it("explains an empty required value instead of 'at least 1 character(s)'", async () => {
+    const res = await handleApi(async () => {
+      z.object({ phones: z.array(z.string().trim().min(1)) }).parse({ phones: ["+971", "  "] });
+      throw new Error("unreachable");
+    });
+
+    const body = await res.json();
+    expect(body.details.issues).toEqual([
+      { path: "phones.1", message: "Can't be empty: fill it in or remove the empty row" },
+    ]);
+  });
+
+  it("keeps a custom message set on the schema", async () => {
+    const res = await handleApi(async () => {
+      z.object({ t: z.string().max(2, "Too long, custom") }).parse({ t: "abc" });
+      throw new Error("unreachable");
+    });
+
+    const body = await res.json();
+    expect(body.details.issues[0].message).toBe("Too long, custom");
   });
 });

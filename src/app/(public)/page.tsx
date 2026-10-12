@@ -1,4 +1,6 @@
+import type { Metadata } from "next";
 import { connectDB } from "@/lib/db";
+import { DEFAULT_OPEN_GRAPH } from "@/lib/seo/site-metadata";
 import { Service, Project } from "@/models";
 import { getSettings } from "@/lib/settings";
 import { getEnv } from "@/lib/env";
@@ -18,6 +20,13 @@ import { ClientsMarquee } from "@/components/frontend/home/ClientsMarquee";
 // Content is editable from the admin, so pages must not be frozen at build
 // time. Revalidate every 5 minutes.
 export const revalidate = 300;
+
+// WHY: the root layout's relative canonical "./" resolves to "/index" on the
+// home route (Next's internal name for it), so the home page pins "/" itself.
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+  openGraph: { ...DEFAULT_OPEN_GRAPH, url: "/" },
+};
 
 // Questions are kept short enough to sit on ONE line in the numbered FAQ
 // cards at desktop width. The answers carry the long-tail terms

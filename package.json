@@ -15,6 +15,7 @@
     "seed": "tsx src/scripts/seed.ts",
     "import:blog": "tsx src/scripts/import-legacy-blog.ts",
     "doctor": "tsx src/scripts/doctor.ts",
+    "fix:seo": "tsx src/scripts/fix-seo-lengths.ts",
     "admin:list": "tsx src/scripts/admin.ts list",
     "admin:unlock": "tsx src/scripts/admin.ts unlock",
     "admin:password": "tsx src/scripts/admin.ts password"

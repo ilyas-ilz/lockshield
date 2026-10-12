@@ -94,8 +94,8 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
     icon: SearchIcon,
     fields: [
       // Limits mirror seoInputSchema (lib/validation/common.ts).
-      { name: "defaultSeo.title", label: "Default SEO Title", type: "text", help: "Up to 70 characters" },
-      { name: "defaultSeo.description", label: "Default Meta Description", type: "textarea", help: "Up to 160 characters" },
+      { name: "defaultSeo.title", label: "Default SEO Title", type: "text", maxLength: 70, help: "Up to 70 characters" },
+      { name: "defaultSeo.description", label: "Default Meta Description", type: "textarea", maxLength: 160, help: "Up to 160 characters" },
       { name: "footerNote", label: "Footer Copyright / Compliance Note", type: "textarea" },
     ],
   },

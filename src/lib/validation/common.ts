@@ -11,8 +11,9 @@ export const objectIdSchema = z.string().regex(/^[a-f0-9]{24}$/, "invalid id");
 
 export const seoInputSchema = z
   .object({
-    title: z.string().max(70).optional(),
-    description: z.string().max(160).optional(),
+    // trim() matches seoSchema (Mongoose trims), so the limit counts the same characters both places.
+    title: z.string().trim().max(70, "Must be 70 characters or fewer").optional(),
+    description: z.string().trim().max(160, "Must be 160 characters or fewer").optional(),
     canonical: z.string().optional(),
     ogImage: z.string().optional(),
     noindex: z.boolean().optional(),

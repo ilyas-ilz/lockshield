@@ -37,6 +37,7 @@ export interface FieldConfig {
   required?: boolean;
   options?: readonly string[]; // for select/multiselect
   help?: string;
+  maxLength?: number; // for text/textarea — shows a live "n / max" counter; must match the zod limit
   defaultValue?: unknown;
   itemFields?: FieldConfig[]; // for type "objectArray" — shape of each row
   relation?: RelationConfig; // for types "relation" / "relationArray" — where options come from

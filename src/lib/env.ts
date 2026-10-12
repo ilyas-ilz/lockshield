@@ -23,6 +23,27 @@ const optionalUrl = z.preprocess(
   z.string().url().optional()
 );
 
+/**
+ * WHY: Vercel serves www.lockshield.ae and 308-redirects the apex to it, but
+ * the Vercel env still had SITE_URL=https://lockshield.ae. Every canonical,
+ * og:url and sitemap <loc> then pointed at a redirect, which Search Console
+ * flags. The apex is never the served host, so map it to www here; any other
+ * host (localhost, preview deploys) is kept as configured.
+ */
+export function normalizeSiteUrl(value: unknown): unknown {
+  if (typeof value !== "string") return value;
+  const trimmed = value.trim();
+  if (trimmed === "") return undefined;
+  let url: URL;
+  try {
+    url = new URL(trimmed);
+  } catch {
+    return trimmed; // let zod report the invalid URL
+  }
+  if (url.hostname === "lockshield.ae") url.hostname = "www.lockshield.ae";
+  return url.toString().replace(/\/+$/, "");
+}
+
 // WHY: fail fast at boot with a clear message instead of a cryptic
 // "Cannot read properties of undefined" three layers deep at request time.
 const envSchema = z.object({
@@ -42,10 +63,7 @@ const envSchema = z.object({
   SMTP_USER: optionalString,
   SMTP_PASSWORD: optionalString,
   SMTP_FROM: optionalString,
-  SITE_URL: z.preprocess(
-    (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
-    z.string().url().default("https://www.lockshield.ae")
-  ),
+  SITE_URL: z.preprocess(normalizeSiteUrl, z.string().url().default("https://www.lockshield.ae")),
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
 });
 

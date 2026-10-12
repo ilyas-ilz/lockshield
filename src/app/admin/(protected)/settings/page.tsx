@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { FieldInput } from "@/components/admin/fields/FieldInput";
 import { getPath, setPath } from "@/lib/admin/object-path";
 import { api, ApiClientError, validationIssues } from "@/lib/admin/api-client";
+import { changedKeys } from "@/lib/admin/changed-keys";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, Skeleton } from "@/components/ui/card";
 import { Field } from "@/components/ui/input";
@@ -16,6 +17,8 @@ import { SETTINGS_SECTIONS as SECTIONS, findSettingsField } from "./sections";
 
 export default function SettingsPage() {
   const [data, setData] = useState<Record<string, unknown> | null>(null);
+  // Last state the server confirmed; the save sends only what differs from it.
+  const [saved, setSaved] = useState<Record<string, unknown> | null>(null);
   const [activeSection, setActiveSection] = useState<string>("identity");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,7 +27,9 @@ export default function SettingsPage() {
   const load = useCallback(async () => {
     setError(null);
     try {
-      setData(await api.get<Record<string, unknown>>("/api/settings"));
+      const loaded = await api.get<Record<string, unknown>>("/api/settings");
+      setData(loaded);
+      setSaved(loaded);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load settings");
     }
@@ -36,15 +41,22 @@ export default function SettingsPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!data) return;
+    if (!data || !saved) return;
+    const changes = changedKeys(saved, data);
+    if (Object.keys(changes).length === 0) {
+      toast.info("No changes to save");
+      return;
+    }
     setSaving(true);
     setFieldErrors({});
     try {
-      setData(await api.patch<Record<string, unknown>>("/api/settings", data));
+      const updated = await api.patch<Record<string, unknown>>("/api/settings", changes);
+      setData(updated);
+      setSaved(updated);
       toast.success("Settings updated successfully");
     } catch (err) {
-      // Every tab saves together, so the field at fault is often on another
-      // tab: open it, mark the field, and name it in the toast.
+      // Edits on several tabs save together, so the field at fault may be on
+      // another tab: open it, mark the field, and name it in the toast.
       const located = validationIssues(err).flatMap((issue) => {
         const field = findSettingsField(issue.path);
         return field ? [{ ...field, message: issue.message }] : [];

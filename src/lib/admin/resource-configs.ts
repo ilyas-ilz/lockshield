@@ -2,8 +2,9 @@ import type { ResourceConfig } from "./field-types";
 import { PROJECT_SECTORS, EMIRATES, SCOPE_TAGS, LOCALES } from "@/lib/constants";
 
 const seoFields = [
-  { name: "seo.title", label: "SEO Title", type: "text" as const, help: "Falls back to the site default when empty" },
-  { name: "seo.description", label: "SEO Description", type: "textarea" as const },
+  // maxLength mirrors seoInputSchema (lib/validation/common.ts).
+  { name: "seo.title", label: "SEO Title", type: "text" as const, maxLength: 70, help: "Falls back to the site default when empty" },
+  { name: "seo.description", label: "SEO Description", type: "textarea" as const, maxLength: 160 },
   { name: "seo.noindex", label: "Hide from search engines (noindex)", type: "boolean" as const },
 ];
 

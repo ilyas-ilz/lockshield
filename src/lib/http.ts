@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { ZodError } from "zod";
+import { ZodError, type ZodIssue } from "zod";
 import { logger } from "./logger";
 
 export class ApiError extends Error {
@@ -38,9 +38,9 @@ export async function handleApi(fn: () => Promise<NextResponse>): Promise<NextRe
       // WHY `issues` next to flatten(): flatten() keys errors by top-level
       // field only, so a too-long "defaultSeo.title" reported as "defaultSeo"
       // and the Settings screen could not say which field (on which tab) to fix.
-      const issues = err.issues.map((issue) => ({ path: issue.path.join("."), message: issue.message }));
+      const issues = err.issues.map((issue) => ({ path: issue.path.join("."), message: friendlyMessage(issue) }));
       return NextResponse.json(
-        { success: false, error: "Validation failed", details: { ...err.flatten(), issues } },
+        { success: false, error: "Validation failed", details: { ...err.flatten(friendlyMessage), issues } },
         { status: 400 }
       );
     }
@@ -53,6 +53,25 @@ export async function handleApi(fn: () => Promise<NextResponse>): Promise<NextRe
     logger.error("unhandled API error", err);
     return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 });
   }
+}
+
+/**
+ * WHY: zod's default string-length wording ("String must contain at least 1
+ * character(s)") is what admins see in the toast, and it reads like a
+ * character limit. An empty phone/social row looks like a "0 character" error.
+ * Rewrite only zod's defaults; messages set on a schema are kept as written.
+ */
+function friendlyMessage(issue: ZodIssue): string {
+  const isDefault = issue.message.startsWith("String must contain");
+  if (isDefault && issue.code === "too_small" && issue.type === "string") {
+    return Number(issue.minimum) <= 1
+      ? "Can't be empty: fill it in or remove the empty row"
+      : `Must be at least ${issue.minimum} characters`;
+  }
+  if (isDefault && issue.code === "too_big" && issue.type === "string") {
+    return `Must be ${issue.maximum} characters or fewer`;
+  }
+  return issue.message;
 }
 
 function isMongoDuplicateKeyError(err: unknown): boolean {

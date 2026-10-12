@@ -31,16 +31,22 @@ export function FieldInput({
     case "text":
     case "slug":
       return (
-        <Input
-          id={id}
-          value={(value as string) ?? ""}
-          required={field.required}
-          onChange={(e) => onChange(field.type === "slug" ? slugify(e.target.value) : e.target.value)}
-          className={field.type === "slug" ? "font-mono text-[13px]" : undefined}
-        />
+        <WithCounter value={value} max={field.maxLength}>
+          <Input
+            id={id}
+            value={(value as string) ?? ""}
+            required={field.required}
+            onChange={(e) => onChange(field.type === "slug" ? slugify(e.target.value) : e.target.value)}
+            className={field.type === "slug" ? "font-mono text-[13px]" : undefined}
+          />
+        </WithCounter>
       );
     case "textarea":
-      return <Textarea id={id} rows={4} value={(value as string) ?? ""} onChange={(e) => onChange(e.target.value)} />;
+      return (
+        <WithCounter value={value} max={field.maxLength}>
+          <Textarea id={id} rows={4} value={(value as string) ?? ""} onChange={(e) => onChange(e.target.value)} />
+        </WithCounter>
+      );
     case "richtext":
       return (
         <RichTextEditor
@@ -157,6 +163,23 @@ export function FieldInput({
     default:
       return null;
   }
+}
+
+/** Live length counter under a length-limited field, so an over-long value
+ * (including one already stored in the database) is visible before saving. */
+function WithCounter({ value, max, children }: { value: unknown; max?: number; children: React.ReactNode }) {
+  if (!max) return <>{children}</>;
+  const length = typeof value === "string" ? value.trim().length : 0;
+  const over = length > max;
+  return (
+    <div className="space-y-1">
+      {children}
+      <p className={cn("text-right text-xs tabular-nums", over ? "font-medium text-red-600 dark:text-red-400" : "text-muted")}>
+        {length} / {max}
+        {over && ` (${length - max} over, shorten it)`}
+      </p>
+    </div>
+  );
 }
 
 function slugify(input: string): string {

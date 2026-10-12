@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Toaster } from "sonner";
 import { getEnv } from "@/lib/env";
+import { DEFAULT_OPEN_GRAPH } from "@/lib/seo/site-metadata";
 import "./globals.css";
 
 // NOTE: Previously used `next/font/google` (Archivo + Chakra Petch).
@@ -38,13 +39,7 @@ export const metadata: Metadata = {
   // "./" is resolved against each page's own pathname, so every page gets a
   // self-referencing canonical and the www/apex duplicate collapses to one.
   alternates: { canonical: "./" },
-  openGraph: {
-    type: "website",
-    siteName: "Lock Shield",
-    locale: "en_AE",
-    url: "./",
-    images: [{ url: "/assets/images/banner-1.png", width: 1600, height: 567, alt: "Lock Shield fire protection, Dubai UAE" }],
-  },
+  openGraph: DEFAULT_OPEN_GRAPH,
   icons: {
     icon: "/assets/images/favicon-32x32.png",
     apple: "/assets/images/logo-shield.png",
