@@ -49,28 +49,24 @@ describe("Storage system (Local first fallback)", () => {
     createdUrl = undefined;
   });
 
-  it("sanitizes malicious SVG files removing script tags and event handlers", async () => {
-    const maliciousSvg = `<svg xmlns="http://www.w3.org/2000/svg" onload="alert('xss')">
-      <script>alert('pwned')</script>
-      <circle cx="50" cy="50" r="40" onclick="alert(1)" />
-      <foreignObject><iframe src="javascript:alert(1)"></iframe></foreignObject>
-    </svg>`;
+  it("rejects SVG uploads outright (they can carry script)", async () => {
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>`;
+    await expect(uploadFile(new File([svg], "attack.svg", { type: "image/svg+xml" }))).rejects.toThrow(/Unsupported file type/);
+  });
 
-    const file = new File([maliciousSvg], "attack.svg", { type: "image/svg+xml" });
-    const result = await uploadFile(file);
-    createdUrl = result.url;
+  it("rejects a non-image disguised as image/png", async () => {
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>`;
+    await expect(uploadFile(new File([svg], "pixel.png", { type: "image/png" }))).rejects.toThrow(/integrity check failed/);
+  });
 
-    const diskPath = path.join(process.cwd(), "public", result.url.replace(/^\//, ""));
-    const savedContent = fs.readFileSync(diskPath, "utf8");
-
-    expect(savedContent).not.toContain("<script>");
-    expect(savedContent).not.toContain("onload=");
-    expect(savedContent).not.toContain("onclick=");
-    expect(savedContent).not.toContain("<foreignObject>");
-    expect(savedContent).not.toContain("javascript:");
-    expect(savedContent).toContain("<circle");
-
-    await deleteStoredFile({ storage: "local", url: result.url });
-    createdUrl = undefined;
+  it("refuses to delete a local path that escapes public/uploads", async () => {
+    const victim = path.join(process.cwd(), "public", "traversal-canary.txt");
+    fs.writeFileSync(victim, "keep me");
+    try {
+      await deleteStoredFile({ storage: "local", url: "/uploads/../traversal-canary.txt" });
+      expect(fs.existsSync(victim)).toBe(true);
+    } finally {
+      fs.rmSync(victim, { force: true });
+    }
   });
 });

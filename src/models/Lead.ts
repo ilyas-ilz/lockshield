@@ -1,4 +1,4 @@
-import { LEAD_SOURCES, LEAD_STATUSES, type LeadSource, type LeadStatus } from "@/lib/constants";
+import { LEAD_FORMS, LEAD_SOURCES, LEAD_STATUSES, type LeadForm, type LeadSource, type LeadStatus } from "@/lib/constants";
 import mongoose, { type Document, type Model } from "mongoose";
 const { Schema, model, models } = mongoose;
 
@@ -16,6 +16,8 @@ export interface ILead extends Document {
   serviceInterest?: string; // for contact/amc: which service they asked about
   jobId?: string; // for career: which Job._id they applied to
   resumeUrl?: string; // career only; unused while CVs are sent by email
+  form?: LeadForm; // which website form (see LEAD_FORMS); absent on older leads
+  page?: string; // site path the form was submitted from, e.g. /services/fm-200-special-systems
   status: LeadStatus;
   ip?: string;
   userAgent?: string;
@@ -38,6 +40,8 @@ const leadSchema = new Schema(
     serviceInterest: { type: String, trim: true },
     jobId: { type: Schema.Types.ObjectId, ref: "Job" },
     resumeUrl: { type: String, trim: true },
+    form: { type: String, enum: LEAD_FORMS },
+    page: { type: String, trim: true, maxlength: 300 },
     status: { type: String, enum: LEAD_STATUSES, default: "new" },
     ip: { type: String, trim: true },
     userAgent: { type: String, trim: true },

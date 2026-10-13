@@ -88,6 +88,8 @@ const ProjectCard = React.memo(function ProjectCard({ project }: { project: Caro
     >
       {/* Media — outer keeps the GSAP scroll-parallax contract (data-project-media);
           inner layers are hover-only so the two never fight over one transform. */}
+      {/* Shimmer until the image paints over it (the media layer is the later sibling). */}
+      <div className="animate-shimmer absolute inset-0" aria-hidden />
       <div data-project-media className="absolute inset-0 scale-[1.12] will-change-transform">
         <span className="block h-full w-full transition-transform duration-[650ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.055] will-change-transform">
           <span

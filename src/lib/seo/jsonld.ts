@@ -14,7 +14,12 @@ export interface OrgInput {
   logoUrl?: string;
   phones: string[];
   emails: string[];
-  address: { poBox?: string; street: string; locality: string; country: string };
+  address: {
+    poBox?: string;
+    street: string;
+    locality: string;
+    country: string;
+  };
   geo?: { lat: number; lng: number };
   socials: { url: string }[];
   partnerLinks: { url: string }[];
@@ -27,7 +32,9 @@ export function buildLocalBusinessSchema(org: OrgInput) {
     "@type": "LocalBusiness",
     "@id": `${org.siteUrl}/#organization`,
     name: org.legalName,
-    ...(org.alternateNames?.length ? { alternateName: org.alternateNames } : {}),
+    ...(org.alternateNames?.length
+      ? { alternateName: org.alternateNames }
+      : {}),
     url: org.siteUrl,
     ...(org.logoUrl ? { logo: org.logoUrl, image: org.logoUrl } : {}),
     telephone: org.phones[0],
@@ -39,10 +46,23 @@ export function buildLocalBusinessSchema(org: OrgInput) {
       addressLocality: org.address.locality,
       addressCountry: org.address.country,
     },
-    ...(org.geo ? { geo: { "@type": "GeoCoordinates", latitude: org.geo.lat, longitude: org.geo.lng } } : {}),
+    ...(org.geo
+      ? {
+          geo: {
+            "@type": "GeoCoordinates",
+            latitude: org.geo.lat,
+            longitude: org.geo.lng,
+          },
+        }
+      : {}),
     areaServed: "AE",
     // Set: the cart domain is entered as both a social and a partner link in Settings.
-    sameAs: [...new Set([...org.socials.map((s) => s.url), ...org.partnerLinks.map((p) => p.url)])],
+    sameAs: [
+      ...new Set([
+        ...org.socials.map((s) => s.url),
+        ...org.partnerLinks.map((p) => p.url),
+      ]),
+    ],
   };
 }
 
@@ -85,7 +105,9 @@ export function buildArticleSchema(post: {
           publisher: {
             "@type": "Organization",
             name: post.publisherName,
-            ...(post.publisherLogoUrl ? { logo: { "@type": "ImageObject", url: post.publisherLogoUrl } } : {}),
+            ...(post.publisherLogoUrl
+              ? { logo: { "@type": "ImageObject", url: post.publisherLogoUrl } }
+              : {}),
           },
         }
       : {}),
@@ -104,7 +126,13 @@ export function buildFaqSchema(items: { question: string; answer: string }[]) {
   };
 }
 
-export function buildServiceSchema(svc: { name: string; description: string; url: string; providerName: string; areaServed?: string }) {
+export function buildServiceSchema(svc: {
+  name: string;
+  description: string;
+  url: string;
+  providerName: string;
+  areaServed?: string;
+}) {
   return {
     "@context": "https://schema.org",
     "@type": "Service",
@@ -133,12 +161,22 @@ export function buildJobPostingSchema(job: {
     title: job.title,
     description: job.description,
     datePosted: new Date(job.datePosted).toISOString(),
-    ...(job.validThrough ? { validThrough: new Date(job.validThrough).toISOString() } : {}),
+    ...(job.validThrough
+      ? { validThrough: new Date(job.validThrough).toISOString() }
+      : {}),
     employmentType: job.employmentType.toUpperCase().replace("-", "_"),
-    hiringOrganization: { "@type": "Organization", name: job.hiringOrgName, sameAs: job.hiringOrgUrl },
+    hiringOrganization: {
+      "@type": "Organization",
+      name: job.hiringOrgName,
+      sameAs: job.hiringOrgUrl,
+    },
     jobLocation: {
       "@type": "Place",
-      address: { "@type": "PostalAddress", addressLocality: job.locality, addressCountry: job.country },
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: job.locality,
+        addressCountry: job.country,
+      },
     },
   };
 }
@@ -147,6 +185,38 @@ export function buildItemListSchema(items: { name: string; url: string }[]) {
   return {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    itemListElement: items.map((item, i) => ({ "@type": "ListItem", position: i + 1, name: item.name, url: item.url })),
+    itemListElement: items.map((item, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: item.name,
+      url: item.url,
+    })),
   };
 }
+
+/**
+ * Serialize a JSON-LD object for `<script type="application/ld+json">`.
+ *
+ * WHY not plain JSON.stringify: the result is injected as raw HTML, and the
+ * HTML parser ends the script at the first `</script>` no matter what JSON
+ * says. Titles and settings are admin-editable, so a post titled
+ * `</script><script src=//evil.js>` ran on every visitor's page. Escaping
+ * `<`, `>` and `&` as \u-sequences keeps the JSON identical once parsed but
+ * gives the HTML parser nothing to act on; U+2028/U+2029 are escaped too so
+ * the payload is also valid as a JS string literal.
+ */
+export function serializeJsonLd(data: unknown): string {
+  return JSON.stringify(data).replace(
+    JSON_LD_UNSAFE,
+    (char) =>
+      BACKSLASH + "u" + char.charCodeAt(0).toString(16).padStart(4, "0"),
+  );
+}
+
+// Built from char codes rather than escape literals so the intent is
+// unambiguous: < > & plus the U+2028/U+2029 line separators.
+const BACKSLASH = String.fromCharCode(92);
+const JSON_LD_UNSAFE = new RegExp(
+  "[<>&" + String.fromCharCode(0x2028, 0x2029) + "]",
+  "g",
+);

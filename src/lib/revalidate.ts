@@ -1,4 +1,4 @@
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 /**
  * Admin writes -> public cache busting.
@@ -16,6 +16,19 @@ import { revalidatePath } from "next/cache";
  * exception: it feeds the shared Navbar/Footer, so it genuinely does
  * invalidate every page.
  */
+
+/**
+ * Data-cache tag for one resource's public queries (lib/public-data.ts).
+ * WHY tags as well as paths: /blog, /projects and /services render per
+ * request (they read ?page=), so there is no page cache to bust - their DB
+ * results are cached with unstable_cache instead, and that cache is keyed by
+ * tag, not path.
+ */
+export function publicTag(resourceName: string): string {
+  return `public:${resourceName}`;
+}
+
+export const SETTINGS_TAG = "public:Settings";
 
 /** Routes that list or embed content and are regenerated on any content change. */
 const SITE_INDEXES = ["/sitemap.xml", "/llms.txt"] as const;
@@ -59,6 +72,8 @@ export function revalidateResource(resourceName: string): void {
     const targets = RESOURCE_TARGETS[resourceName];
     if (!targets) return;
 
+    revalidateTag(publicTag(resourceName));
+
     for (const target of targets) {
       revalidatePath(target.path, target.type);
     }
@@ -79,6 +94,7 @@ export function revalidateResource(resourceName: string): void {
  */
 export function revalidateSettings(): void {
   try {
+    revalidateTag(SETTINGS_TAG);
     revalidatePath("/", "layout");
     for (const path of SITE_INDEXES) revalidatePath(path);
   } catch {

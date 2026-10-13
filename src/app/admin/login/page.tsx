@@ -48,7 +48,10 @@ function BrandPanel() {
       <div className="pointer-events-none absolute -bottom-40 -right-24 size-96 rounded-full bg-brand-600/20 blur-3xl" aria-hidden />
 
       <Link href="/" className="relative flex items-center gap-3 self-start">
-        <Image src="/assets/images/logo-shield.webp" alt="" width={44} height={45} priority className="size-11" />
+        {/* White tile: the mark's navy "LS" and transparent gaps vanish on this navy panel. */}
+        <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-white p-1.5 shadow-[0_8px_24px_-8px_rgba(0,0,0,0.5)]">
+          <Image src="/assets/images/logo-shield.webp" alt="" width={44} height={45} priority className="size-full object-contain" />
+        </span>
         <span className="flex flex-col">
           <span className="font-tech text-xl font-bold uppercase leading-none tracking-tight">Lock Shield</span>
           <span className="mt-1 text-[10px] font-medium uppercase tracking-wider text-white/60">Admin Suite</span>

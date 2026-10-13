@@ -10,14 +10,16 @@ import { Media, type IMedia } from "@/models/Media";
 import { writeAudit } from "@/lib/audit";
 import { assertWriteBudget, getClientIp } from "@/lib/rate-limit";
 import { buildSearchFilter } from "@/lib/search-filter";
+import { R2_UPLOAD_KEY } from "@/lib/storage";
 
 // WHY POST here doesn't upload a file itself: uploads go through
 // /api/upload (validated + sanitized, then stored on R2 or local disk).
 // This only registers an already-hosted asset (url/publicId/dimensions) +
 // required alt text so the media library can list/search it later.
 const mediaRecordSchema = z.object({
-  url: z.string().min(1),
-  publicId: z.string().optional(),
+  url: z.string().min(1).max(2048),
+  // WHY the pattern: publicId later decides which R2 object DELETE removes.
+  publicId: z.string().regex(R2_UPLOAD_KEY, "publicId is not an upload key").optional(),
   storage: z.enum(["local", "r2"]).default("local"),
   alt: z.string().min(1, "alt text is required"),
   mimeType: z.string().optional(),

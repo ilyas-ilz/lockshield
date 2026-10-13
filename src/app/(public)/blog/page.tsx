@@ -1,17 +1,18 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Flame } from "lucide-react";
-import { connectDB } from "@/lib/db";
-import { Post } from "@/models";
+import { loadBlogListing } from "@/lib/public-data";
 import { PageHero } from "@/components/frontend/PageHero";
 import { Section } from "@/components/frontend/Section";
 import { Reveal } from "@/components/frontend/Reveal";
 import { ButtonLink } from "@/components/frontend/Button";
 import { BlogGrid, type BlogPostSummary } from "@/components/frontend/BlogGrid";
 import { Pagination } from "@/components/frontend/Pagination";
-import { PUBLIC_PAGE_SIZE, parsePage, totalPagesFor, type PublicSearchParams } from "@/lib/public-listing";
+import { BlogGridSkeleton } from "@/components/frontend/ListingSkeletons";
+import { pageKey, type PublicSearchParams } from "@/lib/public-listing";
 
-// Rendered per request because the page reads ?page= from the URL. See the
-// matching note in app/(public)/projects/page.tsx.
+// Rendered per request because the page reads ?page= from the URL; the DB
+// result itself is cached (loadBlogListing) and busted on admin save.
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
@@ -29,32 +30,17 @@ interface PostSummary {
   publishedAt?: string | number | Date;
 }
 
-export default async function BlogPage({ searchParams }: { searchParams: Promise<PublicSearchParams> }) {
-  const sp = await searchParams;
+export default async function BlogPage({
+  searchParams,
+}: {
+  searchParams: Promise<PublicSearchParams>;
+}) {
+  const page = pageKey((await searchParams).page);
 
-  let posts: PostSummary[] = [];
-  let total = 0;
-  let page = 1;
-  let totalPages = 1;
-
-  try {
-    await connectDB();
-
-    const filter = { status: "published" };
-    total = await Post.countDocuments(filter);
-    totalPages = totalPagesFor(total, PUBLIC_PAGE_SIZE);
-    page = parsePage(sp.page, totalPages);
-
-    const foundPosts = await Post.find(filter)
-      .sort({ publishedAt: -1, createdAt: -1 })
-      .skip((page - 1) * PUBLIC_PAGE_SIZE)
-      .limit(PUBLIC_PAGE_SIZE)
-      .lean();
-    posts = (foundPosts as unknown as PostSummary[]) || [];
-  } catch {
-    // DB error fallback
-  }
-
+  // WHY Suspense: the hero needs no data, so it streams to the browser
+  // straight away while the grid's query runs; the skeleton holds the grid's
+  // exact footprint until then. Keyed by page so paging shows the skeleton
+  // again instead of the previous page's cards.
   return (
     <>
       <PageHero
@@ -65,35 +51,58 @@ export default async function BlogPage({ searchParams }: { searchParams: Promise
       />
 
       <Section className="blueprint-grid bg-paper-soft">
-        {posts.length === 0 ? (
-          <Reveal className="mx-auto max-w-xl rounded-3xl border border-[var(--marketing-line)] bg-white p-10 text-center sm:p-16">
-            <Flame className="mx-auto mb-4 size-12 text-brand-500" />
-            <h3 className="font-tech text-lg font-bold uppercase text-navy-900 sm:text-xl">
-              Articles Publishing Soon
-            </h3>
-            <p className="mt-2 text-sm text-ink/62">
-              Our fire engineers are preparing fresh technical guides and compliance case studies.
-              Check back shortly or visit our services.
-            </p>
-            <div className="pt-6">
-              <ButtonLink href="/services" variant="red">
-                Explore Our Services
-              </ButtonLink>
-            </div>
-          </Reveal>
-        ) : (
-          <>
-            <BlogGrid posts={posts as BlogPostSummary[]} />
-            <Pagination
-              page={page}
-              totalPages={totalPages}
-              total={total}
-              basePath="/blog"
-              label="articles"
-            />
-          </>
-        )}
+        <Suspense key={page} fallback={<BlogGridSkeleton />}>
+          <BlogResults page={page} />
+        </Suspense>
       </Section>
+    </>
+  );
+}
+
+async function BlogResults({ page: requestedPage }: { page: number }) {
+  let posts: PostSummary[] = [];
+  let total = 0;
+  let page = 1;
+  let totalPages = 1;
+
+  try {
+    const listing = await loadBlogListing(requestedPage);
+    ({ total, totalPages, page } = listing);
+    posts = listing.posts as PostSummary[];
+  } catch {
+    // DB error fallback
+  }
+
+  if (posts.length === 0) {
+    return (
+      <Reveal className="mx-auto max-w-xl rounded-3xl border border-[var(--marketing-line)] bg-white p-10 text-center sm:p-16">
+        <Flame className="mx-auto mb-4 size-12 text-brand-500" />
+        <h3 className="font-tech text-lg font-bold uppercase text-navy-900 sm:text-xl">
+          Articles Publishing Soon
+        </h3>
+        <p className="mt-2 text-sm text-ink/62">
+          Our fire engineers are preparing fresh technical guides and compliance
+          case studies. Check back shortly or visit our services.
+        </p>
+        <div className="pt-6">
+          <ButtonLink href="/services" variant="red">
+            Explore Our Services
+          </ButtonLink>
+        </div>
+      </Reveal>
+    );
+  }
+
+  return (
+    <>
+      <BlogGrid posts={posts as BlogPostSummary[]} />
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        total={total}
+        basePath="/blog"
+        label="articles"
+      />
     </>
   );
 }

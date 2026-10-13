@@ -14,6 +14,18 @@ function firstValue(raw: string | string[] | undefined): string | undefined {
   return Array.isArray(raw) ? raw[0] : raw;
 }
 
+/** Highest page number a listing will cache; beyond any real listing size. */
+const MAX_CACHED_PAGE = 1000;
+
+/**
+ * `?page=` as a bounded integer for use as a data-cache key.
+ * WHY: every distinct key is a separate cache entry, so passing the raw
+ * string would let `?page=a1`, `?page=a2`... fill the cache with junk.
+ */
+export function pageKey(raw: string | string[] | undefined): number {
+  return Math.min(parsePage(raw), MAX_CACHED_PAGE);
+}
+
 /**
  * Clamp `?page=` to something sane. A junk or out-of-range value falls back to
  * page 1 rather than rendering an empty grid — `?page=99` on a 3-page listing

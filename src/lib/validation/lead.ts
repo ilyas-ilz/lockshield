@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { objectIdSchema } from "./common";
 import { LEAD_SOURCES, LEAD_STATUSES } from "@/models/Lead";
+import { LEAD_FORMS } from "@/lib/constants";
 
 // WHY: this is the one schema untrusted anonymous visitors post directly
 // against (contact / AMC / career forms). `status`, `ip`, `userAgent` are
@@ -23,7 +24,14 @@ export const leadCreateSchema = z
     message: z.string().trim().max(5000).optional(),
     serviceInterest: z.string().trim().max(150).optional(),
     jobId: objectIdSchema.optional(),
-    resumeUrl: z.string().optional(),
+    resumeUrl: z.string().trim().max(500).optional(),
+    form: z.enum(LEAD_FORMS).optional(),
+    // A same-site path only ("/services/x"), never a full URL: it is shown in
+    // the admin and the alert email, so it must not carry links elsewhere.
+    page: z.preprocess(
+      blankToUndefined,
+      z.string().trim().max(300).regex(/^[/](?![/])[^\s<>"'`]*$/, "page must be a site path").optional()
+    ),
     // WHY no max(0): rejecting a filled honeypot here returned 400 "bot
     // detected" and taught the bot to adapt. Accept it; the route drops it
     // with a fake success instead.

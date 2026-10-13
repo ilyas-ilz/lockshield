@@ -22,4 +22,10 @@ describe("buildLeadEmail", () => {
     expect(mail.html).not.toContain("<script>");
     expect(mail.html).toContain("&lt;script&gt;");
   });
+
+  it("says which form and page the lead came from", () => {
+    const mail = buildLeadEmail({ source: "contact", name: "Ahmed", phone: "0501234567", form: "quote_form", page: "/services/fm-200-special-systems" });
+    expect(mail.html).toContain("Quote form");
+    expect(mail.html).toContain("/services/fm-200-special-systems");
+  });
 });

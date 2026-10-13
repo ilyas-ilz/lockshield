@@ -3,8 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { ShieldCheck, CheckCircle2, ArrowRight, ChevronRight, FileText } from "lucide-react";
-import { connectDB } from "@/lib/db";
-import { Service } from "@/models";
+import { getPublishedService, publishedServiceSlugs } from "@/lib/public-data";
 import { BlockRenderer } from "@/components/frontend/BlockRenderer";
 import { QuickQuoteForm } from "@/components/frontend/QuickQuoteForm";
 import { Reveal } from "@/components/frontend/Reveal";
@@ -12,6 +11,9 @@ import { Reveal } from "@/components/frontend/Reveal";
 // Content is editable from the admin, so pages must not be frozen at build
 // time. Revalidate every 5 minutes.
 export const revalidate = 300;
+
+// Opts the route into ISR - see lib/public-data.ts.
+export const generateStaticParams = publishedServiceSlugs;
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -100,8 +102,7 @@ const SERVICE_FALLBACKS: Record<string, { title: string; summary: string; detail
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  await connectDB().catch(() => {});
-  const service = await Service.findOne({ slug, status: "published" }).lean().catch(() => null);
+  const service = await getPublishedService(slug).catch(() => null);
 
   const title = service?.title || SERVICE_FALLBACKS[slug]?.title || "Service Details";
   const desc = service?.summary || SERVICE_FALLBACKS[slug]?.summary || "Fire protection service by Lock Shield UAE";
@@ -124,8 +125,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
   let service: ServiceDoc | null = null;
 
   try {
-    await connectDB();
-    const found = await Service.findOne({ slug, status: "published" }).lean();
+    const found = await getPublishedService(slug);
     service = (found as unknown as ServiceDoc) || null;
   } catch {
     // Database connection fallback

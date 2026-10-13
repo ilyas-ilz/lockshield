@@ -12,6 +12,9 @@ import {
   Calendar,
   ExternalLink,
   MessageSquare,
+  Trash2,
+  Wrench,
+  MousePointerClick,
 } from "lucide-react";
 import { toast } from "sonner";
 import { api, type PageResult } from "@/lib/admin/api-client";
@@ -22,6 +25,8 @@ import { Select } from "@/components/ui/select";
 import { DataPagination } from "@/components/shared/data-pagination";
 import { LeadsSkeleton, EmptyState, ErrorState } from "@/components/shared/states";
 import { cn } from "@/lib/utils";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { LEAD_FORM_LABELS, type LeadForm } from "@/lib/constants";
 
 export interface LeadRow {
   _id: string;
@@ -31,6 +36,8 @@ export interface LeadRow {
   phone?: string;
   message?: string;
   serviceInterest?: string;
+  form?: LeadForm;
+  page?: string;
   status: "new" | "contacted" | "qualified" | "closed" | "spam";
   createdAt: string;
   ip?: string;
@@ -53,7 +60,21 @@ const STATUS_TONES: Record<string, "brand" | "warning" | "success" | "neutral" |
   spam: "danger",
 };
 
-export function LeadsClientTable({ initialData }: { initialData?: PageResult<LeadRow> }) {
+/** "Quote form on /services/fm-200" - where on the site the lead came from. */
+function leadOrigin(lead: Pick<LeadRow, "form" | "page">): string | null {
+  const form = lead.form ? LEAD_FORM_LABELS[lead.form] : null;
+  if (form && lead.page) return `${form} on ${lead.page}`;
+  return form ?? (lead.page ? `page ${lead.page}` : null);
+}
+
+export function LeadsClientTable({
+  initialData,
+  canDelete = false,
+}: {
+  initialData?: PageResult<LeadRow>;
+  /** ADMIN only - the DELETE API enforces it too; this just hides the button. */
+  canDelete?: boolean;
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -71,6 +92,7 @@ export function LeadsClientTable({ initialData }: { initialData?: PageResult<Lea
   const [searchDraft, setSearchDraft] = React.useState(search);
   const [copiedField, setCopiedField] = React.useState<string | null>(null);
   const [selectedLead, setSelectedLead] = React.useState<LeadRow | null>(null);
+  const [deleteTarget, setDeleteTarget] = React.useState<LeadRow | null>(null);
 
   // Sync initialData if received from SSR
   React.useEffect(() => {
@@ -133,8 +155,22 @@ export function LeadsClientTable({ initialData }: { initialData?: PageResult<Lea
       await api.patch(`/api/leads/${id}`, { status: next });
       toast.success(`Lead marked as ${next}`);
       void load();
+      // Bell, sidebar badge and the stat cards are server-rendered counts.
+      router.refresh();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Status update failed");
+    }
+  }
+
+  async function deleteLead(lead: LeadRow) {
+    try {
+      await api.delete(`/api/leads/${lead._id}`);
+      toast.success(`Lead from ${lead.name} deleted`);
+      if (selectedLead?._id === lead._id) setSelectedLead(null);
+      void load();
+      router.refresh(); // stat cards, bell and sidebar badge are server-rendered
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Delete failed");
     }
   }
 
@@ -257,6 +293,12 @@ export function LeadsClientTable({ initialData }: { initialData?: PageResult<Lea
                           <Badge tone="neutral" className="uppercase text-[10px] font-semibold">
                             {lead.source}
                           </Badge>
+                          {lead.serviceInterest && (
+                            <Badge tone="brand" className="text-[10px] font-semibold">
+                              <Wrench className="mr-1 size-3" aria-hidden />
+                              {lead.serviceInterest}
+                            </Badge>
+                          )}
                           <span className="flex items-center gap-1 text-xs text-muted">
                             <Calendar className="size-3 text-muted/60" />
                             {new Date(lead.createdAt).toLocaleDateString("en-AE", {
@@ -269,10 +311,17 @@ export function LeadsClientTable({ initialData }: { initialData?: PageResult<Lea
                           </span>
                         </div>
 
+                        {leadOrigin(lead) && (
+                          <p className="mt-1 flex items-center gap-1 text-[11px] text-muted">
+                            <MousePointerClick className="size-3 text-muted/60" aria-hidden />
+                            <span className="truncate">via {leadOrigin(lead)}</span>
+                          </p>
+                        )}
+
                         {/* Contact details with Copy buttons */}
                         <div className="mt-2 flex flex-wrap items-center gap-3 text-xs">
                           {lead.email && (
-                            <div className="inline-flex items-center gap-1.5 rounded-lg border border-app/60 bg-surface-2/40 px-2 py-1">
+                            <div className="inline-flex items-center gap-1.5 rounded-lg border border-line/60 bg-surface-2/40 px-2 py-1">
                               <a
                                 href={`mailto:${lead.email}`}
                                 className="font-medium text-foreground hover:underline flex items-center gap-1"
@@ -296,7 +345,7 @@ export function LeadsClientTable({ initialData }: { initialData?: PageResult<Lea
                           )}
 
                           {lead.phone && (
-                            <div className="inline-flex items-center gap-1.5 rounded-lg border border-app/60 bg-surface-2/40 px-2 py-1">
+                            <div className="inline-flex items-center gap-1.5 rounded-lg border border-line/60 bg-surface-2/40 px-2 py-1">
                               <a
                                 href={`tel:${lead.phone}`}
                                 className="font-medium text-foreground hover:underline flex items-center gap-1"
@@ -322,20 +371,22 @@ export function LeadsClientTable({ initialData }: { initialData?: PageResult<Lea
 
                         {/* Customer Message snippet */}
                         {lead.message && (
-                          <div className="mt-3 rounded-xl border border-app/60 bg-surface-2/30 p-3 text-xs text-muted leading-relaxed">
+                          <div className="mt-3 rounded-xl border border-line/60 bg-surface-2/30 p-3 text-xs text-muted leading-relaxed">
                             <p className="line-clamp-2">{lead.message}</p>
-                            {lead.message.length > 120 && (
-                              <button
-                                type="button"
-                                onClick={() => setSelectedLead(lead)}
-                                className="mt-1 font-semibold text-[var(--color-brand-600)] hover:underline cursor-pointer inline-flex items-center gap-1"
-                              >
-                                Read full message
-                                <ExternalLink className="size-3" />
-                              </button>
-                            )}
                           </div>
                         )}
+
+                        {/* WHY always shown: the popup is the only place with
+                            every field (service, form, page), and it used to
+                            appear only for messages over 120 characters. */}
+                        <button
+                          type="button"
+                          onClick={() => setSelectedLead(lead)}
+                          className="mt-2 inline-flex min-h-8 cursor-pointer items-center gap-1 text-xs font-semibold text-[var(--color-brand-600)] hover:underline"
+                        >
+                          View details
+                          <ExternalLink className="size-3" aria-hidden />
+                        </button>
                       </div>
                     </div>
 
@@ -353,6 +404,20 @@ export function LeadsClientTable({ initialData }: { initialData?: PageResult<Lea
                           className="h-8.5 text-xs rounded-xl"
                         />
                       </div>
+
+                      {canDelete && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setDeleteTarget(lead)}
+                          aria-label={`Delete lead from ${lead.name}`}
+                          className="h-8 text-xs text-muted hover:text-[var(--color-brand-600)]"
+                        >
+                          <Trash2 className="size-3.5 mr-1" aria-hidden />
+                          Delete
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </Card>
@@ -392,12 +457,14 @@ export function LeadsClientTable({ initialData }: { initialData?: PageResult<Lea
                 {selectedLead.email && <span><strong>Email:</strong> {selectedLead.email}</span>}
                 {selectedLead.phone && <span><strong>Phone:</strong> {selectedLead.phone}</span>}
                 {selectedLead.serviceInterest && <span><strong>Service:</strong> {selectedLead.serviceInterest}</span>}
+                {selectedLead.form && <span><strong>Form:</strong> {LEAD_FORM_LABELS[selectedLead.form]}</span>}
+                {selectedLead.page && <span><strong>Page:</strong> {selectedLead.page}</span>}
               </div>
 
               <div>
                 <p className="font-bold text-foreground mb-1.5">Message:</p>
                 <div className="rounded-xl border border-app bg-surface-2/40 p-4 text-sm text-foreground leading-relaxed whitespace-pre-wrap">
-                  {selectedLead.message}
+                  {selectedLead.message || <span className="text-muted">No message - they only left contact details.</span>}
                 </div>
               </div>
 
@@ -425,6 +492,19 @@ export function LeadsClientTable({ initialData }: { initialData?: PageResult<Lea
           </Card>
         </div>
       )}
+
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        onOpenChange={(open) => !open && setDeleteTarget(null)}
+        title={`Delete the lead from ${deleteTarget?.name ?? ""}?`}
+        description="This permanently removes the lead and its message. This cannot be undone."
+        confirmLabel="Delete lead"
+        destructive
+        onConfirm={async () => {
+          if (deleteTarget) await deleteLead(deleteTarget);
+          setDeleteTarget(null);
+        }}
+      />
     </div>
   );
 }

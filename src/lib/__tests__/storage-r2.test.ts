@@ -88,22 +88,23 @@ describe("storage on Cloudflare R2", () => {
     expect(config.credentials).toEqual({ accessKeyId: "test-key", secretAccessKey: "test-secret" });
   });
 
-  it("sanitizes an SVG before it ever reaches the bucket", async () => {
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" onload="alert(1)"><script>alert(2)</script><circle r="4"/></svg>`;
-    await storage.uploadFile(new File([svg], "logo.svg", { type: "image/svg+xml" }));
-
-    const body = String(sent[0]!.input.Body);
-    expect(body).not.toContain("<script>");
-    expect(body).not.toContain("onload=");
-    expect(body).toContain("<circle");
-    expect(sent[0]!.input.ContentType).toBe("image/svg+xml");
+  it("never sends an SVG to the bucket", async () => {
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg"><script>alert(2)</script></svg>`;
+    await expect(storage.uploadFile(new File([svg], "logo.svg", { type: "image/svg+xml" }))).rejects.toThrow();
+    expect(sent).toHaveLength(0);
   });
 
   it("deletes the object by its key", async () => {
-    await storage.deleteStoredFile({ storage: "r2", url: `${CDN}/lockshield/media/2026/09/abc.png`, publicId: "lockshield/media/2026/09/abc.png" });
-    expect(sent).toEqual([
-      { command: "DeleteObjectCommand", input: { Bucket: "lockshield-media", Key: "lockshield/media/2026/09/abc.png" } },
-    ]);
+    const key = "lockshield/media/2026/09/abcdEFGH1234_-xy.png";
+    await storage.deleteStoredFile({ storage: "r2", url: `${CDN}/${key}`, publicId: key });
+    expect(sent).toEqual([{ command: "DeleteObjectCommand", input: { Bucket: "lockshield-media", Key: key } }]);
+  });
+
+  it("refuses to delete keys outside the upload layout (forged Media record)", async () => {
+    for (const publicId of ["lockshield/healthcheck/x.png", "backups/db.json", "lockshield/media/2026/09/../../secret.png"]) {
+      await storage.deleteStoredFile({ storage: "r2", url: `${CDN}/${publicId}`, publicId });
+    }
+    expect(sent).toEqual([]);
   });
 
   it("only removes the registry entry for legacy Spaces uploads", async () => {

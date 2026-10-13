@@ -49,7 +49,9 @@ export function QuoteModal({ open, onOpenChange, defaultService }: QuoteModalPro
           phone: formData.phone,
           serviceInterest: formData.serviceInterest || undefined,
           message: formData.message || undefined,
-          source: "contact",
+          source: /amc|annual maintenance/i.test(formData.serviceInterest) ? "amc" : "contact",
+          form: "quote_popup",
+          page: window.location.pathname,
           honeypot: formData.honeypot,
         }),
       });

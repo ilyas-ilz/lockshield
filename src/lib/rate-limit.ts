@@ -18,6 +18,8 @@ import { ApiError } from "./http";
 
 interface Bucket {
   timestamps: number[];
+  /** The window this bucket was created with - see sweep(). */
+  windowMs: number;
 }
 
 const buckets = new Map<string, Bucket>();
@@ -27,11 +29,14 @@ const buckets = new Map<string, Bucket>();
 const SWEEP_INTERVAL_MS = 10 * 60 * 1000;
 let lastSweep = Date.now();
 
-function sweep(now: number, maxWindowMs: number) {
+// WHY each bucket's own window: the sweep used to prune *every* bucket with
+// the window of whichever call triggered it, so a routine 60 s write check
+// cut 15-minute login buckets down to 60 s and reset the login throttle.
+function sweep(now: number) {
   if (now - lastSweep < SWEEP_INTERVAL_MS) return;
   lastSweep = now;
   for (const [key, bucket] of buckets) {
-    bucket.timestamps = bucket.timestamps.filter((t) => now - t < maxWindowMs);
+    bucket.timestamps = bucket.timestamps.filter((t) => now - t < bucket.windowMs);
     if (bucket.timestamps.length === 0) buckets.delete(key);
   }
 }
@@ -44,9 +49,9 @@ export interface RateLimitResult {
 
 export function checkRateLimit(key: string, maxRequests: number, windowMs: number): RateLimitResult {
   const now = Date.now();
-  sweep(now, windowMs);
+  sweep(now);
 
-  const bucket = buckets.get(key) ?? { timestamps: [] };
+  const bucket = buckets.get(key) ?? { timestamps: [], windowMs };
   bucket.timestamps = bucket.timestamps.filter((t) => now - t < windowMs);
 
   if (bucket.timestamps.length >= maxRequests) {

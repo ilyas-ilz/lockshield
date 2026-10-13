@@ -1,5 +1,21 @@
 @import "tailwindcss";
 
+/* Desktop-only "rail" state of the admin sidebar. The attribute lives on
+   <html> and is set before paint by the root layout's init script, so the
+   collapsed width never flashes open on load. */
+/* Admin dark mode is the .dark class set by the theme toggle, not the OS
+   setting - otherwise `dark:` utilities and the flipped CSS vars disagree.
+   The marketing site has no dark design, so it never gets .dark. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@custom-variant collapsed {
+  @media (width >= 64rem) {
+    html[data-sidebar="collapsed"] & {
+      @slot;
+    }
+  }
+}
+
 @theme {
   --color-brand-50: #fff1f1;
   --color-brand-100: #ffdfdf;
@@ -18,6 +34,8 @@
 
   --font-sans: var(--font-archivo), ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-tech: var(--font-chakra), ui-monospace, monospace;
+  /* Admin UI face: rounded geometric sans, softer than Archivo for dense dashboards. */
+  --font-admin: "Manrope", var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
 
   /* Semantic aliases onto the runtime theme vars below, so `text-foreground`,
      `divide-line` etc. resolve and still flip with `:root.dark`. These were used
@@ -25,6 +43,10 @@
      no-ops. */
   --color-foreground: var(--text);
   --color-line: var(--border);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-muted: var(--text-muted);
 
   /* Marketing-site tokens, ported from the legacy static site's
      assets/css/main.css :root block rather than invented. The admin above
@@ -180,24 +202,9 @@
     font-family: var(--font-tech);
   }
 
-  .bg-app {
-    background: var(--bg);
-  }
-  .bg-surface {
-    background: var(--surface);
-  }
-  .bg-surface-2 {
-    background: var(--surface-2);
-  }
-  .text-app {
-    color: var(--text);
-  }
-  .text-muted {
-    color: var(--text-muted);
-  }
-  .border-app {
-    border-color: var(--border);
-  }
+  /* bg-surface*, text-muted come from @theme colours; bg-app / text-app /
+     border-app are @utility blocks at the end of this file - both forms
+     accept hover:/dark:/data-* variants, which plain classes here did not. */
 
   /* Blueprint grid: the legacy recipe is TWO overlaid grids (a 120px major +
      a 24px minor), not one 32px grid - the single-scale version here read as
@@ -509,7 +516,7 @@
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 1rem;
-    box-shadow: 0 2px 12px -3px rgba(0, 0, 0, 0.08), 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+    box-shadow: 0 1px 2px 0 rgba(13, 18, 32, 0.04);
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
@@ -644,4 +651,16 @@
       transform: none !important;
     }
   }
+}
+
+/* Admin theme helpers as real utilities so variants (hover:text-app,
+   md:bg-app ...) compile. For opacity use text-foreground/NN. */
+@utility bg-app {
+  background-color: var(--bg);
+}
+@utility text-app {
+  color: var(--text);
+}
+@utility border-app {
+  border-color: var(--border);
 }

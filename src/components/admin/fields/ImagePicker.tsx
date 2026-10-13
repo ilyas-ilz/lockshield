@@ -183,7 +183,7 @@ export function ImagePicker({
         <input
           ref={fileInput}
           type="file"
-          accept="image/png,image/jpeg,image/webp,image/svg+xml,image/gif"
+          accept="image/png,image/jpeg,image/webp,image/gif"
           hidden
           onChange={(e) => {
             const file = e.target.files?.[0];

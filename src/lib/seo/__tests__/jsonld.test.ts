@@ -32,3 +32,20 @@ describe("buildLocalBusinessSchema", () => {
     ]);
   });
 });
+
+describe("serializeJsonLd", () => {
+  it("cannot be broken out of with </script> in an admin-editable field", async () => {
+    const { serializeJsonLd } = await import("../jsonld");
+    const out = serializeJsonLd({ headline: '</script><script src="//evil.example/x.js"></script>' });
+    expect(out).not.toMatch(/<\/?script/i);
+    expect(out).not.toContain("<");
+    expect(out).not.toContain(">");
+    expect(out).toContain(String.fromCharCode(92) + "u003c/script");
+  });
+
+  it("round-trips to exactly the same data", async () => {
+    const { serializeJsonLd } = await import("../jsonld");
+    const data = { name: "A & B <Fire> " + String.fromCharCode(0x2028) + " Safety", list: [1, "x"] };
+    expect(JSON.parse(serializeJsonLd(data))).toEqual(data);
+  });
+});

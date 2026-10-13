@@ -1,3 +1,5 @@
+import { LEAD_FORM_LABELS, type LeadForm } from "./constants";
+
 export interface LeadNotification {
   source: string;
   name: string;
@@ -5,6 +7,8 @@ export interface LeadNotification {
   phone?: string;
   serviceInterest?: string;
   message?: string;
+  form?: string;
+  page?: string;
 }
 
 export interface LeadEmail {
@@ -33,6 +37,8 @@ function renderLeadHtml(lead: LeadNotification): string {
     ["Email", lead.email],
     ["Phone", lead.phone],
     ["Service", lead.serviceInterest],
+    ["Form", lead.form ? (LEAD_FORM_LABELS[lead.form as LeadForm] ?? lead.form) : undefined],
+    ["Page", lead.page],
     ["Message", lead.message],
   ];
   const rowsHtml = rows

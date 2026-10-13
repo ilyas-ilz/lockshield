@@ -5,13 +5,16 @@ import { hasR2 } from "./env";
 import { putPublicObject, deleteR2Object } from "./r2";
 import { logger } from "./logger";
 
-export const ALLOWED_MIME_TYPES = [
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "image/svg+xml",
-  "image/gif",
-] as const;
+/**
+ * WHY no SVG: an SVG is a document that can carry script, and uploads are
+ * served from cdn.lockshield.ae - same site as the admin - so a crafted SVG
+ * opened directly could act on an admin session. The regex sanitizer below
+ * was shown to be bypassable (entities, split tags, unterminated <script>),
+ * and HTML sanitizers can't be made airtight for SVG cheaply. Raster formats
+ * can't execute anything, so uploads are raster-only. Logos that need to be
+ * vector belong in /public/assets (reviewed in git), not in the uploader.
+ */
+export const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"] as const;
 
 export type AllowedMimeType = (typeof ALLOWED_MIME_TYPES)[number];
 
@@ -19,9 +22,24 @@ const MIME_TO_EXT: Record<string, string> = {
   "image/jpeg": "jpg",
   "image/png": "png",
   "image/webp": "webp",
-  "image/svg+xml": "svg",
   "image/gif": "gif",
 };
+
+/** The format sharp must detect for each declared type (see uploadFile). */
+const MIME_TO_SHARP_FORMAT: Record<string, string> = {
+  "image/jpeg": "jpeg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "image/gif": "gif",
+};
+
+/**
+ * Shape of every key uploadFile writes: {folder}/{yyyy}/{mm}/{nanoid16}.{ext}
+ * under one of the fixed upload folders (api/upload/route.ts).
+ * WHY deletion checks it: a Media record's publicId decides which object is
+ * deleted, so without this a forged record could delete any key in the bucket.
+ */
+export const R2_UPLOAD_KEY = /^lockshield\/(?:posts|pages|services|projects|jobs|media)\/\d{4}\/\d{2}\/[\w-]{16}\.(?:jpg|png|webp|gif)$/;
 
 export const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
 
@@ -41,7 +59,10 @@ export interface UploadResult {
 }
 
 /**
- * Strip dangerous executable elements and event handlers from SVGs to prevent Stored XSS.
+ * Strip dangerous executable elements and event handlers from SVGs.
+ * Best-effort only - NOT a security boundary (see ALLOWED_MIME_TYPES). Kept
+ * for the image migration script, which only copies SVGs already reviewed
+ * into /public/assets.
  */
 export function sanitizeSvg(svgContent: string): string {
   return svgContent
@@ -78,30 +99,29 @@ export async function uploadFile(
   }
 
   const arrayBuffer = await file.arrayBuffer();
-  let buffer = Buffer.from(arrayBuffer);
+  const buffer = Buffer.from(arrayBuffer);
 
   let width: number | undefined;
   let height: number | undefined;
   let format = MIME_TO_EXT[file.type] || "webp";
 
-  // Security: Sanitize SVG or Validate Image Buffers with Sharp
-  if (file.type === "image/svg+xml") {
-    const rawSvg = buffer.toString("utf8");
-    const cleanSvg = sanitizeSvg(rawSvg);
-    buffer = Buffer.from(cleanSvg, "utf8");
-  } else {
-    try {
-      const sharpMod = (await import("sharp")).default;
-      const meta = await sharpMod(buffer).metadata();
-      if (!meta.format) {
-        throw new Error("Invalid or corrupted image content");
-      }
-      width = meta.width;
-      height = meta.height;
-      if (meta.format) format = meta.format;
-    } catch (err) {
-      throw new Error(`File integrity check failed: ${err instanceof Error ? err.message : "Not a valid image"}`);
+  // Security: decode the bytes and require the real format to match the
+  // declared one. WHY: file.type is whatever the client sent - without this,
+  // an SVG/HTML payload labelled image/png would be stored and served as-is.
+  try {
+    const sharpMod = (await import("sharp")).default;
+    const meta = await sharpMod(buffer).metadata();
+    if (!meta.format) {
+      throw new Error("Invalid or corrupted image content");
     }
+    if (meta.format !== MIME_TO_SHARP_FORMAT[file.type]) {
+      throw new Error(`content is ${meta.format}, not ${file.type}`);
+    }
+    width = meta.width;
+    height = meta.height;
+    format = meta.format;
+  } catch (err) {
+    throw new Error(`File integrity check failed: ${err instanceof Error ? err.message : "Not a valid image"}`);
   }
 
   const now = new Date();
@@ -154,14 +174,24 @@ export async function deleteStoredFile(media: {
   publicId?: string;
 }): Promise<void> {
   if (media.storage === "r2" && media.publicId) {
+    if (!R2_UPLOAD_KEY.test(media.publicId)) {
+      logger.warn("refusing to delete R2 key outside the upload layout", { publicId: media.publicId });
+      return;
+    }
     await deleteR2Object(media.publicId);
   } else if (media.storage === "spaces" || media.storage === "cloudinary") {
     // Pre-R2 upload; that provider's client is gone, so only the registry
     // entry is removed. Delete the remote copy in the provider's console.
     logger.warn("legacy asset not deleted remotely", { storage: media.storage, url: media.url, publicId: media.publicId });
   } else if (media.storage === "local" && media.url.startsWith("/uploads/")) {
-    const relativePath = media.url.replace(/^\//, "");
-    const fullPath = path.join(process.cwd(), "public", relativePath);
+    // WHY resolve + prefix check: "/uploads/../../.env" passes startsWith()
+    // but path.join() walks it out of public/uploads.
+    const uploadsRoot = path.resolve(process.cwd(), "public", "uploads");
+    const fullPath = path.resolve(process.cwd(), "public", media.url.replace(/^\//, ""));
+    if (!fullPath.startsWith(uploadsRoot + path.sep)) {
+      logger.warn("refusing to delete local path outside public/uploads", { url: media.url });
+      return;
+    }
     try {
       await fs.promises.unlink(fullPath);
     } catch {

@@ -23,6 +23,8 @@ function PostCard({ post, idx }: { post: BlogPostSummary; idx: number }) {
         <div>
           {post.coverImage?.url ? (
             <div className="relative aspect-[16/10] overflow-hidden bg-paper-soft">
+              {/* Shimmer until the image paints over it (the image is the later sibling). */}
+              <div className="animate-shimmer absolute inset-0" aria-hidden />
               <Image
                 src={post.coverImage.url}
                 alt={post.coverImage.alt || post.title}

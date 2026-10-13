@@ -11,14 +11,12 @@ const mediaCdnHost = (() => {
   }
 })();
 
-// Uploaded media: the R2 public domain (custom or *.r2.dev), plus legacy
-// pre-R2 uploads still referenced in the DB (DigitalOcean Spaces, Cloudinary).
-const mediaImgSources = [
-  ...(mediaCdnHost ? [`https://${mediaCdnHost}`] : []),
-  "https://*.r2.dev",
-  "https://*.digitaloceanspaces.com",
-  "https://res.cloudinary.com",
-].join(" ");
+// Uploaded media: only our own R2 public domain.
+// WHY no wildcards (*.r2.dev, *.digitaloceanspaces.com, Cloudinary): every
+// stored URL was migrated to the CDN (verified: no document references
+// those hosts), and a wildcard let /_next/image fetch and re-serve images
+// from *anyone's* bucket on our domain and our image-optimization bill.
+const mediaImgSources = mediaCdnHost ? `https://${mediaCdnHost}` : "";
 
 const cspDirectives = [
   "default-src 'self'",
@@ -59,11 +57,11 @@ const nextConfig: NextConfig = {
   poweredByHeader: false, // don't advertise the framework (X-Powered-By: Next.js)
   serverExternalPackages: ["sharp"],
   images: {
+    // WHY a long TTL: R2 keys are random per upload and never overwritten, so
+    // an optimized variant can stay cached for a month without going stale.
+    minimumCacheTTL: 2592000,
     remotePatterns: [
       ...(mediaCdnHost ? [{ protocol: "https" as const, hostname: mediaCdnHost }] : []),
-      { protocol: "https", hostname: "**.r2.dev" },
-      { protocol: "https", hostname: "**.digitaloceanspaces.com" }, // legacy pre-R2 uploads
-      { protocol: "https", hostname: "res.cloudinary.com" }, // legacy pre-Spaces uploads
     ],
   },
   async headers() {

@@ -42,6 +42,8 @@ export function CareerApplicationForm({ jobTitle, jobId, onClose }: CareerApplic
           phone: form.phone || undefined,
           message: `Applying for: ${jobTitle}${form.message ? `\n\n${form.message}` : ""}`,
           jobId: jobId || undefined,
+          form: "career",
+          page: window.location.pathname,
           honeypot: form.honeypot,
         }),
       });

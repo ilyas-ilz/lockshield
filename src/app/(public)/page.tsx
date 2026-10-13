@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { connectDB } from "@/lib/db";
 import { DEFAULT_OPEN_GRAPH } from "@/lib/seo/site-metadata";
 import { Service, Project } from "@/models";
-import { getSettings } from "@/lib/settings";
+import { getPublicSettings } from "@/lib/public-data";
 import { getEnv } from "@/lib/env";
-import { buildLocalBusinessSchema, buildFaqSchema } from "@/lib/seo/jsonld";
+import { buildLocalBusinessSchema, buildFaqSchema, serializeJsonLd } from "@/lib/seo/jsonld";
 import { HeroSlider } from "@/components/frontend/HeroSlider";
 import type { FAQItem } from "@/components/frontend/FAQAccordion";
 import { Section, SectionHead } from "@/components/frontend/Section";
@@ -128,9 +128,13 @@ export default async function HomePage() {
   try {
     await connectDB();
     const [services, projects, settings] = await Promise.all([
-      Service.find({ status: "published" }).sort({ order: 1, title: 1 }).lean(),
-      Project.find({ publishStatus: "published" }).sort({ featured: -1, createdAt: -1 }).limit(9).lean(),
-      getSettings(),
+      Service.find({ status: "published" }).sort({ order: 1, title: 1 }).select("title slug summary").lean(),
+      Project.find({ publishStatus: "published" })
+        .sort({ featured: -1, createdAt: -1 })
+        .limit(9)
+        .select("title slug client sector emirate year coverImage")
+        .lean(),
+      getPublicSettings(),
     ]);
 
     // Next.js: only plain objects can go from Server -> Client Components.
@@ -202,9 +206,9 @@ export default async function HomePage() {
   return (
     <>
       {jsonLdLocalBusiness && (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdLocalBusiness) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLdLocalBusiness) }} />
       )}
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFAQ) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLdFAQ) }} />
 
       {/* 1. Hero — sticky pinned, covered on scroll by .page-body below */}
       <HeroSlider />

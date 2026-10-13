@@ -32,6 +32,23 @@ function pageWindow(page: number, totalPages: number): (number | "gap")[] {
   return [1, "gap", page - 1, page, page + 1, "gap", totalPages];
 }
 
+/**
+ * Phone page list: first, current, last only (1 … 4 … 7).
+ * WHY: seven 44px targets plus both arrows measure ~443px, wider than a
+ * 375px screen, so the 7-page blog listing scrolled the whole page sideways.
+ * Shrinking the targets would break the 44px touch-size rule; showing fewer
+ * keeps them full size. Prev/Next still step one page at a time.
+ */
+function compactWindow(page: number, totalPages: number): (number | "gap")[] {
+  const keep = [...new Set([1, page, totalPages])].sort((a, b) => a - b);
+  const out: (number | "gap")[] = [];
+  keep.forEach((n, i) => {
+    if (i > 0 && n - keep[i - 1]! > 1) out.push("gap");
+    out.push(n);
+  });
+  return out;
+}
+
 export function Pagination({
   page,
   totalPages,
@@ -75,8 +92,34 @@ export function Pagination({
           </span>
         )}
 
-        <div className="flex items-center gap-1 sm:gap-1.5">
+        <div className="hidden items-center gap-1.5 sm:flex">
           {pages.map((entry, index) =>
+            entry === "gap" ? (
+              <span key={`gap-${index}`} aria-hidden className="px-1 text-sm text-ink/40 select-none">
+                …
+              </span>
+            ) : entry === page ? (
+              <span
+                key={entry}
+                aria-current="page"
+                className="inline-flex size-11 items-center justify-center rounded-full bg-brand-500 text-sm font-bold text-white shadow-md"
+              >
+                {entry}
+              </span>
+            ) : (
+              <Link
+                key={entry}
+                href={buildHref(basePath, params, entry)}
+                aria-label={`Go to page ${entry}`}
+                className="inline-flex size-11 items-center justify-center rounded-full border border-[var(--marketing-line)] bg-white text-sm font-semibold text-navy-900 transition-all hover:border-brand-500 hover:text-brand-500"
+              >
+                {entry}
+              </Link>
+            )
+          )}
+        </div>
+        <div className="flex items-center gap-1 sm:hidden">
+          {compactWindow(page, totalPages).map((entry, index) =>
             entry === "gap" ? (
               <span key={`gap-${index}`} aria-hidden className="px-1 text-sm text-ink/40 select-none">
                 …

@@ -37,7 +37,11 @@ export function QuickQuoteForm({ defaultService = "" }: QuickQuoteFormProps) {
           email: form.email || undefined,
           serviceInterest: form.serviceInterest || undefined,
           message: form.message || undefined,
-          source: "contact",
+          // AMC enquiries get their own source so the admin's "AMC" filter
+          // actually catches them (it was never set by any form before).
+          source: /amc|annual maintenance/i.test(form.serviceInterest) ? "amc" : "contact",
+          form: "quote_form",
+          page: window.location.pathname,
           honeypot: form.honeypot,
         }),
       });

@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, DeleteObjectCommand, HeadBucketCommand } from "@aws-sdk/client-s3";
 import { getEnv } from "./env";
 
 let client: S3Client | undefined;
@@ -78,4 +78,10 @@ export async function putPublicObject(key: string, body: Buffer, contentType: st
 export async function deleteR2Object(key: string): Promise<void> {
   const config = getConfig();
   await getClient().send(new DeleteObjectCommand({ Bucket: config.bucket, Key: key }));
+}
+
+/** Throws unless the bucket exists and the credentials can reach it (health check). */
+export async function checkR2Bucket(): Promise<void> {
+  const config = getConfig();
+  await getClient().send(new HeadBucketCommand({ Bucket: config.bucket }));
 }

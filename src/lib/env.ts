@@ -66,6 +66,9 @@ const envSchema = z.object({
   SMTP_USER: optionalString,
   SMTP_PASSWORD: optionalString,
   SMTP_FROM: optionalString,
+  // Lead-alert recipients, comma-separated. Optional: defaults to SMTP_USER
+  // (see notify.ts leadRecipients for why not Settings > Email Addresses).
+  LEAD_NOTIFY_TO: optionalString,
   SITE_URL: z.preprocess(normalizeSiteUrl, z.string().url().default("https://www.lockshield.ae")),
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
 });

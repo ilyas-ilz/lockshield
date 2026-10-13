@@ -3,8 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { ChevronRight, Building2, MapPin, Calendar, Tag } from "lucide-react";
-import { connectDB } from "@/lib/db";
-import { Project } from "@/models";
+import { getPublishedProject, publishedProjectSlugs } from "@/lib/public-data";
 import { QuickQuoteForm } from "@/components/frontend/QuickQuoteForm";
 import { Reveal } from "@/components/frontend/Reveal";
 
@@ -12,14 +11,16 @@ import { Reveal } from "@/components/frontend/Reveal";
 // time. Revalidate every 5 minutes.
 export const revalidate = 300;
 
+// Opts the route into ISR - see lib/public-data.ts.
+export const generateStaticParams = publishedProjectSlugs;
+
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  await connectDB().catch(() => {});
-  const project = await Project.findOne({ slug, publishStatus: "published" }).lean().catch(() => null);
+  const project = await getPublishedProject(slug).catch(() => null);
 
   const title = project?.title || slug.replace(/-/g, " ");
   return {
@@ -45,8 +46,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
   let project: ProjectDoc | null = null;
 
   try {
-    await connectDB();
-    project = (await Project.findOne({ slug, publishStatus: "published" }).lean()) as ProjectDoc | null;
+    project = (await getPublishedProject(slug)) as ProjectDoc | null;
   } catch {
     // DB error
   }

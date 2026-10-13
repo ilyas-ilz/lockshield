@@ -32,4 +32,20 @@ describe("leadCreateSchema", () => {
   it("still rejects a malformed email", () => {
     expect(() => leadCreateSchema.parse({ ...base, phone: "0501234567", email: "not-an-email" })).toThrow();
   });
+
+  it("records which form and page a lead came from", () => {
+    const lead = leadCreateSchema.parse({ ...base, phone: "0501234567", form: "quote_popup", page: "/services/fm-200-special-systems" });
+    expect(lead.form).toBe("quote_popup");
+    expect(lead.page).toBe("/services/fm-200-special-systems");
+  });
+
+  it("only accepts a same-site path as the page (shown in admin + email)", () => {
+    for (const page of ["https://evil.example/x", "//evil.example", "/a b", '/x"><script>', "javascript:alert(1)"]) {
+      expect(() => leadCreateSchema.parse({ ...base, phone: "0501234567", page })).toThrow();
+    }
+  });
+
+  it("rejects an unknown form name", () => {
+    expect(() => leadCreateSchema.parse({ ...base, phone: "0501234567", form: "admin" })).toThrow();
+  });
 });

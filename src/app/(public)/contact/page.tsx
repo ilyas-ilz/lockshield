@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Phone, Mail, MapPin, MessageCircle, Clock } from "lucide-react";
-import { getSettings } from "@/lib/settings";
+import { getPublicSettings } from "@/lib/public-data";
 import { QuickQuoteForm } from "@/components/frontend/QuickQuoteForm";
 import { PageHero } from "@/components/frontend/PageHero";
 import { Section } from "@/components/frontend/Section";
@@ -33,8 +33,7 @@ interface ContactSettings {
 export default async function ContactPage() {
   let settings: ContactSettings = {};
   try {
-    const s = await getSettings();
-    settings = (s.toObject ? s.toObject() : s) as ContactSettings;
+    settings = (await getPublicSettings()) as ContactSettings;
   } catch {
     // DB error fallback
     void 0;

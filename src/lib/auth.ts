@@ -3,8 +3,8 @@ import Credentials from "next-auth/providers/credentials";
 import { authConfig } from "./auth.config";
 import { connectDB } from "./db";
 import { User, type UserRole } from "@/models/User";
-import { verifyPassword } from "./password";
-import { isLocked, recordFailedAttempt, resetLockout } from "./lockout";
+import { hashPassword, verifyPassword } from "./password";
+import { isLocked, MAX_ATTEMPTS, LOCK_DURATION_MS } from "./lockout";
 import { checkRateLimit, RATE_LIMITS } from "./rate-limit";
 import { logger } from "./logger";
 
@@ -37,6 +37,18 @@ const ROLE_REVALIDATE_MS = 5 * 60 * 1000;
 // this file (it imports auth.config.ts directly instead) or the Edge
 // build breaks. Route handlers and Server Components (both Node runtime)
 // import this file for the full `auth()`/`signIn`/`signOut`/`handlers`.
+/**
+ * WHY a dummy hash: bcrypt is the slow part of a login. Skipping it for an
+ * unknown email made "no such account" answer ~100x faster than "wrong
+ * password", which tells an attacker which emails exist. Comparing against a
+ * throwaway hash makes both paths cost the same. Created once, lazily.
+ */
+let dummyHash: Promise<string> | undefined;
+function getDummyHash(): Promise<string> {
+  dummyHash ??= hashPassword(`dummy-${Math.random()}-${Date.now()}`);
+  return dummyHash;
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   callbacks: {
@@ -105,32 +117,44 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         // WHY a generic "invalid" for a missing user rather than "no such
         // account": telling an anonymous caller which emails exist is user
-        // enumeration. A locked/inactive state is only reported to someone
-        // who already got the password combination far enough to trip it.
-        if (!user) throw new LoginError("invalid");
-        if (!user.active) throw new LoginError("inactive");
+        // enumeration - and the dummy compare keeps the timing identical.
+        if (!user) {
+          await verifyPassword(password, await getDummyHash());
+          throw new LoginError("invalid");
+        }
 
+        // Checked before the password so a locked account can't keep being
+        // brute-forced; the lock itself was earned by failed guesses.
         if (isLocked({ lockUntil: user.lockUntil })) throw new LoginError("locked");
 
         const valid = await verifyPassword(password, user.passwordHash);
         if (!valid) {
-          const next = recordFailedAttempt({
-            failedLoginAttempts: user.failedLoginAttempts,
-            lockUntil: user.lockUntil,
-          });
-          user.failedLoginAttempts = next.failedLoginAttempts;
-          user.lockUntil = next.lockUntil;
-          await user.save();
-          // Tell them immediately if that attempt was the one that locked
-          // the account, rather than letting the next try look identical.
-          throw new LoginError(next.lockUntil ? "locked" : "invalid");
+          // WHY $inc and not read-modify-save: N parallel guesses each read
+          // the same count and each wrote count+1, so a burst never reached
+          // the lock threshold. The DB increments atomically instead.
+          const updated = await User.findOneAndUpdate(
+            { _id: user._id },
+            { $inc: { failedLoginAttempts: 1 } },
+            { new: true, projection: { failedLoginAttempts: 1 } }
+          ).lean();
+          const attempts = updated?.failedLoginAttempts ?? MAX_ATTEMPTS;
+          if (attempts >= MAX_ATTEMPTS) {
+            await User.updateOne({ _id: user._id }, { $set: { lockUntil: new Date(Date.now() + LOCK_DURATION_MS) } });
+            // Tell them immediately if that attempt was the one that locked
+            // the account, rather than letting the next try look identical.
+            throw new LoginError("locked");
+          }
+          throw new LoginError("invalid");
         }
 
-        const reset = resetLockout();
-        user.failedLoginAttempts = reset.failedLoginAttempts;
-        user.lockUntil = reset.lockUntil;
-        user.lastLoginAt = new Date();
-        await user.save();
+        // WHY only after a correct password: reporting "inactive" earlier
+        // confirmed the email exists to anyone who typed it.
+        if (!user.active) throw new LoginError("inactive");
+
+        await User.updateOne(
+          { _id: user._id },
+          { $set: { failedLoginAttempts: 0, lockUntil: null, lastLoginAt: new Date() } }
+        );
 
         return { id: user._id.toString(), email: user.email, name: user.name, role: user.role };
       },

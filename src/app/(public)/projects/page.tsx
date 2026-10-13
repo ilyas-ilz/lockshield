@@ -1,24 +1,26 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import Link from "next/link";
-import { connectDB } from "@/lib/db";
-import { Project } from "@/models";
-import { ProjectsGallery, type ProjectItem } from "@/components/frontend/ProjectsGallery";
+import { loadProjectListing, loadProjectSectors } from "@/lib/public-data";
+import {
+  ProjectsGallery,
+  type ProjectItem,
+} from "@/components/frontend/ProjectsGallery";
 import { PageHero } from "@/components/frontend/PageHero";
 import { Section } from "@/components/frontend/Section";
 import { Pagination } from "@/components/frontend/Pagination";
+import { ProjectGridSkeleton } from "@/components/frontend/ListingSkeletons";
 import {
-  PUBLIC_PAGE_SIZE,
+  pageKey,
   parseFilter,
-  parsePage,
-  totalPagesFor,
   type PublicSearchParams,
 } from "@/lib/public-listing";
 
 // Reading searchParams makes this route render per request, which is what we
 // want here: the listing is paginated and filtered from the URL, and an admin
 // publishing a project now shows up immediately instead of waiting out an ISR
-// window. The project *detail* pages stay cached and are busted explicitly on
-// write — see lib/revalidate.ts.
+// window. The DB result is cached (loadProjectListing) and busted on admin
+// save; the project *detail* pages are ISR - see lib/revalidate.ts.
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
@@ -78,10 +80,45 @@ const SAMPLE_PROJECTS: ProjectItem[] = [
   },
 ];
 
-export default async function ProjectsPage({ searchParams }: { searchParams: Promise<PublicSearchParams> }) {
+export default async function ProjectsPage({
+  searchParams,
+}: {
+  searchParams: Promise<PublicSearchParams>;
+}) {
   const sp = await searchParams;
   const sector = parseFilter(sp.sector);
+  const page = pageKey(sp.page);
 
+  // Hero streams immediately; the gallery streams in behind a same-size
+  // skeleton (see app/(public)/blog/page.tsx for the full rationale).
+  return (
+    <>
+      <PageHero
+        crumbs={[{ label: "Home", href: "/" }, { label: "Projects" }]}
+        title="Completed"
+        accent="Projects"
+        description="Showcasing over 300 certified fire protection installations across healthcare, banking, hospitality, retail, and commercial properties in the UAE."
+      />
+
+      <Section className="blueprint-grid bg-paper-soft">
+        <Suspense
+          key={`${sector ?? ""}:${page}`}
+          fallback={<ProjectGridSkeleton />}
+        >
+          <ProjectResults sector={sector} requestedPage={page} />
+        </Suspense>
+      </Section>
+    </>
+  );
+}
+
+async function ProjectResults({
+  sector,
+  requestedPage,
+}: {
+  sector: string | undefined;
+  requestedPage: number;
+}) {
   let projectsList: ProjectItem[] = [];
   let sectors: string[] = [];
   let total = 0;
@@ -90,48 +127,14 @@ export default async function ProjectsPage({ searchParams }: { searchParams: Pro
   let usingFallback = false;
 
   try {
-    await connectDB();
-
-    const baseFilter: Record<string, unknown> = { publishStatus: "published" };
-    const filter = sector ? { ...baseFilter, sector } : baseFilter;
-
-    // Sector list is built from the whole published collection, not the
-    // current page, so the filter tabs stay identical on every page.
-    const [count, allSectors] = await Promise.all([
-      Project.countDocuments(filter),
-      Project.distinct("sector", baseFilter),
-    ]);
-
-    total = count;
-    totalPages = totalPagesFor(total, PUBLIC_PAGE_SIZE);
-    page = parsePage(sp.page, totalPages);
-
-    const found = await Project.find(filter)
-      .sort({ featured: -1, createdAt: -1 })
-      .skip((page - 1) * PUBLIC_PAGE_SIZE)
-      .limit(PUBLIC_PAGE_SIZE)
-      .select("title slug client sector emirate year coverImage")
-      .lean();
-
-    sectors = (allSectors as unknown[])
-      .filter((value): value is string => typeof value === "string" && value.trim() !== "")
-      .sort((a, b) => a.localeCompare(b));
-
-    projectsList = found.map((p) => ({
-      _id: String(p._id),
-      title: String(p.title || ""),
-      slug: String(p.slug || ""),
-      client: p.client ? String(p.client) : undefined,
-      sector: p.sector ? String(p.sector) : undefined,
-      emirate: p.emirate ? String(p.emirate) : undefined,
-      year: typeof p.year === "number" ? p.year : undefined,
-      coverImage: p.coverImage?.url
-        ? {
-            url: String(p.coverImage.url),
-            alt: p.coverImage.alt ? String(p.coverImage.alt) : undefined,
-          }
-        : undefined,
-    }));
+    sectors = await loadProjectSectors();
+    // An unknown sector has no projects by definition - answer without a DB
+    // query or a new cache entry.
+    if (!sector || sectors.includes(sector)) {
+      const listing = await loadProjectListing(requestedPage, sector);
+      ({ total, totalPages, page } = listing);
+      projectsList = listing.projects;
+    }
   } catch {
     // Fallback
   }
@@ -150,45 +153,43 @@ export default async function ProjectsPage({ searchParams }: { searchParams: Pro
 
   return (
     <>
-      <PageHero
-        crumbs={[{ label: "Home", href: "/" }, { label: "Projects" }]}
-        title="Completed"
-        accent="Projects"
-        description="Showcasing over 300 certified fire protection installations across healthcare, banking, hospitality, retail, and commercial properties in the UAE."
-      />
-
-      <Section className="blueprint-grid bg-paper-soft">
-        {items.length === 0 ? (
-          <div className="mx-auto max-w-xl rounded-3xl border border-[var(--marketing-line)] bg-white p-10 text-center sm:p-16">
-            <h2 className="font-tech text-lg font-bold uppercase text-navy-900 sm:text-xl">No projects in this sector</h2>
-            <p className="mt-2 text-sm text-ink/62">
-              Nothing is published under “{sector}” yet. Browse the full portfolio instead.
-            </p>
-            <div className="pt-6">
-              <Link
-                href="/projects"
-                className="inline-flex min-h-11 items-center rounded-full bg-brand-500 px-6 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
-              >
-                View all projects
-              </Link>
-            </div>
+      {items.length === 0 ? (
+        <div className="mx-auto max-w-xl rounded-3xl border border-[var(--marketing-line)] bg-white p-10 text-center sm:p-16">
+          <h2 className="font-tech text-lg font-bold uppercase text-navy-900 sm:text-xl">
+            No projects in this sector
+          </h2>
+          <p className="mt-2 text-sm text-ink/62">
+            Nothing is published under “{sector}” yet. Browse the full portfolio
+            instead.
+          </p>
+          <div className="pt-6">
+            <Link
+              href="/projects"
+              className="inline-flex min-h-11 items-center rounded-full bg-brand-500 px-6 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
+            >
+              View all projects
+            </Link>
           </div>
-        ) : (
-          <>
-            <ProjectsGallery projects={items} sectors={sectors} activeSector={sector} />
-            {!usingFallback && (
-              <Pagination
-                page={page}
-                totalPages={totalPages}
-                total={total}
-                basePath="/projects"
-                params={{ sector }}
-                label="projects"
-              />
-            )}
-          </>
-        )}
-      </Section>
+        </div>
+      ) : (
+        <>
+          <ProjectsGallery
+            projects={items}
+            sectors={sectors}
+            activeSector={sector}
+          />
+          {!usingFallback && (
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              total={total}
+              basePath="/projects"
+              params={{ sector }}
+              label="projects"
+            />
+          )}
+        </>
+      )}
     </>
   );
 }

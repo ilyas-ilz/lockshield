@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Save, Database, Server, Cloud, HardDrive, RefreshCw, Activity } from "lucide-react";
+import { Save, Settings as SettingsIcon } from "lucide-react";
 import { toast } from "sonner";
 import { FieldInput } from "@/components/admin/fields/FieldInput";
 import { getPath, setPath } from "@/lib/admin/object-path";
@@ -14,6 +14,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { ErrorState } from "@/components/shared/states";
 import { cn } from "@/lib/utils";
 import { SETTINGS_SECTIONS as SECTIONS, findSettingsField } from "./sections";
+import { WebsiteStatus } from "./website-status";
 
 export default function SettingsPage() {
   const [data, setData] = useState<Record<string, unknown> | null>(null);
@@ -79,7 +80,8 @@ export default function SettingsPage() {
     <div className="space-y-6">
       <PageHeader
         title="Site Settings"
-        description="Global business information, contact channels, partner links, and SEO metadata."
+        description="Business details, contact information, partner links, search engine settings and website status."
+        icon={SettingsIcon}
       />
 
       {error ? (
@@ -123,7 +125,7 @@ export default function SettingsPage() {
 
           {/* Active Section Card */}
           {activeSection === "system" ? (
-            <SystemHealthSection />
+            <WebsiteStatus />
           ) : (
             <>
               <Card className="border-app shadow-xs">
@@ -181,137 +183,5 @@ export default function SettingsPage() {
         </form>
       )}
     </div>
-  );
-}
-
-function SystemHealthSection() {
-  const [health, setHealth] = useState<{
-    database?: { status: string; provider: string; pingMs: number; name: string };
-    storage?: { provider: string; isCdn: boolean };
-    system?: { nodeVersion: string; environment: string; timestamp: string };
-  } | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-
-  const fetchHealth = useCallback(async () => {
-    try {
-      const res = await api.get<{
-        database: { status: string; provider: string; pingMs: number; name: string };
-        storage: { provider: string; isCdn: boolean };
-        system: { nodeVersion: string; environment: string; timestamp: string };
-      }>("/api/admin/health");
-      setHealth(res);
-    } catch {
-      // ignore
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    void fetchHealth();
-  }, [fetchHealth]);
-
-  const handleRefresh = () => {
-    setRefreshing(true);
-    void fetchHealth();
-  };
-
-  return (
-    <Card className="border-app shadow-xs">
-      <CardHeader className="px-6 py-4 border-b border-app bg-surface-2/30 flex flex-row items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="p-2 rounded-lg bg-surface border border-app text-foreground">
-            <Activity className="size-4 text-[var(--color-brand-500)]" />
-          </div>
-          <div>
-            <CardTitle className="text-base font-semibold">System & Infrastructure Diagnostics</CardTitle>
-            <p className="mt-0.5 text-xs text-muted">Technical infrastructure health, database connection, and storage provider.</p>
-          </div>
-        </div>
-        <Button
-          type="button"
-          variant="secondary"
-          size="sm"
-          onClick={handleRefresh}
-          disabled={refreshing || loading}
-          className="text-xs"
-        >
-          <RefreshCw className={cn("size-3.5 mr-1.5", refreshing && "animate-spin")} />
-          Refresh
-        </Button>
-      </CardHeader>
-      <CardContent className="p-6">
-        {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Skeleton className="h-28 w-full rounded-xl" />
-            <Skeleton className="h-28 w-full rounded-xl" />
-            <Skeleton className="h-28 w-full rounded-xl" />
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Database */}
-            <div className="p-4 rounded-xl border border-app bg-surface-2/40 space-y-2.5">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-foreground text-sm font-semibold">
-                  <Database className="size-4 text-emerald-500" />
-                  <span>Database</span>
-                </div>
-                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                  <span className="size-1.5 rounded-full bg-emerald-500 inline-block animate-pulse" />
-                  {health?.database?.status === "connected" ? "Connected" : "Online"}
-                </span>
-              </div>
-              <div className="text-xs text-muted space-y-1 pt-1">
-                <p className="font-medium text-foreground">{health?.database?.provider ?? "MongoDB Atlas"}</p>
-                <p>Latency: <span className="font-mono text-foreground">{health?.database?.pingMs ?? 0}ms</span></p>
-                <p>Database: <span className="font-mono text-foreground">{health?.database?.name ?? "lockshield"}</span></p>
-              </div>
-            </div>
-
-            {/* Storage */}
-            <div className="p-4 rounded-xl border border-app bg-surface-2/40 space-y-2.5">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-foreground text-sm font-semibold">
-                  {health?.storage?.isCdn ? (
-                    <Cloud className="size-4 text-blue-500" />
-                  ) : (
-                    <HardDrive className="size-4 text-amber-500" />
-                  )}
-                  <span>Media Storage</span>
-                </div>
-                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
-                  Active
-                </span>
-              </div>
-              <div className="text-xs text-muted space-y-1 pt-1">
-                <p className="font-medium text-foreground">{health?.storage?.provider ?? "Unknown"}</p>
-                <p>{health?.storage?.isCdn ? "Global CDN delivery" : "Local uploads storage (not persistent on Vercel)"}</p>
-                <p>Assets served: <span className="text-foreground">Optimized</span></p>
-              </div>
-            </div>
-
-            {/* Runtime */}
-            <div className="p-4 rounded-xl border border-app bg-surface-2/40 space-y-2.5">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-foreground text-sm font-semibold">
-                  <Server className="size-4 text-purple-500" />
-                  <span>Runtime</span>
-                </div>
-                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20">
-                  Ready
-                </span>
-              </div>
-              <div className="text-xs text-muted space-y-1 pt-1">
-                <p>Environment: <span className="font-mono capitalize text-foreground">{health?.system?.environment ?? "development"}</span></p>
-                <p>Node: <span className="font-mono text-foreground">{health?.system?.nodeVersion ?? process.version}</span></p>
-                <p>Status: <span className="text-foreground font-medium">All systems operational</span></p>
-              </div>
-            </div>
-          </div>
-        )}
-      </CardContent>
-    </Card>
   );
 }

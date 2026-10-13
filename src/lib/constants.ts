@@ -61,6 +61,20 @@ export type EmploymentType = (typeof EMPLOYMENT_TYPES)[number];
 export const LEAD_SOURCES = ["contact", "amc", "career"] as const;
 export type LeadSource = (typeof LEAD_SOURCES)[number];
 
+/**
+ * Which website form a lead was sent from. WHY separate from `source`:
+ * source is *what* they want (quote / AMC / job), form is *where* they asked -
+ * every quote form used to say "contact", so the popup, the Contact page and
+ * the per-service forms were indistinguishable in the admin.
+ */
+export const LEAD_FORMS = ["quote_popup", "quote_form", "career"] as const;
+export type LeadForm = (typeof LEAD_FORMS)[number];
+export const LEAD_FORM_LABELS: Record<LeadForm, string> = {
+  quote_popup: "Get a Quote popup",
+  quote_form: "Quote form",
+  career: "Job application form",
+};
+
 export const LEAD_STATUSES = ["new", "contacted", "qualified", "closed", "spam"] as const;
 export type LeadStatus = (typeof LEAD_STATUSES)[number];
 

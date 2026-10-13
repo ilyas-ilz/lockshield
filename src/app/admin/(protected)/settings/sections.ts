@@ -111,8 +111,8 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
   },
   {
     id: "system",
-    title: "System & Health",
-    description: "Database connectivity, storage backend, environment status, and runtime diagnostics.",
+    title: "Website Status",
+    description: "Check that your website, pictures and enquiry emails are working.",
     icon: Activity,
     fields: [],
   },

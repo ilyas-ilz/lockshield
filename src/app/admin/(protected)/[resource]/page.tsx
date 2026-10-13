@@ -3,7 +3,11 @@ import { getResourceConfig } from "@/lib/admin/resource-configs";
 import { DataTable } from "@/components/admin/data-table";
 import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState, TableSkeleton } from "@/components/shared/states";
-import { FileQuestion } from "lucide-react";
+import Link from "next/link";
+import { FileQuestion, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { navIconFor } from "@/components/admin/nav-config";
+import { singular } from "@/components/admin/data-table-cells";
 import { fetchResourceSSR } from "@/lib/admin/server-data";
 
 interface ResourcePageProps {
@@ -37,7 +41,23 @@ export default async function ResourceListPage({ params, searchParams }: Resourc
 
   return (
     <>
-      <PageHeader title={config.label} description={config.description} />
+      <PageHeader
+        title={config.label}
+        description={config.description}
+        icon={navIconFor(`/admin/${config.key}`)}
+        actions={
+          // Media has no standalone create flow - assets come in through the
+          // image picker on other forms.
+          config.key === "media" ? undefined : (
+            <Button variant="primary" asChild className="min-h-11 sm:min-h-10">
+              <Link href={`/admin/${config.key}/new`}>
+                <Plus aria-hidden />
+                New {singular(config.label).toLowerCase()}
+              </Link>
+            </Button>
+          )
+        }
+      />
       <Suspense fallback={<TableSkeleton columns={config.columns.length} />}>
         <DataTable config={config} initialData={initialData ?? undefined} />
       </Suspense>

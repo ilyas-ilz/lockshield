@@ -86,6 +86,8 @@ export function ProjectsGallery({
               className="group flex h-full flex-col overflow-hidden rounded-3xl border border-[var(--marketing-line)] bg-white transition-all duration-300 hover:border-brand-500 hover:shadow-xl"
             >
               <div className="relative aspect-[16/10] overflow-hidden bg-paper-soft">
+                {/* Shimmer until the image paints over it (the image is the later sibling). */}
+                <div className="animate-shimmer absolute inset-0" aria-hidden />
                 <div data-project-media className="absolute inset-0 scale-[1.12] will-change-transform">
                   <Image
                     src={project.coverImage?.url || project.image?.url || "/assets/images/commercial.webp"}

@@ -3,18 +3,21 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { ChevronRight, Calendar, User, Clock, ArrowLeft } from "lucide-react";
-import { connectDB } from "@/lib/db";
-import { Post } from "@/models";
+import { getPublishedPost, publishedPostSlugs } from "@/lib/public-data";
 import { BlockRenderer } from "@/components/frontend/BlockRenderer";
 import { Reveal } from "@/components/frontend/Reveal";
 import { ButtonLink } from "@/components/frontend/Button";
 import { getEnv } from "@/lib/env";
+import { defaultBlogCover } from "@/lib/default-images";
 import { sanitizeRichHtml } from "@/lib/sanitize-html";
-import { buildArticleSchema, buildBreadcrumbSchema } from "@/lib/seo/jsonld";
+import { buildArticleSchema, buildBreadcrumbSchema, serializeJsonLd } from "@/lib/seo/jsonld";
 
 // Content is editable from the admin, so pages must not be frozen at build
 // time. Revalidate every 5 minutes.
 export const revalidate = 300;
+
+// Opts the route into ISR - see lib/public-data.ts.
+export const generateStaticParams = publishedPostSlugs;
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -22,8 +25,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  await connectDB().catch(() => {});
-  const post = await Post.findOne({ slug, status: "published" }).lean().catch(() => null);
+  const post = await getPublishedPost(slug).catch(() => null);
 
   if (!post) {
     return { title: "Article Not Found" };
@@ -37,7 +39,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       url: "./",
       title: post.title,
       description: post.excerpt,
-      images: post.coverImage?.url ? [post.coverImage.url] : undefined,
+      images: [post.coverImage?.url || defaultBlogCover().url],
     },
   };
 }
@@ -57,8 +59,7 @@ export default async function BlogPostPage({ params }: PageProps) {
   let post: BlogPostDoc | null = null;
 
   try {
-    await connectDB();
-    post = await Post.findOne({ slug, status: "published" }).lean();
+    post = await getPublishedPost(slug);
   } catch {
     // DB error
   }
@@ -68,12 +69,16 @@ export default async function BlogPostPage({ params }: PageProps) {
   }
 
   const siteUrl = getEnv().SITE_URL;
-  // coverImage.url is either an absolute CDN (R2) URL or a local /assets
+  // Posts saved without a cover get the branded default, so the page,
+  // social previews and Article rich results never go image-less.
+  const cover = post.coverImage?.url ? post.coverImage : defaultBlogCover(post.title);
+
+  // cover.url is either an absolute CDN (R2) URL or a local /assets
   // path - schema.org/Google Rich Results want Article.image absolute.
-  const absoluteCoverImageUrl = post.coverImage?.url
-    ? post.coverImage.url.startsWith("http")
-      ? post.coverImage.url
-      : `${siteUrl}${post.coverImage.url}`
+  const absoluteCoverImageUrl = cover.url
+    ? cover.url.startsWith("http")
+      ? cover.url
+      : `${siteUrl}${cover.url}`
     : undefined;
   const jsonLdArticle = buildArticleSchema({
     title: post.title,
@@ -96,11 +101,11 @@ export default async function BlogPostPage({ params }: PageProps) {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdArticle) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLdArticle) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdBreadcrumb) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLdBreadcrumb) }}
       />
 
       {/* Header */}
@@ -148,18 +153,16 @@ export default async function BlogPostPage({ params }: PageProps) {
 
       <section className="bg-white py-14 sm:py-20 lg:py-24">
         <article className="wrap max-w-4xl">
-          {post.coverImage?.url && (
-            <Reveal className="relative mb-10 aspect-[16/9] overflow-hidden rounded-3xl border border-[var(--marketing-line)] shadow-lg sm:mb-12">
-              <Image
-                src={post.coverImage.url}
-                alt={post.coverImage.alt || post.title}
-                fill
-                sizes="(min-width: 1024px) 60vw, 100vw"
-                className="object-cover"
-                priority
-              />
-            </Reveal>
-          )}
+          <Reveal className="relative mb-10 aspect-[16/9] overflow-hidden rounded-3xl border border-[var(--marketing-line)] bg-paper-soft shadow-lg sm:mb-12">
+            <Image
+              src={cover.url}
+              alt={cover.alt || post.title}
+              fill
+              sizes="(min-width: 1024px) 60vw, 100vw"
+              className="object-cover"
+              priority
+            />
+          </Reveal>
 
           {post.excerpt && (
             <Reveal delayMs={60} className="mb-8 rounded-r-2xl border-l-4 border-brand-500 bg-paper-soft/80 py-2 pl-6 text-base font-medium leading-relaxed text-ink/80 sm:mb-10 sm:text-xl">

@@ -46,7 +46,8 @@ export const metadata: Metadata = {
   },
 };
 
-// Runs before hydration so the admin never flashes light-then-dark on load.
+// Runs before hydration so the admin never flashes light-then-dark (or the
+// sidebar open-then-collapsed) on load.
 // Scoped to /admin: the marketing site has no theme toggle and isn't
 // designed with a dark variant, so this must never touch it.
 const THEME_INIT_SCRIPT = `
@@ -57,6 +58,9 @@ const THEME_INIT_SCRIPT = `
     var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     var isDark = stored ? stored === "dark" : prefersDark;
     if (isDark) document.documentElement.classList.add("dark");
+    if (localStorage.getItem("ls-admin-sidebar") === "collapsed") {
+      document.documentElement.setAttribute("data-sidebar", "collapsed");
+    }
   } catch (e) {}
 })();
 `;
@@ -83,7 +87,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700;800&family=Chakra+Petch:wght@400;500;600;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700;800&family=Chakra+Petch:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
           rel="stylesheet"
         />
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />

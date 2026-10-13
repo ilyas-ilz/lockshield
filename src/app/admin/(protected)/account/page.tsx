@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
+import { KeyRound } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { AccountClient } from "./account-client";
 
@@ -26,7 +27,7 @@ export default async function AccountPage() {
 
   return (
     <div className="mx-auto w-full max-w-lg">
-      <PageHeader title="My account" description="Change the password you use to sign in." />
+      <PageHeader title="My account" description="Change the password you use to sign in." icon={KeyRound} />
       <AccountClient name={name ?? ""} email={email ?? ""} role={role ?? "EDITOR"} />
     </div>
   );

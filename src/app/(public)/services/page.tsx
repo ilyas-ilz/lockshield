@@ -1,18 +1,19 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { serviceIcon } from "@/components/frontend/serviceMeta";
-import { connectDB } from "@/lib/db";
-import { Service } from "@/models";
+import { loadServiceListing } from "@/lib/public-data";
 import { PageHero } from "@/components/frontend/PageHero";
 import { Section } from "@/components/frontend/Section";
 import { Reveal } from "@/components/frontend/Reveal";
 import { Pagination } from "@/components/frontend/Pagination";
+import { ServiceGridSkeleton } from "@/components/frontend/ListingSkeletons";
 import { CardGrid } from "@/components/frontend/CardGrid";
-import { PUBLIC_PAGE_SIZE, parsePage, totalPagesFor, type PublicSearchParams } from "@/lib/public-listing";
+import { pageKey, type PublicSearchParams } from "@/lib/public-listing";
 
-// Rendered per request because the page reads ?page= from the URL. See the
-// matching note in app/(public)/projects/page.tsx.
+// Rendered per request because the page reads ?page= from the URL; the DB
+// result itself is cached (loadServiceListing) and busted on admin save.
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
@@ -31,38 +32,69 @@ const DEFAULT_SERVICES: ServiceItem[] = [
   {
     title: "Annual Maintenance Contract (AMC)",
     slug: "annual-maintenance-contract",
-    summary: "Comprehensive preventative maintenance, quarterly inspections, and 24/7 emergency response for all fire protection assets.",
+    summary:
+      "Comprehensive preventative maintenance, quarterly inspections, and 24/7 emergency response for all fire protection assets.",
   },
   {
     title: "Designing, Drawing & Civil Defence Approval",
     slug: "designing-drawing-civil-defence-approval",
-    summary: "Full engineering design, AutoCAD shop drawings, and hassle-free approvals from Dubai Civil Defence (DCD).",
+    summary:
+      "Full engineering design, AutoCAD shop drawings, and hassle-free approvals from Dubai Civil Defence (DCD).",
   },
   {
     title: "FM-200 Special Fire Suppression Systems",
     slug: "fm-200-special-systems",
-    summary: "Waterless clean agent fire extinguishing solutions protecting sensitive server rooms, data centers, and critical facilities.",
+    summary:
+      "Waterless clean agent fire extinguishing solutions protecting sensitive server rooms, data centers, and critical facilities.",
   },
   {
     title: "Kitchen Fire Suppression Systems",
     slug: "kitchen-fire-suppression-systems",
-    summary: "UL-300 certified wet chemical fire suppression safeguarding commercial kitchen hoods, ducts, and cooking appliances.",
+    summary:
+      "UL-300 certified wet chemical fire suppression safeguarding commercial kitchen hoods, ducts, and cooking appliances.",
   },
   {
     title: "Fire Extinguisher Refilling & Testing",
     slug: "fire-extinguisher-refilling",
-    summary: "Authorized hydrostatic testing, refilling, and certification for CO2, DCP, foam, and water extinguishers.",
+    summary:
+      "Authorized hydrostatic testing, refilling, and certification for CO2, DCP, foam, and water extinguishers.",
   },
   {
     title: "Fire System Products Supply & Trading",
     slug: "fire-system-products-supply",
-    summary: "Genuine certified firefighting equipment, alarm panels, smoke detectors, landing valves, and fire hoses.",
+    summary:
+      "Genuine certified firefighting equipment, alarm panels, smoke detectors, landing valves, and fire hoses.",
   },
 ];
 
-export default async function ServicesPage({ searchParams }: { searchParams: Promise<PublicSearchParams> }) {
-  const sp = await searchParams;
+export default async function ServicesPage({
+  searchParams,
+}: {
+  searchParams: Promise<PublicSearchParams>;
+}) {
+  const page = pageKey((await searchParams).page);
 
+  // Hero streams immediately; the cards stream in behind a same-size
+  // skeleton (see app/(public)/blog/page.tsx for the full rationale).
+  return (
+    <>
+      <PageHero
+        crumbs={[{ label: "Home", href: "/" }, { label: "Services" }]}
+        title="Our Fire Safety"
+        accent="Services"
+        description="End-to-end fire engineering: design, DCD approvals, installation, suppression, and 24/7 annual maintenance contracts."
+      />
+
+      <Section className="blueprint-grid bg-paper-soft">
+        <Suspense key={page} fallback={<ServiceGridSkeleton />}>
+          <ServiceResults requestedPage={page} />
+        </Suspense>
+      </Section>
+    </>
+  );
+}
+
+async function ServiceResults({ requestedPage }: { requestedPage: number }) {
   let servicesList: ServiceItem[] = [];
   let total = 0;
   let page = 1;
@@ -70,23 +102,9 @@ export default async function ServicesPage({ searchParams }: { searchParams: Pro
   let usingFallback = false;
 
   try {
-    await connectDB();
-
-    const filter = { status: "published" };
-    total = await Service.countDocuments(filter);
-    totalPages = totalPagesFor(total, PUBLIC_PAGE_SIZE);
-    page = parsePage(sp.page, totalPages);
-
-    const services = await Service.find(filter)
-      .sort({ order: 1, title: 1 })
-      .skip((page - 1) * PUBLIC_PAGE_SIZE)
-      .limit(PUBLIC_PAGE_SIZE)
-      .lean();
-    servicesList = ((services as unknown as Array<Record<string, unknown>>) ?? []).map((s) => ({
-      title: String(s["title"] ?? ""),
-      slug: String(s["slug"] ?? ""),
-      summary: String(s["summary"] ?? ""),
-    }));
+    const listing = await loadServiceListing(requestedPage);
+    ({ total, totalPages, page } = listing);
+    servicesList = listing.services;
   } catch {
     // Fallback
     void 0;
@@ -105,18 +123,10 @@ export default async function ServicesPage({ searchParams }: { searchParams: Pro
 
   return (
     <>
-      <PageHero
-        crumbs={[{ label: "Home", href: "/" }, { label: "Services" }]}
-        title="Our Fire Safety"
-        accent="Services"
-        description="End-to-end fire engineering: design, DCD approvals, installation, suppression, and 24/7 annual maintenance contracts."
-      />
-
-      <Section className="blueprint-grid bg-paper-soft">
-        <CardGrid>
-          {items.map((service, idx) => {
-            const Icon = serviceIcon(service.slug);
-            return (
+      <CardGrid>
+        {items.map((service, idx) => {
+          const Icon = serviceIcon(service.slug);
+          return (
             <Reveal key={service.slug || idx} delayMs={(idx % 3) * 80}>
               <Link
                 href={`/services/${service.slug}`}
@@ -129,7 +139,9 @@ export default async function ServicesPage({ searchParams }: { searchParams: Pro
                   <h3 className="font-tech text-lg font-bold uppercase tracking-wide text-navy-900 transition-colors group-hover:text-brand-500 sm:text-xl">
                     {service.title}
                   </h3>
-                  <p className="mt-3 text-sm leading-relaxed text-ink/62">{service.summary}</p>
+                  <p className="mt-3 text-sm leading-relaxed text-ink/62">
+                    {service.summary}
+                  </p>
                 </div>
 
                 <div className="mt-8 flex items-center justify-between border-t border-[var(--marketing-line)] pt-4 text-xs font-semibold text-ink/50 group-hover:text-brand-500">
@@ -138,20 +150,19 @@ export default async function ServicesPage({ searchParams }: { searchParams: Pro
                 </div>
               </Link>
             </Reveal>
-            );
-          })}
-        </CardGrid>
+          );
+        })}
+      </CardGrid>
 
-        {!usingFallback && (
-          <Pagination
-            page={page}
-            totalPages={totalPages}
-            total={total}
-            basePath="/services"
-            label="services"
-          />
-        )}
-      </Section>
+      {!usingFallback && (
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          total={total}
+          basePath="/services"
+          label="services"
+        />
+      )}
     </>
   );
 }

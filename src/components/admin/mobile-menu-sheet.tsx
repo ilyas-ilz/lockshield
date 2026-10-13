@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { ChevronRight, ExternalLink, Globe, LogOut, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { BOTTOM_NAV_ITEMS, NAV_GROUPS, isNavActive } from "./nav-config";
+import { BOTTOM_NAV_ITEMS, flatNavGroups, isNavActive } from "./nav-config";
 
 const IN_BOTTOM_NAV = new Set(BOTTOM_NAV_ITEMS.map((item) => item.href));
 
@@ -35,10 +35,9 @@ export function MobileMenuSheet({
   const isAdmin = user.role === "ADMIN";
   const close = () => onOpenChange(false);
 
-  const groups = NAV_GROUPS.map((group) => ({
-    ...group,
-    items: group.items.filter((item) => !IN_BOTTOM_NAV.has(item.href) && (!item.adminOnly || isAdmin)),
-  })).filter((group) => group.items.length > 0);
+  const groups = flatNavGroups(isAdmin)
+    .map((group) => ({ ...group, items: group.items.filter((item) => !IN_BOTTOM_NAV.has(item.href)) }))
+    .filter((group) => group.items.length > 0);
 
   return (
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>

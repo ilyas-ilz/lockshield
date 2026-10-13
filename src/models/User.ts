@@ -12,6 +12,8 @@ export interface IUser extends Document {
   failedLoginAttempts: number;
   lockUntil: Date | null;
   lastLoginAt: Date | null;
+  /** Newest lead this user has looked at; the bell/Leads badge counts leads after it. */
+  leadsSeenAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -36,6 +38,7 @@ const userSchema = new Schema(
     failedLoginAttempts: { type: Number, default: 0 },
     lockUntil: { type: Date, default: null },
     lastLoginAt: { type: Date, default: null },
+    leadsSeenAt: { type: Date, default: null },
   },
   { timestamps: true }
 );

@@ -3,20 +3,24 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { ArrowDown, ArrowUp, ChevronsUpDown, Plus, Search, Pencil, Trash2, X, ImageOff, Check } from "lucide-react";
+import { ArrowDown, ArrowUp, ChevronsUpDown, Plus, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, Badge } from "@/components/ui/card";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { DataPagination } from "@/components/shared/data-pagination";
 import { TableSkeleton, EmptyState, ErrorState } from "@/components/shared/states";
 import { api, type PageResult } from "@/lib/admin/api-client";
 import { SORTABLE_FIELDS, type SortableResource } from "@/lib/sortable-fields";
-import type { ResourceConfig, ColumnConfig } from "@/lib/admin/field-types";
+import type { ResourceConfig } from "@/lib/admin/field-types";
+import { initialsOf } from "@/lib/initials";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { cellText, isImageColumn, renderCell, singular, type Row } from "./data-table-cells";
+import { DataTableToolbar } from "./data-table-toolbar";
+import { MediaGrid } from "./data-table-media-grid";
+import { RowActionsMenu } from "./row-actions-menu";
 
-type Row = Record<string, unknown>;
+const EXPORT_PAGE_SIZE = 100;
+const EXPORT_MAX_PAGES = 50;
 
 export function DataTable({
   config,
@@ -43,10 +47,13 @@ export function DataTable({
   const [deleteTarget, setDeleteTarget] = React.useState<Row | null>(null);
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
   const [bulkDeleteOpen, setBulkDeleteOpen] = React.useState(false);
+  const [exporting, setExporting] = React.useState(false);
 
   const sortable = (SORTABLE_FIELDS[config.key as SortableResource] ?? []) as readonly string[];
   const columns = config.columns;
   const hasStatusColumn = columns.some((c) => c.key === "status" || c.key === "publishStatus");
+  const isMediaGrid = config.key === "media";
+  const showAvatar = !isImageColumn(columns[0]!);
 
   // Sync initialData updates if props change (e.g. on SSR navigation)
   React.useEffect(() => {
@@ -69,24 +76,29 @@ export function DataTable({
     [router, pathname, searchParams]
   );
 
+  const queryParams = React.useCallback(
+    (overrides: Record<string, string> = {}) => {
+      const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize), order });
+      if (search) params.set("search", search);
+      if (sort) params.set("sort", sort);
+      if (hasStatusColumn && statusFilter !== "all") params.set("status", statusFilter);
+      for (const [k, v] of Object.entries(overrides)) params.set(k, v);
+      return params;
+    },
+    [page, pageSize, order, search, sort, statusFilter, hasStatusColumn]
+  );
+
   const load = React.useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize), order });
-      if (search) params.set("search", search);
-      if (sort) params.set("sort", sort);
-      if (hasStatusColumn && statusFilter !== "all") {
-        params.set("status", statusFilter);
-      }
-      const result = await api.get<PageResult<Row>>(`${config.apiPath}?${params}`);
-      setData(result);
+      setData(await api.get<PageResult<Row>>(`${config.apiPath}?${queryParams()}`));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load");
     } finally {
       setLoading(false);
     }
-  }, [config.apiPath, page, pageSize, search, sort, order, statusFilter, hasStatusColumn]);
+  }, [config.apiPath, queryParams]);
 
   // Load when searchParams change, unless initialData was provided on first mount
   const isFirstMount = React.useRef(true);
@@ -108,26 +120,27 @@ export function DataTable({
     setSearchDraft(search);
   }, [search]);
 
-  // Clear selections on page/filter change
+  // Selection only ever covers rows on screen: whenever the visible rows
+  // change (page, sort, size, filter, delete), drop ids that left the view so
+  // a bulk action can't hit rows the user no longer sees.
   React.useEffect(() => {
-    setSelectedIds(new Set());
-  }, [page, statusFilter, search]);
+    setSelectedIds((prev) => {
+      if (prev.size === 0) return prev;
+      const visible = new Set((data?.items ?? []).map((r) => String(r._id)));
+      const next = new Set([...prev].filter((id) => visible.has(id)));
+      return next.size === prev.size ? prev : next;
+    });
+  }, [data]);
 
   function toggleSort(field: string) {
-    if (sort === field) {
-      setParams({ sort: field, order: order === "asc" ? "desc" : "asc" });
-    } else {
-      setParams({ sort: field, order: "asc" });
-    }
+    if (sort === field) setParams({ sort: field, order: order === "asc" ? "desc" : "asc" });
+    else setParams({ sort: field, order: "asc" });
   }
 
   function toggleSelectAll() {
     if (!data?.items) return;
-    if (selectedIds.size === data.items.length) {
-      setSelectedIds(new Set());
-    } else {
-      setSelectedIds(new Set(data.items.map((r) => String(r._id))));
-    }
+    if (selectedIds.size === data.items.length) setSelectedIds(new Set());
+    else setSelectedIds(new Set(data.items.map((r) => String(r._id))));
   }
 
   function toggleSelectRow(id: string) {
@@ -164,9 +177,7 @@ export function DataTable({
     const ids = Array.from(selectedIds);
     const fieldName = config.key === "projects" ? "publishStatus" : "status";
     try {
-      await Promise.all(
-        ids.map((id) => api.patch(`${config.apiPath}/${id}`, { [fieldName]: targetStatus }))
-      );
+      await Promise.all(ids.map((id) => api.patch(`${config.apiPath}/${id}`, { [fieldName]: targetStatus })));
       toast.success(`${ids.length} item${ids.length === 1 ? "" : "s"} updated to ${targetStatus}`);
       setSelectedIds(new Set());
       void load();
@@ -175,406 +186,289 @@ export function DataTable({
     }
   }
 
+  // Export every row matching the current search/filter/sort, not just this page.
+  async function handleExport() {
+    setExporting(true);
+    try {
+      const rows: Row[] = [];
+      let truncated = false;
+      for (let p = 1; p <= EXPORT_MAX_PAGES; p++) {
+        const res = await api.get<PageResult<Row>>(
+          `${config.apiPath}?${queryParams({ page: String(p), pageSize: String(EXPORT_PAGE_SIZE) })}`
+        );
+        rows.push(...res.items);
+        if (!res.hasNextPage) break;
+        if (p === EXPORT_MAX_PAGES) truncated = true;
+      }
+      const escape = (v: string) => (/[",\n\r]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v);
+      const csv = [
+        columns.map((c) => escape(c.label)).join(","),
+        ...rows.map((row) => columns.map((c) => escape(cellText(row, c))).join(",")),
+      ].join("\r\n");
+      // BOM so Excel opens the UTF-8 file with Arabic/accented names intact.
+      const url = URL.createObjectURL(new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" }));
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${config.key}-${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      // Revoking synchronously can cancel the download in Firefox/Safari.
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      const noun = rows.length === 1 ? singular(config.label).toLowerCase() : config.label.toLowerCase();
+      if (truncated) toast.warning(`Exported the first ${rows.length} ${noun}. Narrow the search to export the rest.`);
+      else toast.success(`Exported ${rows.length} ${noun}`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Export failed");
+    } finally {
+      setExporting(false);
+    }
+  }
+
   const hasFilters = Boolean(search || (hasStatusColumn && statusFilter !== "all"));
   const allSelected = Boolean(data?.items.length && selectedIds.size === data.items.length);
-  const isMediaGrid = config.key === "media";
+  const editHref = (row: Row) => `/admin/${config.key}/${row._id}`;
+  const rowLabel = (row: Row) => cellText(row, columns[0]!) || singular(config.label);
+
+  const pagination = data && (
+    <div className="border-t border-app px-4 py-3 sm:px-5">
+      <DataPagination
+        page={data.page}
+        pageSize={data.pageSize ?? pageSize}
+        total={data.total}
+        totalPages={data.totalPages}
+        hasPrevPage={data.hasPrevPage}
+        hasNextPage={data.hasNextPage}
+        onPageChange={(p) => setParams({ page: p }, { resetPage: false })}
+        onPageSizeChange={(s) => setParams({ pageSize: s })}
+      />
+    </div>
+  );
 
   return (
-    <div className="space-y-4">
-      {/* Top Filter Tabs (if resource has status) */}
-      {hasStatusColumn && (
-        <div className="flex items-center gap-1.5 border-b border-app pb-2">
-          {["all", "published", "draft"].map((tab) => {
-            const isActive = statusFilter === tab || (tab === "all" && !searchParams.has("status"));
-            return (
-              <button
-                key={tab}
-                type="button"
-                onClick={() => setParams({ status: tab === "all" ? null : tab })}
-                className={cn(
-                  "rounded-xl px-3.5 py-1.5 text-xs font-semibold capitalize transition-all cursor-pointer",
-                  isActive
-                    ? "bg-surface border border-app text-foreground shadow-2xs"
-                    : "text-muted hover:text-foreground hover:bg-surface-2"
-                )}
-              >
-                {tab}
-              </button>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Toolbar */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        {config.searchable ? (
-          <div className="relative w-full sm:max-w-xs">
-            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted/70" aria-hidden />
-            <Input
-              value={searchDraft}
-              onChange={(e) => setSearchDraft(e.target.value)}
-              placeholder={`Search ${config.label.toLowerCase()}…`}
-              className="pl-9 pr-9 text-xs rounded-xl h-9.5"
-              aria-label={`Search ${config.label}`}
-            />
-            {searchDraft && (
-              <button
-                type="button"
-                onClick={() => setSearchDraft("")}
-                aria-label="Clear search"
-                className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1.5 text-muted hover:bg-surface-2 cursor-pointer"
-              >
-                <X className="size-3.5" aria-hidden />
-              </button>
-            )}
-          </div>
-        ) : (
-          <div />
-        )}
-
-        {/* Media has no standalone "create" flow - assets are uploaded via
-            the image picker embedded in other resources' forms, so a bare
-            alt-text-only creation form here would be a dead end. */}
-        {!isMediaGrid && (
-          <Button variant="primary" size="sm" asChild className="w-full sm:w-auto shadow-xs">
-            <Link href={`/admin/${config.key}/new`}>
-              <Plus className="size-4" aria-hidden />
-              New {singular(config.label)}
-            </Link>
-          </Button>
-        )}
+    <div className="rounded-2xl border border-app bg-surface">
+      <div className="p-4 sm:p-5">
+        <DataTableToolbar
+          label={config.label}
+          searchable={Boolean(config.searchable)}
+          searchDraft={searchDraft}
+          onSearchDraft={setSearchDraft}
+          hasStatusFilter={hasStatusColumn}
+          statusFilter={statusFilter}
+          onStatusFilter={(v) => setParams({ status: v === "all" ? null : v })}
+          sortable={sortable}
+          sort={sort}
+          order={order}
+          onSort={(field, o) => setParams({ sort: field, order: o })}
+          onRefresh={() => void load()}
+          refreshing={loading}
+          onExport={() => void handleExport()}
+          exporting={exporting}
+        />
       </div>
 
-      {/* Floating Bulk Action Bar */}
       {selectedIds.size > 0 && (
-        <div className="sticky top-17 z-15 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-app bg-surface p-3 px-4 shadow-lg backdrop-blur animate-in fade-in slide-in-from-top-2">
-          <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
-            <span className="flex size-6 items-center justify-center rounded-lg bg-[var(--color-brand-500)] text-white text-[11px]">
+        <div className="sticky top-18 z-10 mx-4 mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-app bg-surface-2 px-4 py-2.5 shadow-sm sm:mx-5">
+          <p className="flex items-center gap-2 text-sm font-medium text-app">
+            <span className="flex h-6 min-w-6 items-center justify-center rounded-md bg-[var(--color-brand-500)] px-1.5 text-xs font-bold text-white">
               {selectedIds.size}
             </span>
-            <span>item{selectedIds.size === 1 ? "" : "s"} selected</span>
-          </div>
-
+            selected
+          </p>
           <div className="flex flex-wrap items-center gap-2">
             {hasStatusColumn && (
               <>
-                <Button variant="secondary" size="sm" onClick={() => handleBulkStatus("published")} className="h-8 text-xs">
-                  Mark Published
+                <Button variant="secondary" size="sm" onClick={() => handleBulkStatus("published")}>
+                  Mark published
                 </Button>
-                <Button variant="secondary" size="sm" onClick={() => handleBulkStatus("draft")} className="h-8 text-xs">
-                  Mark Draft
+                <Button variant="secondary" size="sm" onClick={() => handleBulkStatus("draft")}>
+                  Mark draft
                 </Button>
               </>
             )}
-            <Button variant="danger" size="sm" onClick={() => setBulkDeleteOpen(true)} className="h-8 text-xs">
-              <Trash2 className="size-3.5 mr-1" />
-              Delete Selected
+            <Button variant="danger" size="sm" onClick={() => setBulkDeleteOpen(true)}>
+              <Trash2 aria-hidden />
+              Delete
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => setSelectedIds(new Set())} className="h-8 text-xs text-muted">
-              Cancel
+            <Button variant="ghost" size="sm" onClick={() => setSelectedIds(new Set())} aria-label="Clear selection">
+              <X aria-hidden />
             </Button>
           </div>
         </div>
       )}
 
-      {/* Data region */}
-      {loading ? (
-        <TableSkeleton rows={Math.min(pageSize, 8)} columns={columns.length} />
+      {loading && !data ? (
+        <div className="px-4 pb-4 sm:px-5 sm:pb-5">
+          <TableSkeleton rows={Math.min(pageSize, 8)} columns={columns.length} />
+        </div>
       ) : error ? (
-        <ErrorState message={error} onRetry={() => void load()} />
+        <div className="px-4 pb-4 sm:px-5 sm:pb-5">
+          <ErrorState message={error} onRetry={() => void load()} />
+        </div>
       ) : !data || data.items.length === 0 ? (
-        <EmptyState
-          title={hasFilters ? `No ${config.label.toLowerCase()} match your filters` : `No ${config.label.toLowerCase()} yet`}
-          description={
-            hasFilters
-              ? "Try a different search term or status filter, or clear them to view everything."
-              : isMediaGrid
-                ? "Images you upload from any image field in the admin (cover photos, logos, etc.) will show up here."
-                : `Create your first ${singular(config.label).toLowerCase()} to get started.`
-          }
-          action={
-            hasFilters ? (
-              <Button variant="secondary" size="sm" onClick={() => setParams({ search: null, status: null })}>
-                Clear filters
-              </Button>
-            ) : isMediaGrid ? undefined : (
-              <Button variant="primary" size="sm" asChild>
-                <Link href={`/admin/${config.key}/new`}>
-                  <Plus className="size-4" aria-hidden />
-                  New {singular(config.label)}
-                </Link>
-              </Button>
-            )
-          }
-        />
+        <div className="px-4 pb-4 sm:px-5 sm:pb-5">
+          <EmptyState
+            title={hasFilters ? `No ${config.label.toLowerCase()} match your filters` : `No ${config.label.toLowerCase()} yet`}
+            description={
+              hasFilters
+                ? "Try a different search term or status filter, or clear them to view everything."
+                : isMediaGrid
+                  ? "Images you upload from any image field in the admin (cover photos, logos, etc.) will show up here."
+                  : `Create your first ${singular(config.label).toLowerCase()} to get started.`
+            }
+            action={
+              hasFilters ? (
+                <Button variant="secondary" size="sm" onClick={() => setParams({ search: null, status: null })}>
+                  Clear filters
+                </Button>
+              ) : isMediaGrid ? undefined : (
+                <Button variant="primary" size="sm" asChild>
+                  <Link href={`/admin/${config.key}/new`}>
+                    <Plus aria-hidden />
+                    New {singular(config.label).toLowerCase()}
+                  </Link>
+                </Button>
+              )
+            }
+          />
+        </div>
       ) : isMediaGrid ? (
         <>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
+          <div className={cn("px-4 pb-4 sm:px-5 sm:pb-5", loading && "opacity-60")}>
+            <MediaGrid items={data.items} selectedIds={selectedIds} onToggle={toggleSelectRow} onDelete={setDeleteTarget} />
+          </div>
+          {pagination}
+        </>
+      ) : (
+        <div className={cn("transition-opacity", loading && "opacity-60")}>
+          {/* Mobile: compact list */}
+          <ul className="divide-y divide-line border-t border-app md:hidden">
             {data.items.map((row) => {
               const id = String(row._id);
               const isSelected = selectedIds.has(id);
-              const url = typeof row.url === "string" ? row.url : "";
-              const alt = typeof row.alt === "string" ? row.alt : "";
-              const format = typeof row.format === "string" ? row.format : undefined;
-              const bytes = typeof row.bytes === "number" ? row.bytes : undefined;
-
               return (
-                <Card
-                  key={id}
-                  className={cn(
-                    "group relative overflow-hidden border-app p-0 transition-all",
-                    isSelected && "ring-2 ring-[var(--color-brand-500)]"
-                  )}
-                >
-                  <button
-                    type="button"
-                    onClick={() => toggleSelectRow(id)}
-                    aria-label={isSelected ? "Deselect" : "Select"}
-                    aria-pressed={isSelected}
-                    className={cn(
-                      "absolute left-2 top-2 z-10 flex size-6 items-center justify-center rounded-md border transition-all cursor-pointer",
-                      isSelected
-                        ? "border-[var(--color-brand-500)] bg-[var(--color-brand-500)] text-white"
-                        : "border-white/70 bg-black/30 text-transparent opacity-0 backdrop-blur-xs group-hover:opacity-100 group-focus-within:opacity-100 sm:opacity-0"
-                    )}
-                  >
-                    <Check className="size-3.5" aria-hidden />
-                  </button>
-
-                  <Link href={`/admin/media/${id}`} className="block">
-                    <div className="relative aspect-square bg-surface-2">
-                      {url ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={url} alt={alt || "Media asset"} className="size-full object-cover" loading="lazy" />
-                      ) : (
-                        <div className="flex size-full items-center justify-center text-muted/50">
-                          <ImageOff className="size-6" aria-hidden />
+                <li key={id} className={cn("flex items-start gap-3 px-4 py-3.5", isSelected && "bg-surface-2/70")}>
+                  <input
+                    type="checkbox"
+                    checked={isSelected}
+                    onChange={() => toggleSelectRow(id)}
+                    className="mt-3 size-4 cursor-pointer rounded accent-[var(--color-brand-500)]"
+                    aria-label={`Select ${rowLabel(row)}`}
+                  />
+                  <Link href={editHref(row)} className="min-w-0 flex-1">
+                    <span className="flex items-center gap-3">
+                      {showAvatar && <RowAvatar text={rowLabel(row)} />}
+                      <span className="min-w-0 truncate text-[15px] font-medium text-app">{renderCell(row, columns[0]!)}</span>
+                    </span>
+                    <dl className="mt-2 space-y-1">
+                      {columns.slice(1).map((col) => (
+                        <div key={col.key} className="flex items-center gap-2 text-sm">
+                          <dt className="shrink-0 text-muted">{col.label}</dt>
+                          <dd className="min-w-0 truncate text-app">{renderCell(row, col)}</dd>
                         </div>
-                      )}
-                    </div>
+                      ))}
+                    </dl>
                   </Link>
-
-                  <div className="space-y-1.5 p-2.5">
-                    <p className="truncate text-xs font-medium text-foreground" title={alt}>
-                      {alt || "—"}
-                    </p>
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="truncate text-[10px] uppercase tracking-wide text-muted">
-                        {[format, bytes ? formatBytes(bytes) : null].filter(Boolean).join(" · ") || "—"}
-                      </span>
-                      <div className="flex shrink-0 gap-0.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                        <Button variant="ghost" size="icon" asChild className="size-7 rounded-md">
-                          <Link href={`/admin/media/${id}`} aria-label="Edit">
-                            <Pencil className="size-3.5" aria-hidden />
-                          </Link>
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => setDeleteTarget(row)}
-                          aria-label="Delete"
-                          className="size-7 rounded-md text-[var(--danger)] hover:bg-[var(--danger)]/10"
-                        >
-                          <Trash2 className="size-3.5" aria-hidden />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
+                  <RowActionsMenu editHref={editHref(row)} itemLabel={rowLabel(row)} onDelete={() => setDeleteTarget(row)} />
+                </li>
               );
             })}
-          </div>
-
-          <DataPagination
-            page={data.page}
-            pageSize={data.pageSize ?? pageSize}
-            total={data.total}
-            totalPages={data.totalPages}
-            hasPrevPage={data.hasPrevPage}
-            hasNextPage={data.hasNextPage}
-            onPageChange={(p) => setParams({ page: p }, { resetPage: false })}
-            onPageSizeChange={(s) => setParams({ pageSize: s })}
-          />
-        </>
-      ) : (
-        <>
-          {/* Mobile: card list */}
-          <div className="space-y-3 md:hidden">
-            {data.items.map((row) => {
-              const isSelected = selectedIds.has(String(row._id));
-              return (
-                <Card
-                  key={String(row._id)}
-                  className={cn(
-                    "p-4 border-app transition-all",
-                    isSelected && "border-[var(--color-brand-500)] bg-[var(--color-brand-50)]/20"
-                  )}
-                >
-                  <div className="flex items-start gap-3">
-                    <input
-                      type="checkbox"
-                      checked={isSelected}
-                      onChange={() => toggleSelectRow(String(row._id))}
-                      className="mt-1 size-4 rounded accent-[var(--color-brand-500)] cursor-pointer"
-                      aria-label="Select row"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <Link
-                        href={`/admin/${config.key}/${row._id}`}
-                        className="font-bold text-sm truncate text-foreground hover:text-[var(--color-brand-600)] block"
-                      >
-                        {renderCell(row, columns[0]!)}
-                      </Link>
-                      <dl className="mt-2 space-y-1">
-                        {columns.slice(1).map((col) => (
-                          <div key={col.key} className="flex items-center gap-2 text-xs">
-                            <dt className="text-muted shrink-0">{col.label}:</dt>
-                            <dd className="truncate text-foreground font-medium">{renderCell(row, col)}</dd>
-                          </div>
-                        ))}
-                      </dl>
-                    </div>
-                  </div>
-                  <div className="mt-3 flex gap-2 border-t border-app pt-3">
-                    <Button variant="secondary" size="sm" asChild className="flex-1 text-xs">
-                      <Link href={`/admin/${config.key}/${row._id}`}>
-                        <Pencil className="size-3.5 mr-1" aria-hidden />
-                        Edit
-                      </Link>
-                    </Button>
-                    <Button variant="danger" size="sm" onClick={() => setDeleteTarget(row)}>
-                      <Trash2 className="size-3.5" aria-hidden />
-                      <span className="sr-only">Delete</span>
-                    </Button>
-                  </div>
-                </Card>
-              );
-            })}
-          </div>
+          </ul>
 
           {/* Desktop: table */}
-          <Card className="hidden md:block overflow-hidden border-app shadow-2xs">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-app bg-surface-2/60 text-left">
-                    <th className="w-10 px-4 py-3.5 text-center">
-                      <input
-                        type="checkbox"
-                        checked={allSelected}
-                        onChange={toggleSelectAll}
-                        className="size-4 rounded accent-[var(--color-brand-500)] cursor-pointer"
-                        aria-label="Select all"
-                      />
-                    </th>
-                    {columns.map((col) => {
-                      const canSort = sortable.includes(col.key);
-                      const isSorted = sort === col.key;
-                      return (
-                        <th key={col.key} className="px-4 py-3.5 font-bold text-xs text-muted uppercase tracking-wider">
-                          {canSort ? (
-                            <button
-                              type="button"
-                              onClick={() => toggleSort(col.key)}
-                              className="inline-flex items-center gap-1.5 hover:text-foreground transition-colors cursor-pointer"
-                              aria-label={`Sort by ${col.label}`}
-                            >
-                              {col.label}
-                              {isSorted ? (
-                                order === "asc" ? (
-                                  <ArrowUp className="size-3.5 text-[var(--color-brand-500)]" aria-hidden />
-                                ) : (
-                                  <ArrowDown className="size-3.5 text-[var(--color-brand-500)]" aria-hidden />
-                                )
-                              ) : (
-                                <ChevronsUpDown className="size-3.5 opacity-40" aria-hidden />
-                              )}
-                            </button>
-                          ) : (
-                            col.label
-                          )}
-                        </th>
-                      );
-                    })}
-                    <th className="px-4 py-3.5 w-24 text-right pr-5 text-xs font-bold text-muted uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-line">
-                  {data.items.map((row) => {
-                    const isSelected = selectedIds.has(String(row._id));
+          <div className="hidden overflow-x-auto px-5 pb-2 md:block">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left">
+                  <th className="w-10 rounded-l-xl bg-surface-2 py-3 pl-4">
+                    <input
+                      type="checkbox"
+                      checked={allSelected}
+                      onChange={toggleSelectAll}
+                      className="size-4 cursor-pointer rounded accent-[var(--color-brand-500)]"
+                      aria-label="Select all"
+                    />
+                  </th>
+                  {columns.map((col) => {
+                    const canSort = sortable.includes(col.key);
+                    const isSorted = sort === col.key;
                     return (
-                      <tr
-                        key={String(row._id)}
-                        className={cn(
-                          "transition-colors hover:bg-surface-2/40 group",
-                          isSelected && "bg-[var(--color-brand-50)]/30 dark:bg-[var(--color-brand-900)]/15"
-                        )}
+                      <th
+                        key={col.key}
+                        aria-sort={isSorted ? (order === "asc" ? "ascending" : "descending") : undefined}
+                        className="bg-surface-2 px-4 py-3 text-sm font-medium text-muted"
                       >
-                        <td className="px-4 py-3 text-center">
-                          <input
-                            type="checkbox"
-                            checked={isSelected}
-                            onChange={() => toggleSelectRow(String(row._id))}
-                            className="size-4 rounded accent-[var(--color-brand-500)] cursor-pointer"
-                            aria-label="Select row"
-                          />
-                        </td>
-                        {columns.map((col, i) => (
-                          <td key={col.key} className={cn("px-4 py-3.5", i === 0 && "font-semibold text-foreground")}>
-                            {i === 0 ? (
-                              <Link
-                                href={`/admin/${config.key}/${row._id}`}
-                                className="hover:text-[var(--color-brand-600)] dark:hover:text-[var(--color-brand-400)] transition-colors hover:underline"
-                              >
-                                {renderCell(row, col)}
-                              </Link>
+                        {canSort ? (
+                          <button
+                            type="button"
+                            onClick={() => toggleSort(col.key)}
+                            className="inline-flex cursor-pointer items-center gap-1.5 transition-colors hover:text-app"
+                          >
+                            {col.label}
+                            {isSorted ? (
+                              order === "asc" ? (
+                                <ArrowUp className="size-3.5 text-[var(--color-brand-500)]" aria-hidden />
+                              ) : (
+                                <ArrowDown className="size-3.5 text-[var(--color-brand-500)]" aria-hidden />
+                              )
                             ) : (
-                              renderCell(row, col)
+                              <ChevronsUpDown className="size-3.5 opacity-50" aria-hidden />
                             )}
-                          </td>
-                        ))}
-                        <td className="px-4 py-3.5 text-right pr-4">
-                          <div className="flex justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
-                            <Button variant="ghost" size="icon" asChild className="size-8 rounded-lg">
-                              <Link href={`/admin/${config.key}/${row._id}`} aria-label="Edit">
-                                <Pencil className="size-3.5" aria-hidden />
-                              </Link>
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => setDeleteTarget(row)}
-                              aria-label="Delete"
-                              className="size-8 rounded-lg text-[var(--danger)] hover:bg-[var(--danger)]/10"
-                            >
-                              <Trash2 className="size-3.5" aria-hidden />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
+                          </button>
+                        ) : (
+                          col.label
+                        )}
+                      </th>
                     );
                   })}
-                </tbody>
-              </table>
-            </div>
-          </Card>
-
-          <DataPagination
-            page={data.page}
-            pageSize={data.pageSize ?? pageSize}
-            total={data.total}
-            totalPages={data.totalPages}
-            hasPrevPage={data.hasPrevPage}
-            hasNextPage={data.hasNextPage}
-            onPageChange={(p) => setParams({ page: p }, { resetPage: false })}
-            onPageSizeChange={(s) => setParams({ pageSize: s })}
-          />
-        </>
+                  <th className="w-14 rounded-r-xl bg-surface-2 py-3 pr-2">
+                    <span className="sr-only">Actions</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-line">
+                {data.items.map((row) => {
+                  const id = String(row._id);
+                  const isSelected = selectedIds.has(id);
+                  return (
+                    <tr key={id} className={cn("transition-colors hover:bg-surface-2/50", isSelected && "bg-surface-2/70")}>
+                      <td className="py-3.5 pl-4">
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => toggleSelectRow(id)}
+                          className="size-4 cursor-pointer rounded accent-[var(--color-brand-500)]"
+                          aria-label={`Select ${rowLabel(row)}`}
+                        />
+                      </td>
+                      {columns.map((col, i) => (
+                        <td key={col.key} className={cn("px-4 py-3.5 text-app", i === 0 && "font-medium")}>
+                          {i === 0 ? (
+                            <Link
+                              href={editHref(row)}
+                              className="group inline-flex max-w-md items-center gap-3 transition-colors hover:text-[var(--color-brand-600)] dark:hover:text-[var(--color-brand-400)]"
+                            >
+                              {showAvatar && <RowAvatar text={rowLabel(row)} />}
+                              <span className="min-w-0 truncate">{renderCell(row, col)}</span>
+                            </Link>
+                          ) : (
+                            renderCell(row, col)
+                          )}
+                        </td>
+                      ))}
+                      <td className="py-2 pr-2 text-right">
+                        <RowActionsMenu editHref={editHref(row)} itemLabel={rowLabel(row)} onDelete={() => setDeleteTarget(row)} />
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          {pagination}
+        </div>
       )}
 
-      {/* Delete Single Item Dialog */}
       <ConfirmDialog
         open={deleteTarget !== null}
         onOpenChange={(open) => !open && setDeleteTarget(null)}
@@ -585,7 +479,6 @@ export function DataTable({
         }}
       />
 
-      {/* Bulk Delete Dialog */}
       <ConfirmDialog
         open={bulkDeleteOpen}
         onOpenChange={setBulkDeleteOpen}
@@ -597,90 +490,13 @@ export function DataTable({
   );
 }
 
-function renderCell(row: Row, col: ColumnConfig): React.ReactNode {
-  if (col.render) return col.render(row);
-  const value = row[col.key];
-
-  // Empty values
-  if (value === null || value === undefined || value === "") return "—";
-
-  // Boolean values
-  if (typeof value === "boolean") {
-    return value ? (
-      <Badge tone="success" className="text-[11px]">Yes</Badge>
-    ) : (
-      <span className="text-xs text-muted">No</span>
-    );
-  }
-
-  // Status & publishStatus badges
-  if (col.key === "status" || col.key === "publishStatus") {
-    const s = String(value).toLowerCase();
-    if (s === "published" || s === "active") return <Badge tone="success" className="capitalize text-[11px]">{s}</Badge>;
-    if (s === "draft") return <Badge tone="warning" className="capitalize text-[11px]">Draft</Badge>;
-    if (s === "archived") return <Badge tone="neutral" className="capitalize text-[11px]">Archived</Badge>;
-    if (s === "new") return <Badge tone="brand" className="capitalize text-[11px]">New</Badge>;
-    if (s === "closed") return <Badge tone="success" className="capitalize text-[11px]">Closed</Badge>;
-    return <Badge tone="neutral" className="capitalize text-[11px]">{s}</Badge>;
-  }
-
-  // Role badges
-  if (col.key === "role") {
-    const r = String(value);
-    return <Badge tone={r === "ADMIN" ? "brand" : "neutral"} className="text-[11px]">{r}</Badge>;
-  }
-
-  // Image / coverImage thumbnail preview
-  if (
-    (col.key === "image" || col.key === "coverImage") &&
-    typeof value === "object" &&
-    value !== null &&
-    "url" in value
-  ) {
-    const imgObj = value as { url: string; alt?: string };
-    return (
-      <div className="size-9 rounded-md border border-app overflow-hidden bg-surface-2 flex items-center justify-center">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={imgObj.url} alt={imgObj.alt || "Thumbnail"} className="size-full object-cover" />
-      </div>
-    );
-  }
-
-  // Direct image URL string
-  if (
-    col.key === "url" &&
-    typeof value === "string" &&
-    // https covers the R2 public domain and legacy Spaces/Cloudinary URLs.
-    (value.startsWith("/uploads/") || value.startsWith("/assets/") || value.startsWith("https://"))
-  ) {
-    return (
-      <div className="size-9 rounded-md border border-app overflow-hidden bg-surface-2 flex items-center justify-center">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={value} alt="Thumbnail" className="size-full object-cover" />
-      </div>
-    );
-  }
-
-  // Dates
-  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}T/.test(value)) {
-    return new Date(value).toLocaleDateString(undefined, {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  }
-
-  return String(value);
-}
-
-function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
-
-function singular(label: string): string {
-  if (label.endsWith("ies")) return `${label.slice(0, -3)}y`;
-  if (label.endsWith("s")) return label.slice(0, -1);
-  return label;
+function RowAvatar({ text }: { text: string }) {
+  return (
+    <span
+      className="flex size-9 shrink-0 items-center justify-center rounded-full bg-surface-2 text-xs font-semibold text-muted"
+      aria-hidden
+    >
+      {initialsOf(text)}
+    </span>
+  );
 }

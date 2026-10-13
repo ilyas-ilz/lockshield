@@ -1,5 +1,5 @@
 import * as React from "react";
-import { getSettings } from "@/lib/settings";
+import { getPublicSettings } from "@/lib/public-data";
 import type { ISettings } from "@/models/Settings";
 import { Navbar } from "@/components/frontend/Navbar";
 import { Footer } from "@/components/frontend/Footer";
@@ -9,8 +9,7 @@ import { ChromeEffects } from "@/components/frontend/ChromeEffects";
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
   let settingsData: Partial<ISettings> = {};
   try {
-    const s = await getSettings();
-    settingsData = (s.toObject ? s.toObject() : s) as Partial<ISettings>;
+    settingsData = await getPublicSettings();
   } catch {
     // Graceful fallback if database temporarily unavailable
   }
