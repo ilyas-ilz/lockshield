@@ -1,10 +1,10 @@
 import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
 
 /**
- * DigitalOcean Spaces branch of lib/storage (replaces Cloudinary). The S3
+ * Cloudflare R2 branch of lib/storage (replaces DigitalOcean Spaces). The S3
  * client is faked so no network or bucket is needed; what matters is the
- * request we build: bucket/key layout, public-read ACL, cache headers, the
- * DO endpoint, and the checksum setting Spaces needs.
+ * request we build: bucket/key layout, no ACL (R2 has none), cache headers,
+ * the account endpoint, and the "auto" signing region.
  */
 
 const { sent, clientConfigs } = vi.hoisted(() => ({
@@ -38,29 +38,29 @@ const PNG = Buffer.from(
 );
 
 type Storage = typeof import("../storage");
-type Spaces = typeof import("../spaces");
+type R2 = typeof import("../r2");
 let storage: Storage;
-let spaces: Spaces;
+let r2: R2;
 
-describe("storage on DigitalOcean Spaces", () => {
+describe("storage on Cloudflare R2", () => {
   beforeAll(async () => {
     Object.assign(process.env, {
       MONGODB_URI: "mongodb://127.0.0.1:27017/test",
       AUTH_SECRET: "test-secret-at-least-32-characters-long-000000",
-      DO_SPACES_KEY: "test-key",
-      DO_SPACES_SECRET: "test-secret",
-      DO_SPACES_BUCKET: "lockshield-media",
-      DO_SPACES_REGION: "sgp1",
-      DO_SPACES_CDN_URL: `${CDN}/`,
+      R2_ENDPOINT: "https://abc123account.r2.cloudflarestorage.com/",
+      R2_ACCESS_KEY_ID: "test-key",
+      R2_SECRET_ACCESS_KEY: "test-secret",
+      R2_BUCKET_NAME: "lockshield-media",
+      R2_PUBLIC_URL: `${CDN}/`,
     });
     storage = await import("../storage");
-    spaces = await import("../spaces");
+    r2 = await import("../r2");
   });
   beforeEach(() => {
     sent.length = 0;
   });
 
-  it("uploads a public, long-cached object and returns its CDN url", async () => {
+  it("uploads a long-cached object and returns its CDN url", async () => {
     const result = await storage.uploadFile(new File([PNG], "pixel.png", { type: "image/png" }), "lockshield/media");
 
     expect(sent).toHaveLength(1);
@@ -69,20 +69,20 @@ describe("storage on DigitalOcean Spaces", () => {
     expect(input.Bucket).toBe("lockshield-media");
     expect(input.Key).toMatch(/^lockshield\/media\/\d{4}\/\d{2}\/[\w-]+\.png$/);
     expect(input.ContentType).toBe("image/png");
-    expect(input.ACL).toBe("public-read");
+    expect(input).not.toHaveProperty("ACL");
     expect(input.CacheControl).toContain("immutable");
 
-    expect(result.storage).toBe("spaces");
+    expect(result.storage).toBe("r2");
     expect(result.publicId).toBe(input.Key);
     expect(result.url).toBe(`${CDN}/${input.Key}`);
     expect(result.bytes).toBe(PNG.length);
   });
 
-  it("talks to the region's Spaces endpoint with the checksum mode Spaces accepts", async () => {
+  it("talks to the configured R2 endpoint with the auto region", async () => {
     await storage.uploadFile(new File([PNG], "pixel.png", { type: "image/png" }));
     const config = clientConfigs.at(-1)!;
-    expect(config.endpoint).toBe("https://sgp1.digitaloceanspaces.com");
-    expect(config.forcePathStyle).toBe(false);
+    expect(config.endpoint).toBe("https://abc123account.r2.cloudflarestorage.com");
+    expect(config.region).toBe("auto");
     expect(config.requestChecksumCalculation).toBe("WHEN_REQUIRED");
     expect(config.responseChecksumValidation).toBe("WHEN_REQUIRED");
     expect(config.credentials).toEqual({ accessKeyId: "test-key", secretAccessKey: "test-secret" });
@@ -100,15 +100,18 @@ describe("storage on DigitalOcean Spaces", () => {
   });
 
   it("deletes the object by its key", async () => {
-    await storage.deleteStoredFile({ storage: "spaces", url: `${CDN}/lockshield/media/2026/09/abc.png`, publicId: "lockshield/media/2026/09/abc.png" });
+    await storage.deleteStoredFile({ storage: "r2", url: `${CDN}/lockshield/media/2026/09/abc.png`, publicId: "lockshield/media/2026/09/abc.png" });
     expect(sent).toEqual([
       { command: "DeleteObjectCommand", input: { Bucket: "lockshield-media", Key: "lockshield/media/2026/09/abc.png" } },
     ]);
   });
 
-  it("falls back to the bucket's built-in DigitalOcean CDN url when no custom CDN is set", () => {
-    expect(spaces.spacesPublicUrl("a/b.png", { bucket: "lockshield-media", region: "sgp1" })).toBe(
-      "https://lockshield-media.sgp1.cdn.digitaloceanspaces.com/a/b.png"
-    );
+  it("only removes the registry entry for legacy Spaces uploads", async () => {
+    await storage.deleteStoredFile({ storage: "spaces", url: "https://old.sgp1.cdn.digitaloceanspaces.com/a.png", publicId: "a.png" });
+    expect(sent).toEqual([]);
+  });
+
+  it("joins the public URL and key without a double slash", () => {
+    expect(r2.r2PublicUrl("a/b.png", "https://pub-123.r2.dev/")).toBe("https://pub-123.r2.dev/a/b.png");
   });
 });

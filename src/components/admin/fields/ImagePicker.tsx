@@ -9,7 +9,7 @@ import { MediaModal } from "./MediaModal";
 export interface PickedImage {
   url: string;
   publicId?: string;
-  storage?: "local" | "spaces" | "cloudinary";
+  storage?: "local" | "r2" | "spaces" | "cloudinary";
   alt: string;
   width?: number;
   height?: number;

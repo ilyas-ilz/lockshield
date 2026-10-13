@@ -16,6 +16,7 @@
     "import:blog": "tsx src/scripts/import-legacy-blog.ts",
     "doctor": "tsx src/scripts/doctor.ts",
     "fix:seo": "tsx src/scripts/fix-seo-lengths.ts",
+    "migrate:r2": "tsx src/scripts/migrate-images-to-r2.ts",
     "admin:list": "tsx src/scripts/admin.ts list",
     "admin:unlock": "tsx src/scripts/admin.ts unlock",
     "admin:password": "tsx src/scripts/admin.ts password"

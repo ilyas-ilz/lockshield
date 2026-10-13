@@ -12,13 +12,13 @@ import { assertWriteBudget, getClientIp } from "@/lib/rate-limit";
 import { buildSearchFilter } from "@/lib/search-filter";
 
 // WHY POST here doesn't upload a file itself: uploads go through
-// /api/upload (validated + sanitized, then stored on Spaces or local disk).
+// /api/upload (validated + sanitized, then stored on R2 or local disk).
 // This only registers an already-hosted asset (url/publicId/dimensions) +
 // required alt text so the media library can list/search it later.
 const mediaRecordSchema = z.object({
   url: z.string().min(1),
   publicId: z.string().optional(),
-  storage: z.enum(["local", "spaces"]).default("local"),
+  storage: z.enum(["local", "r2"]).default("local"),
   alt: z.string().min(1, "alt text is required"),
   mimeType: z.string().optional(),
   width: z.number().optional(),

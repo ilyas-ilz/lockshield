@@ -68,7 +68,7 @@ export default async function BlogPostPage({ params }: PageProps) {
   }
 
   const siteUrl = getEnv().SITE_URL;
-  // coverImage.url is either an absolute CDN (Spaces) URL or a local /assets
+  // coverImage.url is either an absolute CDN (R2) URL or a local /assets
   // path - schema.org/Google Rich Results want Article.image absolute.
   const absoluteCoverImageUrl = post.coverImage?.url
     ? post.coverImage.url.startsWith("http")

@@ -1,7 +1,7 @@
 import { handleApi, ok } from "@/lib/http";
 import { requireRole, STAFF } from "@/lib/rbac";
 import { connectDB } from "@/lib/db";
-import { hasSpaces, getEnv } from "@/lib/env";
+import { hasR2, getEnv } from "@/lib/env";
 import mongoose from "mongoose";
 
 export async function GET() {
@@ -21,7 +21,7 @@ export async function GET() {
       dbStatus = "error";
     }
 
-    const isCdn = hasSpaces();
+    const isCdn = hasR2();
     const env = getEnv();
 
     return ok({
@@ -32,7 +32,7 @@ export async function GET() {
         name: mongoose.connection.name || "lockshield",
       },
       storage: {
-        provider: isCdn ? "DigitalOcean Spaces CDN" : "Local Disk (uploads)",
+        provider: isCdn ? "Cloudflare R2 CDN" : "Local Disk (uploads)",
         isCdn,
       },
       system: {

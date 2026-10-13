@@ -34,14 +34,14 @@ export const seoSchema = new Schema(
   { _id: false }
 );
 
-// A single image reference (Spaces CDN, local /uploads or static /assets) used across models
+// A single image reference (R2 CDN, local /uploads or static /assets) used across models
 // (cover images, gallery items, logos). alt is required everywhere it's
 // used — enforced at the field level by callers, not here, since some
 // embeds (e.g. plain logo url) don't need captions.
 export const imageSchema = new Schema(
   {
     url: { type: String, required: true, trim: true },
-    publicId: { type: String, trim: true }, // Spaces object key (legacy: Cloudinary public_id), for deletion
+    publicId: { type: String, trim: true }, // R2 object key (legacy: Spaces key / Cloudinary public_id), for deletion
     alt: { type: String, required: true, trim: true, maxlength: 200 },
     caption: { type: String, trim: true, maxlength: 300 },
     width: Number,

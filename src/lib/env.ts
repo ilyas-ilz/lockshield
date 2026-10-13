@@ -1,12 +1,12 @@
 import { z } from "zod";
 
 /**
- * WHY: a key that is present-but-blank in .env (`DO_SPACES_KEY=`) is the
+ * WHY: a key that is present-but-blank in .env (`R2_ACCESS_KEY_ID=`) is the
  * same thing as "not configured", but zod sees `""` and fails `.min(1)` even
  * behind `.optional()`. That turned a half-filled .env into a hard boot crash
  * — `npm run seed` could not run without dummy storage credentials. Blank
  * now collapses to undefined so the optional keys behave as intended, and
- * hasSpaces()/hasSmtp() keep gating the features that actually need them.
+ * hasR2()/hasSmtp() keep gating the features that actually need them.
  */
 const optionalString = z.preprocess(
   (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
@@ -50,14 +50,17 @@ const envSchema = z.object({
   MONGODB_URI: z.string().min(1, "MONGODB_URI is required"),
   AUTH_SECRET: z.string().min(32, "AUTH_SECRET must be at least 32 chars (openssl rand -base64 32)"),
   AUTH_URL: optionalUrl,
-  // DigitalOcean Spaces (S3-compatible) for admin uploads. REGION is the
-  // Spaces datacenter slug, e.g. "sgp1", "fra1", "ams3". CDN_URL is optional:
-  // a custom CDN domain; without it the bucket's built-in DO CDN is used.
-  DO_SPACES_KEY: optionalString,
-  DO_SPACES_SECRET: optionalString,
-  DO_SPACES_BUCKET: optionalString,
-  DO_SPACES_REGION: optionalString,
-  DO_SPACES_CDN_URL: optionalUrl,
+  // Cloudflare R2 (S3-compatible) for admin uploads. ENDPOINT is the bucket's
+  // S3 API URL (https://<account-id>.r2.cloudflarestorage.com, shown in the
+  // bucket's settings); the key pair comes from an R2 API token with Object
+  // Read & Write on the bucket. PUBLIC_URL is the bucket's public domain - a
+  // custom domain (served via Cloudflare's CDN) or its https://pub-<hash>.r2.dev
+  // URL - and is required: the S3 endpoint itself is private.
+  R2_ENDPOINT: optionalUrl,
+  R2_ACCESS_KEY_ID: optionalString,
+  R2_SECRET_ACCESS_KEY: optionalString,
+  R2_BUCKET_NAME: optionalString,
+  R2_PUBLIC_URL: optionalUrl,
   SMTP_HOST: optionalString,
   SMTP_PORT: optionalPort,
   SMTP_USER: optionalString,
@@ -87,13 +90,16 @@ export function getEnv(): Env {
   return cached;
 }
 
-export function hasSpaces(): boolean {
-  return Boolean(
-    process.env.DO_SPACES_KEY?.trim() &&
-    process.env.DO_SPACES_SECRET?.trim() &&
-    process.env.DO_SPACES_BUCKET?.trim() &&
-    process.env.DO_SPACES_REGION?.trim()
-  );
+export const R2_ENV_VARS = [
+  "R2_ENDPOINT",
+  "R2_ACCESS_KEY_ID",
+  "R2_SECRET_ACCESS_KEY",
+  "R2_BUCKET_NAME",
+  "R2_PUBLIC_URL",
+] as const;
+
+export function hasR2(): boolean {
+  return R2_ENV_VARS.every((name) => Boolean(process.env[name]?.trim()));
 }
 
 export function hasSmtp(): boolean {

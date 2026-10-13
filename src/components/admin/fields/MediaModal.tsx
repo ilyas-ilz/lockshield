@@ -13,7 +13,7 @@ interface MediaItem {
   _id: string;
   url: string;
   publicId?: string;
-  storage: "local" | "spaces" | "cloudinary";
+  storage: "local" | "r2" | "spaces" | "cloudinary";
   alt: string;
   width?: number;
   height?: number;

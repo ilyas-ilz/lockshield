@@ -7,8 +7,8 @@ const { Schema, model, models } = mongoose;
 // — lives with the asset, not duplicated per use.
 export interface IMedia extends Document {
   url: string;
-  publicId?: string; // Spaces object key (or legacy Cloudinary public_id)
-  storage: "local" | "spaces" | "cloudinary"; // "cloudinary" = legacy, pre-Spaces
+  publicId?: string; // R2 object key (legacy: Spaces key / Cloudinary public_id)
+  storage: "local" | "r2" | "spaces" | "cloudinary"; // "spaces"/"cloudinary" = legacy, pre-R2
   alt: string;
   mimeType?: string;
   width?: number;
@@ -24,7 +24,7 @@ const mediaSchema = new Schema(
   {
     url: { type: String, required: true },
     publicId: { type: String, sparse: true, index: true },
-    storage: { type: String, enum: ["local", "spaces", "cloudinary"], default: "local" },
+    storage: { type: String, enum: ["local", "r2", "spaces", "cloudinary"], default: "local" },
     alt: { type: String, required: true, trim: true, maxlength: 200 },
     mimeType: String,
     width: Number,

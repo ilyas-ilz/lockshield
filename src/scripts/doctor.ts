@@ -15,6 +15,7 @@
 import "dotenv/config";
 import mongoose from "mongoose";
 import nodemailer from "nodemailer";
+import { R2_ENV_VARS } from "../lib/env";
 
 function mask(value: string | undefined): string {
   if (!value) return "NOT SET";
@@ -54,14 +55,13 @@ async function main() {
   else if (secret.length < 32) problem(`AUTH_SECRET is too short (${secret.length} chars, needs 32+)`);
   else ok(`AUTH_SECRET ${mask(secret)}`);
 
-  const spacesVars = ["DO_SPACES_KEY", "DO_SPACES_SECRET", "DO_SPACES_BUCKET", "DO_SPACES_REGION"] as const;
-  const missingSpaces = spacesVars.filter((name) => !process.env[name]?.trim());
-  if (missingSpaces.length === 0) {
-    ok(`DigitalOcean Spaces set (bucket ${process.env.DO_SPACES_BUCKET}, region ${process.env.DO_SPACES_REGION}, CDN ${process.env.DO_SPACES_CDN_URL || "built-in DO CDN"})`);
-  } else if (missingSpaces.length === spacesVars.length) {
-    ok("DigitalOcean Spaces NOT SET (uploads go to local disk - fine for dev, NOT persistent on Vercel)");
+  const missingR2 = R2_ENV_VARS.filter((name) => !process.env[name]?.trim());
+  if (missingR2.length === 0) {
+    ok(`Cloudflare R2 set (bucket ${process.env.R2_BUCKET_NAME}, public URL ${process.env.R2_PUBLIC_URL})`);
+  } else if (missingR2.length === R2_ENV_VARS.length) {
+    ok("Cloudflare R2 NOT SET (uploads go to local disk - fine for dev, NOT persistent on Vercel)");
   } else {
-    problem(`DigitalOcean Spaces partly set - missing ${missingSpaces.join(", ")} (uploads fall back to local disk)`);
+    problem(`Cloudflare R2 partly set - missing ${missingR2.join(", ")} (uploads fall back to local disk)`);
   }
 
   results.push("\nDatabase");

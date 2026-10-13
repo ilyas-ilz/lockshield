@@ -1,13 +1,13 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LogOut,
   Moon,
   Sun,
-  ShieldCheck,
   ChevronRight,
   Plus,
   KeyRound,
@@ -87,7 +87,7 @@ export function AdminShell({
   }, [pathname]);
 
   const nav = (
-    <nav className="flex-1 overflow-y-auto px-3.5 py-4 space-y-6">
+    <nav className="admin-scroll flex-1 overflow-y-auto overscroll-contain px-3 py-4 space-y-5">
       {NAV_GROUPS.map((group) => {
         const items = group.items.filter((item) => !item.adminOnly || isAdmin);
         if (items.length === 0) return null;
@@ -143,18 +143,23 @@ export function AdminShell({
   );
 
   const brand = (
-    <div className="flex h-15 items-center justify-between border-b border-app px-4 shrink-0 bg-surface">
-      <Link href="/admin" className="flex items-center gap-2.5 group">
-        <div className="flex size-8 items-center justify-center rounded-xl bg-[var(--color-brand-500)] text-white shadow-xs group-hover:scale-105 transition-transform">
-          <ShieldCheck className="size-4.5" aria-hidden />
-        </div>
-        <div>
-          <span className="font-bold text-sm tracking-tight text-foreground block leading-tight">
+    <div className="flex h-15 items-center border-b border-app px-4 shrink-0 bg-surface">
+      <Link href="/admin" className="group flex min-w-0 items-center gap-2.5">
+        <Image
+          src="/assets/images/logo-shield.webp"
+          alt=""
+          width={36}
+          height={37}
+          priority
+          className="size-9 shrink-0 object-contain transition-transform group-hover:scale-105"
+        />
+        <div className="min-w-0">
+          <span className="font-tech block truncate text-[15px] font-bold uppercase leading-none tracking-tight text-foreground">
             Lock Shield
           </span>
-          <span className="text-[10px] font-medium text-muted flex items-center gap-1.5">
-            <span className="size-1.5 rounded-full bg-emerald-500 inline-block animate-pulse" />
-            Admin Suite
+          <span className="mt-1 flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wider text-muted">
+            <span className="inline-block size-1.5 rounded-full bg-emerald-500" aria-hidden />
+            Admin Panel
           </span>
         </div>
       </Link>
@@ -162,55 +167,55 @@ export function AdminShell({
   );
 
   const userBlock = (
-    <div className="border-t border-app p-3.5 shrink-0 space-y-2 bg-surface">
-      <Link
-        href="/admin/account"
-        className="flex items-center gap-2.5 rounded-xl px-2 py-1 transition-colors hover:bg-surface-2"
-      >
-        <div className="flex size-8.5 shrink-0 items-center justify-center rounded-full bg-surface-2 border border-app text-xs font-bold uppercase text-foreground">
+    <div className="border-t border-app p-3 shrink-0 bg-surface">
+      <div className="flex items-center gap-2.5 rounded-xl px-1.5 py-1.5">
+        <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-500)]/10 text-xs font-bold uppercase text-[var(--color-brand-600)] dark:text-[var(--color-brand-400)]">
           {(user.name ?? user.email ?? "?").slice(0, 2)}
         </div>
         <div className="min-w-0 flex-1">
           <p className="truncate text-xs font-semibold text-foreground">{user.name ?? "Staff Member"}</p>
-          <div className="flex items-center gap-1.5 mt-0.5">
-            <Badge tone={isAdmin ? "brand" : "neutral"} className="text-[10px] px-1.5 py-0 h-4">
+          <div className="mt-0.5 flex items-center gap-1.5">
+            <Badge tone={isAdmin ? "brand" : "neutral"} className="h-4 px-1.5 py-0 text-[10px]">
               {user.role}
             </Badge>
           </div>
         </div>
-      </Link>
+      </div>
 
-      {/* WHY here and not under System: /admin/account is the one settings-ish
-          page every role can open, and System is admin-only. Editors are
-          exactly who needs it — they arrive with a temporary password. */}
-      <Link
-        href="/admin/account"
-        className="flex items-center gap-2 rounded-xl px-2 py-1.5 text-xs font-medium text-muted transition-colors hover:bg-surface-2 hover:text-foreground"
-      >
-        <KeyRound className="size-3.5" aria-hidden />
-        Change password
-      </Link>
-
-      <Link
-        href="/"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex items-center gap-2 rounded-xl px-2 py-1.5 text-xs font-medium text-muted transition-colors hover:bg-surface-2 hover:text-foreground"
-      >
-        <Globe className="size-3.5" aria-hidden />
-        View website
-      </Link>
-
-      <Button
-        type="button"
-        variant="secondary"
-        size="sm"
-        onClick={() => setSignOutOpen(true)}
-        className="w-full justify-start text-xs rounded-xl"
-      >
-        <LogOut className="size-3.5 mr-1 text-muted" aria-hidden />
-        Sign out
-      </Button>
+      {/* WHY Change password lives here and not under System: /admin/account is
+          the one settings-ish page every role can open, and System is
+          admin-only. Editors are exactly who needs it - they arrive with a
+          temporary password. Icon row keeps the footer short so the nav above
+          doesn't get squeezed into a scroll on 768-900px tall screens. */}
+      <div className="mt-2 grid grid-cols-3 gap-1.5">
+        <Link
+          href="/admin/account"
+          title="Change password"
+          aria-label="Change password"
+          className="flex h-8 items-center justify-center rounded-lg border border-app text-muted transition-colors hover:bg-surface-2 hover:text-foreground"
+        >
+          <KeyRound className="size-3.5" aria-hidden />
+        </Link>
+        <Link
+          href="/"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="View website"
+          aria-label="View website (opens in new tab)"
+          className="flex h-8 items-center justify-center rounded-lg border border-app text-muted transition-colors hover:bg-surface-2 hover:text-foreground"
+        >
+          <Globe className="size-3.5" aria-hidden />
+        </Link>
+        <button
+          type="button"
+          onClick={() => setSignOutOpen(true)}
+          title="Sign out"
+          aria-label="Sign out"
+          className="flex h-8 items-center justify-center rounded-lg border border-app text-muted transition-colors hover:border-[var(--color-brand-500)]/40 hover:bg-[var(--color-brand-500)]/10 hover:text-[var(--color-brand-600)]"
+        >
+          <LogOut className="size-3.5" aria-hidden />
+        </button>
+      </div>
     </div>
   );
 
@@ -219,7 +224,7 @@ export function AdminShell({
     // sticky save bars in forms both need to clear it; 0 on desktop.
     <div className="min-h-dvh bg-app [--admin-bottom-nav:calc(3.5rem_+_1px_+_env(safe-area-inset-bottom))] lg:[--admin-bottom-nav:0px]">
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex fixed inset-y-0 left-0 z-30 w-62 flex-col border-r border-app bg-surface shadow-2xs">
+      <aside className="hidden lg:flex fixed inset-y-0 left-0 z-30 w-62 flex-col border-r border-app bg-surface">
         {brand}
         {nav}
         {userBlock}
@@ -231,10 +236,8 @@ export function AdminShell({
           <div className="flex items-center gap-3 min-w-0">
             {/* Phone: brand mark in place of breadcrumbs; the menu lives in the bottom nav */}
             <Link href="/admin" className="flex items-center gap-2 sm:hidden">
-              <div className="flex size-8 items-center justify-center rounded-xl bg-[var(--color-brand-500)] text-white shadow-xs">
-                <ShieldCheck className="size-4.5" aria-hidden />
-              </div>
-              <span className="font-bold text-sm tracking-tight text-foreground">Lock Shield</span>
+              <Image src="/assets/images/logo-shield.webp" alt="" width={32} height={33} className="size-8 object-contain" />
+              <span className="font-tech text-sm font-bold uppercase tracking-tight text-foreground">Lock Shield</span>
             </Link>
 
             {/* Breadcrumb Trail */}

@@ -650,7 +650,7 @@ function renderCell(row: Row, col: ColumnConfig): React.ReactNode {
   if (
     col.key === "url" &&
     typeof value === "string" &&
-    // https covers the Spaces CDN, a custom CDN domain and legacy Cloudinary URLs.
+    // https covers the R2 public domain and legacy Spaces/Cloudinary URLs.
     (value.startsWith("/uploads/") || value.startsWith("/assets/") || value.startsWith("https://"))
   ) {
     return (

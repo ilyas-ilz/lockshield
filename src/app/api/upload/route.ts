@@ -8,7 +8,7 @@ import { Media } from "@/models/Media";
 import { writeAudit } from "@/lib/audit";
 import { getClientIp } from "@/lib/rate-limit";
 
-// WHY a fixed folder set: the folder becomes the Spaces object key prefix,
+// WHY a fixed folder set: the folder becomes the R2 object key prefix,
 // so a free-form value would let a staff session write anywhere in the bucket.
 const folderSchema = z.enum(["posts", "pages", "services", "projects", "jobs", "media"]).catch("media");
 

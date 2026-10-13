@@ -1,8 +1,8 @@
 import path from "node:path";
 import fs from "node:fs";
 import { nanoid } from "nanoid";
-import { hasSpaces } from "./env";
-import { putPublicObject, deleteSpacesObject } from "./spaces";
+import { hasR2 } from "./env";
+import { putPublicObject, deleteR2Object } from "./r2";
 import { logger } from "./logger";
 
 export const ALLOWED_MIME_TYPES = [
@@ -25,13 +25,14 @@ const MIME_TO_EXT: Record<string, string> = {
 
 export const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
 
-// "cloudinary" only survives on records uploaded before the move to Spaces.
-export type StorageProvider = "local" | "spaces" | "cloudinary";
+// "spaces" (DigitalOcean) and "cloudinary" only survive on records uploaded
+// before the move to Cloudflare R2.
+export type StorageProvider = "local" | "r2" | "spaces" | "cloudinary";
 
 export interface UploadResult {
   url: string;
-  publicId?: string; // Spaces object key
-  storage: Exclude<StorageProvider, "cloudinary">;
+  publicId?: string; // R2 object key
+  storage: "local" | "r2";
   width?: number;
   height?: number;
   format?: string;
@@ -53,10 +54,11 @@ export function sanitizeSvg(svgContent: string): string {
 
 /**
  * Single entry point for file uploads across Lock Shield.
- * Auto-detects whether DigitalOcean Spaces is configured via environment variables.
- * If yes -> uploads to Spaces ({folder}/{year}/{month}/{nanoid}.ext), served via its CDN.
+ * Auto-detects whether Cloudflare R2 is configured via environment variables.
+ * If yes -> uploads to R2 ({folder}/{year}/{month}/{nanoid}.ext), served from
+ *           the bucket's public domain through Cloudflare's CDN.
  * If no  -> writes to local disk (public/uploads/{year}/{month}/{nanoid}.ext).
- * WHY Spaces in production: Vercel's filesystem is not persistent, so the
+ * WHY R2 in production: Vercel's filesystem is not persistent, so the
  * local fallback only suits dev and disk-backed hosts.
  */
 export async function uploadFile(
@@ -109,13 +111,13 @@ export async function uploadFile(
   const id = nanoid(16);
   const filename = `${id}.${ext}`;
 
-  if (hasSpaces()) {
+  if (hasR2()) {
     const key = `${folder}/${year}/${month}/${filename}`;
     const url = await putPublicObject(key, buffer, file.type);
     return {
       url,
       publicId: key,
-      storage: "spaces",
+      storage: "r2",
       width,
       height,
       format,
@@ -144,19 +146,19 @@ export async function uploadFile(
 }
 
 /**
- * Safely delete an asset from Spaces or local storage.
+ * Safely delete an asset from R2 or local storage.
  */
 export async function deleteStoredFile(media: {
   storage: StorageProvider;
   url: string;
   publicId?: string;
 }): Promise<void> {
-  if (media.storage === "spaces" && media.publicId) {
-    await deleteSpacesObject(media.publicId);
-  } else if (media.storage === "cloudinary") {
-    // Pre-Spaces upload; the Cloudinary SDK is gone, so only the registry
-    // entry is removed. Delete the remote copy in the Cloudinary console.
-    logger.warn("legacy Cloudinary asset not deleted remotely", { url: media.url, publicId: media.publicId });
+  if (media.storage === "r2" && media.publicId) {
+    await deleteR2Object(media.publicId);
+  } else if (media.storage === "spaces" || media.storage === "cloudinary") {
+    // Pre-R2 upload; that provider's client is gone, so only the registry
+    // entry is removed. Delete the remote copy in the provider's console.
+    logger.warn("legacy asset not deleted remotely", { storage: media.storage, url: media.url, publicId: media.publicId });
   } else if (media.storage === "local" && media.url.startsWith("/uploads/")) {
     const relativePath = media.url.replace(/^\//, "");
     const fullPath = path.join(process.cwd(), "public", relativePath);

@@ -24,15 +24,49 @@ const DURATION_MS = 5500;
 export function HeroSlider() {
   const [current, setCurrent] = React.useState(0);
   const [quoteOpen, setQuoteOpen] = React.useState(false);
+  const [covered, setCovered] = React.useState(false);
+  const coveredRef = React.useRef(false);
   const sectionRef = React.useRef<HTMLElement>(null);
   const bgRef = React.useRef<HTMLDivElement>(null);
   const contentRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     const timer = setInterval(() => {
+      if (coveredRef.current) return; // no crossfades nobody can see
       setCurrent((prev) => (prev + 1) % SLIDES.length);
     }, DURATION_MS);
     return () => clearInterval(timer);
+  }, []);
+
+  // WHY: .hero-pin is sticky, so it stays pinned behind .page-body for the
+  // whole page. Left running, its slideshow, Ken Burns zoom and parallax were
+  // repainted every frame under the opaque sheet, which dropped scroll frames
+  // to ~33ms and made the page flicker while images were still loading.
+  // Once the sheet fully covers it, [data-covered] hides it and pauses its
+  // animations (globals.css); scrolling back up restores it.
+  React.useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+    let raf = 0;
+    const check = () => {
+      raf = 0;
+      const next = window.scrollY >= section.offsetHeight;
+      if (next !== coveredRef.current) {
+        coveredRef.current = next;
+        setCovered(next);
+      }
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(check);
+    };
+    check();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
   }, []);
 
   // Subtle scroll parallax: bg drifts down, content rises + fades.
@@ -60,7 +94,10 @@ export function HeroSlider() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="hero-pin relative flex items-center justify-center bg-ink pb-28 pt-24 sm:pb-32 sm:pt-28">
+    <section
+      ref={sectionRef}
+      data-covered={covered ? "" : undefined}
+      className="hero-pin relative flex items-center justify-center bg-ink pb-28 pt-24 sm:pb-32 sm:pt-28">
       {/* Background layer — animated slide image only */}
       <div ref={bgRef} className="absolute inset-0 z-0 will-change-transform">
         {SLIDES.map((src, i) => {

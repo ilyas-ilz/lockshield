@@ -1,21 +1,22 @@
 import type { NextConfig } from "next";
 
-// Optional custom CDN domain in front of the Spaces bucket (DO_SPACES_CDN_URL,
-// e.g. https://cdn.lockshield.ae). Read at build time, so on Vercel it must be
+// Public domain of the R2 bucket (R2_PUBLIC_URL, e.g. https://cdn.lockshield.ae
+// or https://pub-<hash>.r2.dev). Read at build time, so on Vercel it must be
 // set before the deploy that should use it.
 const mediaCdnHost = (() => {
   try {
-    return process.env.DO_SPACES_CDN_URL ? new URL(process.env.DO_SPACES_CDN_URL).hostname : undefined;
+    return process.env.R2_PUBLIC_URL ? new URL(process.env.R2_PUBLIC_URL).hostname : undefined;
   } catch {
     return undefined;
   }
 })();
 
-// Uploaded media: Spaces origin + built-in CDN (*.digitaloceanspaces.com), a
-// custom CDN domain if set, and legacy pre-Spaces Cloudinary images.
+// Uploaded media: the R2 public domain (custom or *.r2.dev), plus legacy
+// pre-R2 uploads still referenced in the DB (DigitalOcean Spaces, Cloudinary).
 const mediaImgSources = [
-  "https://*.digitaloceanspaces.com",
   ...(mediaCdnHost ? [`https://${mediaCdnHost}`] : []),
+  "https://*.r2.dev",
+  "https://*.digitaloceanspaces.com",
   "https://res.cloudinary.com",
 ].join(" ");
 
@@ -25,7 +26,7 @@ const cspDirectives = [
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   `img-src 'self' blob: data: ${mediaImgSources} https://www.google-analytics.com https://www.googletagmanager.com`,
   "font-src 'self' data: https://fonts.gstatic.com",
-  // WHY no storage host here: the browser never talks to Spaces directly -
+  // WHY no storage host here: the browser never talks to R2 directly -
   // uploads go through /api/upload, which validates and sanitizes first.
   "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com",
   "frame-src https://www.google.com",
@@ -59,8 +60,9 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["sharp"],
   images: {
     remotePatterns: [
-      { protocol: "https", hostname: "**.digitaloceanspaces.com" },
       ...(mediaCdnHost ? [{ protocol: "https" as const, hostname: mediaCdnHost }] : []),
+      { protocol: "https", hostname: "**.r2.dev" },
+      { protocol: "https", hostname: "**.digitaloceanspaces.com" }, // legacy pre-R2 uploads
       { protocol: "https", hostname: "res.cloudinary.com" }, // legacy pre-Spaces uploads
     ],
   },
