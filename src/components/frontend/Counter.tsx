@@ -15,14 +15,22 @@ interface CounterProps {
  * to `target` over 1600ms (cubic ease-out) once scrolled into view, then
  * pulses briefly on finish. Counts once - re-scrolling past it doesn't
  * restart the animation.
+ *
+ * WHY it starts at `target`, not 0: the server HTML is what Google and link
+ * previews read, and "0+ Employees, 0+ Projects Completed" looked like an
+ * unfinished template. It drops to 0 only after hydration, while still
+ * off-screen, so visitors see the same count-up as before.
  */
 export function Counter({ target, suffix = "+", className }: CounterProps) {
   const [ref, inView] = useInView<HTMLSpanElement>();
-  const [value, setValue] = React.useState(0);
+  const [value, setValue] = React.useState(target);
   const [pulsing, setPulsing] = React.useState(false);
 
   React.useEffect(() => {
-    if (!inView) return;
+    if (!inView) {
+      setValue(0);
+      return;
+    }
     const duration = 1600;
     const start = performance.now();
     let frame: number;

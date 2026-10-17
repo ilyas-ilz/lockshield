@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { nonCanonicalHostNoindex } from "./src/lib/seo/host-noindex";
 
 // Public domain of the R2 bucket (R2_PUBLIC_URL, e.g. https://cdn.lockshield.ae
 // or https://pub-<hash>.r2.dev). Read at build time, so on Vercel it must be
@@ -65,7 +66,11 @@ const nextConfig: NextConfig = {
     ],
   },
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      // Read at build time, like R2_PUBLIC_URL above.
+      nonCanonicalHostNoindex(process.env.SITE_URL),
+    ];
   },
 };
 
