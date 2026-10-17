@@ -7,6 +7,7 @@ import { BLOCK_TYPES, BLOCK_LABELS, type Block, type BlockType } from "@/lib/blo
 import { BLOCK_FIELD_CONFIGS } from "@/lib/admin/block-field-configs";
 import { FieldInput } from "./FieldInput";
 import { getPath, setPath } from "@/lib/admin/object-path";
+import { withFieldDefaults } from "@/lib/admin/field-defaults";
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/select";
 import { Card, Badge } from "@/components/ui/card";
@@ -57,7 +58,10 @@ export function BlockEditor({ value, onChange }: { value: Block[]; onChange: (v:
 
   function addBlock() {
     const id = nanoid(8);
-    onChange([...blocks, { id, type: addingType, hidden: false } as Block]);
+    // Seeded from the block's field defaults so a new block shows the values
+    // it will actually save (e.g. gallery columns 3, not a displayed "2").
+    const block = withFieldDefaults(BLOCK_FIELD_CONFIGS[addingType] ?? [], { id, type: addingType, hidden: false });
+    onChange([...blocks, block as Block]);
     setExpanded((prev) => new Set(prev).add(id)); // open the new block straight away
   }
 

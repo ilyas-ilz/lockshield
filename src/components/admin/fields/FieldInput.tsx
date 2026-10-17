@@ -1,6 +1,7 @@
 "use client";
 
 import type { FieldConfig } from "@/lib/admin/field-types";
+import { selectValue } from "@/lib/admin/field-defaults";
 import { ImagePicker, type PickedImage } from "./ImagePicker";
 import { RichTextEditor } from "./RichTextEditor";
 import { StringArrayField, StatsArrayField, ImageArrayField } from "./ArrayFields";
@@ -79,11 +80,15 @@ export function FieldInput({
         </label>
       );
     case "select":
+      // Shows exactly the stored value (String() so a numeric 301 matches the
+      // "301" option) — never a fallback the form state doesn't hold. Forms
+      // seed defaults up front via lib/admin/field-defaults.ts.
       return (
         <Select
           id={id}
-          value={(value as string) ?? field.options?.[0] ?? ""}
-          onValueChange={onChange}
+          value={value === undefined || value === null ? "" : String(value)}
+          onValueChange={(opt) => onChange(selectValue(field, opt))}
+          placeholder="Select an option"
           options={(field.options ?? []).map((opt) => ({ value: opt, label: opt }))}
         />
       );

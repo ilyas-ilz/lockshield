@@ -36,6 +36,10 @@ export interface FieldConfig {
   type: FieldType;
   required?: boolean;
   options?: readonly string[]; // for select/multiselect
+  // for select — "number" when the server stores a number (redirect status
+  // code, grid columns): the options stay strings for the dropdown, but the
+  // form stores and sends Number(option) so the zod literal check passes.
+  valueType?: "number";
   help?: string;
   maxLength?: number; // for text/textarea — shows a live "n / max" counter; must match the zod limit
   defaultValue?: unknown;

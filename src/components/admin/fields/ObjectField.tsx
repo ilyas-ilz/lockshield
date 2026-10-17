@@ -4,6 +4,7 @@ import { Plus, Trash2 } from "lucide-react";
 import type { FieldConfig } from "@/lib/admin/field-types";
 import { FieldInput } from "./FieldInput";
 import { getPath, setPath } from "@/lib/admin/object-path";
+import { fieldDefault } from "@/lib/admin/field-defaults";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/input";
 
@@ -25,7 +26,7 @@ export function ObjectField({
         size="sm"
         onClick={() => {
           const obj: Record<string, unknown> = {};
-          for (const f of itemFields) obj[f.name] = f.defaultValue ?? "";
+          for (const f of itemFields) obj[f.name] = fieldDefault(f) ?? "";
           onChange(obj);
         }}
       >

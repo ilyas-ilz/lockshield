@@ -4,6 +4,7 @@ import { Plus, Trash2 } from "lucide-react";
 import type { FieldConfig } from "@/lib/admin/field-types";
 import { FieldInput } from "./FieldInput";
 import { getPath, setPath } from "@/lib/admin/object-path";
+import { fieldDefault } from "@/lib/admin/field-defaults";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Field } from "@/components/ui/input";
@@ -30,7 +31,7 @@ export function ObjectArrayField({
 
   function emptyItem(): Record<string, unknown> {
     const item: Record<string, unknown> = {};
-    for (const f of itemFields) item[f.name] = f.defaultValue ?? "";
+    for (const f of itemFields) item[f.name] = fieldDefault(f) ?? "";
     return item;
   }
 

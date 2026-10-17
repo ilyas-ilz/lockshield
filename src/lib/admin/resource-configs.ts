@@ -168,7 +168,7 @@ export const RESOURCE_CONFIGS: Record<string, ResourceConfig> = {
     fields: [
       { name: "from", label: "From path", type: "text", required: true, help: "e.g. /blog/old-post.html" },
       { name: "to", label: "To (path or full URL)", type: "text", required: true },
-      { name: "statusCode", label: "Status Code", type: "select", options: ["301", "302"] },
+      { name: "statusCode", label: "Status Code", type: "select", options: ["301", "302"], valueType: "number" },
     ],
   },
   media: {

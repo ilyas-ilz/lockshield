@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import type { ResourceConfig } from "@/lib/admin/field-types";
 import { FieldInput } from "./fields/FieldInput";
 import { getPath, setPath } from "@/lib/admin/object-path";
+import { withFieldDefaults } from "@/lib/admin/field-defaults";
 import { api, ApiClientError } from "@/lib/admin/api-client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,15 +31,9 @@ export function ResourceForm({
   initialData?: Record<string, unknown>;
 }) {
   const router = useRouter();
-  const [formData, setFormData] = React.useState<Record<string, unknown>>(() => {
-    const seed: Record<string, unknown> = { ...(initialData ?? {}) };
-    for (const f of config.fields) {
-      if (getPath(seed, f.name) === undefined && f.defaultValue !== undefined) {
-        Object.assign(seed, setPath(seed, f.name, f.defaultValue));
-      }
-    }
-    return seed;
-  });
+  const [formData, setFormData] = React.useState<Record<string, unknown>>(() =>
+    withFieldDefaults(config.fields, initialData ?? {})
+  );
   const [saving, setSaving] = React.useState(false);
   const [fieldErrors, setFieldErrors] = React.useState<Record<string, string[]>>({});
 

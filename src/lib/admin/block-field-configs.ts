@@ -37,7 +37,7 @@ export const BLOCK_FIELD_CONFIGS: Record<BlockType, FieldConfig[]> = {
   imageGallery: [
     { name: "heading", label: "Heading", type: "text" },
     { name: "images", label: "Images", type: "imageArray" },
-    { name: "columns", label: "Columns", type: "select", options: ["2", "3", "4"] },
+    { name: "columns", label: "Columns", type: "select", options: ["2", "3", "4"], valueType: "number", defaultValue: 3 },
   ],
   faq: [
     { name: "heading", label: "Heading", type: "text" },
