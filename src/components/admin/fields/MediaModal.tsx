@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { api } from "@/lib/admin/api-client";
 import { toast } from "sonner";
 import { type PickedImage } from "./ImagePicker";
+import { parseUploadResponse } from "@/lib/admin/upload-response";
 
 interface MediaItem {
   _id: string;
@@ -99,21 +100,12 @@ export function MediaModal({
         body: formData,
       });
 
+      const body = await res.json().catch(() => null);
       if (!res.ok) {
-        throw new Error("Upload failed");
+        throw new Error(body?.error || "Upload failed");
       }
 
-      const uploaded = await res.json();
-      const newMedia: PickedImage = {
-        url: uploaded.url,
-        publicId: uploaded.publicId,
-        storage: uploaded.storage,
-        width: uploaded.width,
-        height: uploaded.height,
-        alt: uploaded.alt || "",
-      };
-
-      onSelect(newMedia);
+      onSelect(parseUploadResponse(body));
       onOpenChange(false);
     } catch (err) {
       // WHY toast, not alert(): a native alert blocks the whole tab and, worse,

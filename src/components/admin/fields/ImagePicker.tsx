@@ -5,6 +5,7 @@ import { ImagePlus, Trash2, AlertTriangle, Loader2, FolderOpen } from "lucide-re
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MediaModal } from "./MediaModal";
+import { parseUploadResponse } from "@/lib/admin/upload-response";
 
 export interface PickedImage {
   url: string;
@@ -52,18 +53,17 @@ export function ImagePicker({
 
       xhr.onload = () => {
         if (xhr.status >= 200 && xhr.status < 300) {
+          let body: unknown;
           try {
-            const data = JSON.parse(xhr.responseText);
-            resolve({
-              url: data.url,
-              publicId: data.publicId,
-              storage: data.storage,
-              width: data.width,
-              height: data.height,
-              alt: data.alt || value?.alt || "",
-            });
+            body = JSON.parse(xhr.responseText);
           } catch {
             reject(new Error("Failed to parse upload response"));
+            return;
+          }
+          try {
+            resolve(parseUploadResponse(body, value?.alt || ""));
+          } catch (err) {
+            reject(err);
           }
         } else {
           try {
