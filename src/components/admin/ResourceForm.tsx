@@ -107,7 +107,7 @@ export function ResourceForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_21rem] lg:items-start">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_21rem] lg:items-start">
         <Card className="border-app shadow-2xs">
           <CardContent className="space-y-5 p-6">{mainFields.map(renderField)}</CardContent>
         </Card>

@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import {
   Mail,
   Phone,
@@ -289,12 +290,12 @@ export function LeadsClientTable({
 
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <p className="font-bold text-sm text-foreground">{lead.name}</p>
+                          <p className="font-bold text-sm text-foreground [overflow-wrap:anywhere]">{lead.name}</p>
                           <Badge tone="neutral" className="uppercase text-[10px] font-semibold">
                             {lead.source}
                           </Badge>
                           {lead.serviceInterest && (
-                            <Badge tone="brand" className="text-[10px] font-semibold">
+                            <Badge tone="brand" className="max-w-full whitespace-normal text-[10px] font-semibold">
                               <Wrench className="mr-1 size-3" aria-hidden />
                               {lead.serviceInterest}
                             </Badge>
@@ -321,18 +322,19 @@ export function LeadsClientTable({
                         {/* Contact details with Copy buttons */}
                         <div className="mt-2 flex flex-wrap items-center gap-3 text-xs">
                           {lead.email && (
-                            <div className="inline-flex items-center gap-1.5 rounded-lg border border-line/60 bg-surface-2/40 px-2 py-1">
+                            <div className="inline-flex max-w-full items-center gap-1.5 rounded-lg border border-line/60 bg-surface-2/40 px-2 py-1">
                               <a
                                 href={`mailto:${lead.email}`}
-                                className="font-medium text-foreground hover:underline flex items-center gap-1"
+                                title={lead.email}
+                                className="font-medium text-foreground hover:underline flex min-w-0 items-center gap-1"
                               >
-                                <Mail className="size-3 text-muted" />
-                                {lead.email}
+                                <Mail className="size-3 shrink-0 text-muted" />
+                                <span className="truncate">{lead.email}</span>
                               </a>
                               <button
                                 type="button"
                                 onClick={() => handleCopy(lead.email!, "Email")}
-                                className="p-1 text-muted hover:text-foreground cursor-pointer rounded"
+                                className="shrink-0 p-1 text-muted hover:text-foreground cursor-pointer rounded"
                                 aria-label="Copy email"
                               >
                                 {copiedField === lead.email ? (
@@ -391,7 +393,7 @@ export function LeadsClientTable({
                     </div>
 
                     {/* Status selection and badge */}
-                    <div className="shrink-0 sm:w-44 flex flex-row sm:flex-col items-center sm:items-end justify-between gap-2 border-t sm:border-t-0 pt-2 sm:pt-0 border-app">
+                    <div className="shrink-0 sm:w-44 flex flex-row flex-wrap sm:flex-nowrap sm:flex-col items-center sm:items-end justify-between gap-2 border-t sm:border-t-0 pt-2 sm:pt-0 border-app">
                       <Badge tone={STATUS_TONES[lead.status] ?? "neutral"} dot className="capitalize text-xs font-semibold py-0.5">
                         {lead.status}
                       </Badge>
@@ -438,40 +440,52 @@ export function LeadsClientTable({
         </>
       )}
 
-      {/* Full Message Modal */}
-      {selectedLead && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
-          <Card className="w-full max-w-lg border-app shadow-2xl animate-in fade-in zoom-in-95">
-            <div className="flex items-center justify-between border-b border-app p-4 px-5">
-              <div className="flex items-center gap-2">
-                <MessageSquare className="size-4 text-[var(--color-brand-500)]" />
-                <h3 className="font-bold text-sm text-foreground">Enquiry from {selectedLead.name}</h3>
-              </div>
-              <Button variant="ghost" size="icon" onClick={() => setSelectedLead(null)} className="size-8">
-                <X className="size-4" />
-              </Button>
-            </div>
-            <div className="p-5 space-y-4 text-xs">
-              <div className="flex flex-wrap gap-3 pb-3 border-b border-app text-muted">
-                <span><strong>Source:</strong> {selectedLead.source}</span>
-                {selectedLead.email && <span><strong>Email:</strong> {selectedLead.email}</span>}
-                {selectedLead.phone && <span><strong>Phone:</strong> {selectedLead.phone}</span>}
-                {selectedLead.serviceInterest && <span><strong>Service:</strong> {selectedLead.serviceInterest}</span>}
-                {selectedLead.form && <span><strong>Form:</strong> {LEAD_FORM_LABELS[selectedLead.form]}</span>}
-                {selectedLead.page && <span><strong>Page:</strong> {selectedLead.page}</span>}
+      {/* Full message modal: header and actions stay pinned, the body scrolls,
+          so a long enquiry never pushes the close button off a phone screen. */}
+      <DialogPrimitive.Root open={selectedLead !== null} onOpenChange={(open) => !open && setSelectedLead(null)}>
+        <DialogPrimitive.Portal>
+          <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs animate-in fade-in-0" />
+          {selectedLead && (
+            <DialogPrimitive.Content
+              aria-describedby={undefined}
+              className="fixed left-1/2 top-1/2 z-50 flex max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-xl border border-app bg-surface shadow-2xl animate-in fade-in-0 zoom-in-95"
+            >
+              <div className="flex shrink-0 items-center justify-between gap-2 border-b border-app p-4 px-5">
+                <div className="flex min-w-0 items-center gap-2">
+                  <MessageSquare className="size-4 shrink-0 text-[var(--color-brand-500)]" />
+                  <DialogPrimitive.Title className="truncate font-bold text-sm text-foreground">
+                    Enquiry from {selectedLead.name}
+                  </DialogPrimitive.Title>
+                </div>
+                <DialogPrimitive.Close asChild>
+                  <Button variant="ghost" size="icon" aria-label="Close" className="size-8 shrink-0">
+                    <X className="size-4" />
+                  </Button>
+                </DialogPrimitive.Close>
               </div>
 
-              <div>
-                <p className="font-bold text-foreground mb-1.5">Message:</p>
-                <div className="rounded-xl border border-app bg-surface-2/40 p-4 text-sm text-foreground leading-relaxed whitespace-pre-wrap">
-                  {selectedLead.message || <span className="text-muted">No message - they only left contact details.</span>}
+              <div className="admin-scroll min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain p-5 text-xs">
+                <div className="flex flex-wrap gap-3 pb-3 border-b border-app text-muted [overflow-wrap:anywhere]">
+                  <span><strong>Source:</strong> {selectedLead.source}</span>
+                  {selectedLead.email && <span><strong>Email:</strong> {selectedLead.email}</span>}
+                  {selectedLead.phone && <span><strong>Phone:</strong> {selectedLead.phone}</span>}
+                  {selectedLead.serviceInterest && <span><strong>Service:</strong> {selectedLead.serviceInterest}</span>}
+                  {selectedLead.form && <span><strong>Form:</strong> {LEAD_FORM_LABELS[selectedLead.form]}</span>}
+                  {selectedLead.page && <span><strong>Page:</strong> {selectedLead.page}</span>}
+                </div>
+
+                <div>
+                  <p className="font-bold text-foreground mb-1.5">Message:</p>
+                  <div className="rounded-xl border border-app bg-surface-2/40 p-4 text-sm text-foreground leading-relaxed whitespace-pre-wrap [overflow-wrap:anywhere]">
+                    {selectedLead.message || <span className="text-muted">No message - they only left contact details.</span>}
+                  </div>
                 </div>
               </div>
 
-              <div className="flex justify-end gap-2 pt-2">
-                <Button variant="secondary" size="sm" onClick={() => setSelectedLead(null)}>
-                  Close
-                </Button>
+              <div className="flex shrink-0 justify-end gap-2 border-t border-app p-4 px-5 pb-[max(1rem,env(safe-area-inset-bottom))]">
+                <DialogPrimitive.Close asChild>
+                  <Button variant="secondary" size="sm">Close</Button>
+                </DialogPrimitive.Close>
                 {selectedLead.email ? (
                   <Button variant="primary" size="sm" asChild>
                     <a href={`mailto:${selectedLead.email}`}>
@@ -488,10 +502,10 @@ export function LeadsClientTable({
                   </Button>
                 ) : null}
               </div>
-            </div>
-          </Card>
-        </div>
-      )}
+            </DialogPrimitive.Content>
+          )}
+        </DialogPrimitive.Portal>
+      </DialogPrimitive.Root>
 
       <ConfirmDialog
         open={deleteTarget !== null}

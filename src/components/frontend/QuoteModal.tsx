@@ -92,7 +92,7 @@ export function QuoteModal({ open, onOpenChange, defaultService }: QuoteModalPro
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs animate-in fade-in-0 duration-200" />
-        <DialogPrimitive.Content className="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-gray-100 bg-white p-6 sm:p-8 shadow-2xl animate-in fade-in-0 zoom-in-95 duration-200">
+        <DialogPrimitive.Content className="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain rounded-2xl border border-gray-100 bg-white p-6 sm:p-8 shadow-2xl animate-in fade-in-0 zoom-in-95 duration-200">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-2.5">
               <div className="flex size-10 items-center justify-center rounded-xl bg-[#e01b24]/10 text-[#e01b24]">

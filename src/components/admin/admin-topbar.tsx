@@ -103,7 +103,8 @@ export function AdminTopbar({
           height={33}
           className="size-8 object-contain dark:rounded-lg dark:bg-white dark:p-0.5"
         />
-        <span className="font-tech text-sm font-bold uppercase tracking-tight text-app">Lock Shield</span>
+        {/* Under 360px the wordmark pushes the account button off-screen */}
+        <span className="font-tech text-sm font-bold uppercase tracking-tight text-app max-[359px]:sr-only">Lock Shield</span>
       </Link>
 
       <div className="hidden min-w-0 flex-1 sm:block">

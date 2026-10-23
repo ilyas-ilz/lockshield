@@ -22,6 +22,8 @@ const STATUS_OPTIONS = [
 ];
 
 const toolButton = "h-11 rounded-xl px-3.5 text-sm font-medium sm:h-10 [&_svg]:size-4";
+// Phones: one row — Filter/Sort share the width, Refresh/Export are icon-only.
+const growButton = "min-w-0 flex-1 sm:flex-none";
 
 export function DataTableToolbar({
   label,
@@ -106,7 +108,7 @@ export function DataTableToolbar({
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-2.5 sm:flex sm:items-center">
+      <div className="flex items-center gap-2 sm:gap-2.5">
         {hasStatusFilter && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -114,6 +116,7 @@ export function DataTableToolbar({
                 variant="secondary"
                 className={cn(
                   toolButton,
+                  growButton,
                   filterActive &&
                     "border-[var(--color-brand-500)]/40 bg-[var(--color-brand-50)] text-[var(--color-brand-700)] dark:bg-[var(--color-brand-500)]/12 dark:text-[var(--color-brand-300)]"
                 )}
@@ -138,7 +141,7 @@ export function DataTableToolbar({
         {sortable.length > 0 && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="secondary" className={toolButton}>
+              <Button variant="secondary" className={cn(toolButton, growButton)}>
                 <ArrowDownWideNarrow aria-hidden />
                 <span className="truncate">{sort ? humanize(sort) : "Sort by"}</span>
                 <ChevronDown className="text-muted" aria-hidden />
@@ -170,14 +173,20 @@ export function DataTableToolbar({
           disabled={refreshing}
           aria-label="Refresh"
           title="Refresh"
-          className="size-11 rounded-xl sm:size-10"
+          className="size-11 shrink-0 rounded-xl sm:size-10"
         >
           <RefreshCw className={cn(refreshing && "animate-spin")} aria-hidden />
         </Button>
 
-        <Button variant="secondary" onClick={onExport} loading={exporting} className={toolButton}>
+        <Button
+          variant="secondary"
+          onClick={onExport}
+          loading={exporting}
+          aria-label="Export"
+          className={cn(toolButton, "w-11 shrink-0 px-0 sm:w-auto sm:px-3.5")}
+        >
           {!exporting && <Download aria-hidden />}
-          Export
+          <span className="hidden sm:inline">Export</span>
         </Button>
       </div>
     </div>

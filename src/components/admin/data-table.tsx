@@ -358,7 +358,7 @@ export function DataTable({
                   <Link href={editHref(row)} className="min-w-0 flex-1">
                     <span className="flex items-center gap-3">
                       {showAvatar && <RowAvatar text={rowLabel(row)} />}
-                      <span className="min-w-0 truncate text-[15px] font-medium text-app">{renderCell(row, columns[0]!)}</span>
+                      <span className="min-w-0 line-clamp-2 text-[15px] font-medium text-app [overflow-wrap:anywhere]">{renderCell(row, columns[0]!)}</span>
                     </span>
                     <dl className="mt-2 space-y-1">
                       {columns.slice(1).map((col) => (
@@ -376,7 +376,7 @@ export function DataTable({
           </ul>
 
           {/* Desktop: table */}
-          <div className="hidden overflow-x-auto px-5 pb-2 md:block">
+          <div className="relative hidden overflow-x-auto px-5 pb-2 md:block">
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-left">

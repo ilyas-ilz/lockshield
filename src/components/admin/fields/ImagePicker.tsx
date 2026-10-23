@@ -217,7 +217,7 @@ export function ImagePicker({
             value={value.alt}
             onChange={(e) => onChange({ ...value, alt: e.target.value })}
           />
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Button
               type="button"
               variant="ghost"
