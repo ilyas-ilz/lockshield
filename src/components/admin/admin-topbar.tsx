@@ -172,9 +172,10 @@ export function AdminTopbar({
           <button
             type="button"
             aria-label={`Account menu for ${displayName(user)}`}
-            className="ml-1 flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-xl bg-[var(--color-brand-500)] text-sm font-bold text-white shadow-[0_6px_14px_-6px_var(--color-brand-500)] transition-colors hover:bg-[var(--color-brand-600)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]"
+            className="ml-1 flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-app bg-white p-1 shadow-xs transition-colors hover:border-[var(--color-brand-500)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]"
           >
-            {initialsOf(displayName(user)).slice(0, 1)}
+            {/* Site logo as the account button (white tile keeps it legible in dark mode) */}
+            <Image src="/assets/images/logo-shield.webp" alt="" width={32} height={33} className="size-full object-contain" />
           </button>
         </AdminUserMenu>
       </div>

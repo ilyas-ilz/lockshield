@@ -1,13 +1,19 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { Save, Settings as SettingsIcon } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Settings as SettingsIcon } from "lucide-react";
 import { toast } from "sonner";
 import { FieldInput } from "@/components/admin/fields/FieldInput";
 import { getPath, setPath } from "@/lib/admin/object-path";
 import { api, ApiClientError, validationIssues } from "@/lib/admin/api-client";
 import { changedKeys } from "@/lib/admin/changed-keys";
-import { Button } from "@/components/ui/button";
+import { diffFields } from "@/lib/admin/field-diff";
+import {
+  EditLockActions,
+  EditLockStatus,
+  LockedFieldset,
+  ReviewChangesDialog,
+} from "@/components/admin/edit-lock";
 import { Card, CardContent, CardHeader, CardTitle, Skeleton } from "@/components/ui/card";
 import { Field } from "@/components/ui/input";
 import { PageHeader } from "@/components/shared/page-header";
@@ -15,6 +21,8 @@ import { ErrorState } from "@/components/shared/states";
 import { cn } from "@/lib/utils";
 import { SETTINGS_SECTIONS as SECTIONS, findSettingsField } from "./sections";
 import { WebsiteStatus } from "./website-status";
+
+const ALL_FIELDS = SECTIONS.flatMap((s) => s.fields);
 
 export default function SettingsPage() {
   const [data, setData] = useState<Record<string, unknown> | null>(null);
@@ -24,6 +32,20 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  // Saved values open locked; "Edit" unlocks, Save asks for confirmation.
+  const [editing, setEditing] = useState(false);
+  const [reviewOpen, setReviewOpen] = useState(false);
+  // Bumped on discard so editors with internal state (rich text) remount.
+  const [resetKey, setResetKey] = useState(0);
+
+  const changes = useMemo(() => (data && saved ? diffFields(ALL_FIELDS, saved, data) : []), [data, saved]);
+
+  function discard() {
+    setData(saved);
+    setFieldErrors({});
+    setEditing(false);
+    setResetKey((k) => k + 1);
+  }
 
   const load = useCallback(async () => {
     setError(null);
@@ -40,20 +62,27 @@ export default function SettingsPage() {
     void load();
   }, [load]);
 
-  async function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!data || !saved) return;
-    const changes = changedKeys(saved, data);
-    if (Object.keys(changes).length === 0) {
+    if (!editing || !data || !saved) return;
+    if (changes.length === 0 || Object.keys(changedKeys(saved, data)).length === 0) {
       toast.info("No changes to save");
       return;
     }
+    setReviewOpen(true);
+  }
+
+  async function save() {
+    if (!data || !saved) return;
+    const payload = changedKeys(saved, data);
     setSaving(true);
     setFieldErrors({});
     try {
-      const updated = await api.patch<Record<string, unknown>>("/api/settings", changes);
+      const updated = await api.patch<Record<string, unknown>>("/api/settings", payload);
       setData(updated);
       setSaved(updated);
+      setEditing(false);
+      setResetKey((k) => k + 1);
       toast.success("Settings updated successfully");
     } catch (err) {
       // Edits on several tabs save together, so the field at fault may be on
@@ -142,6 +171,7 @@ export default function SettingsPage() {
                     </div>
                   </div>
                 </CardHeader>
+                <LockedFieldset key={resetKey} locked={!editing} className="min-w-0">
                 <CardContent className="space-y-5 p-6">
                   {currentSection.fields.map((field) => {
                     const fieldId = `settings-${field.name.replace(/\./g, "-")}`;
@@ -164,22 +194,26 @@ export default function SettingsPage() {
                     );
                   })}
                 </CardContent>
+                </LockedFieldset>
               </Card>
 
               {/* Sticky Save Bar */}
               <div className="sticky bottom-(--admin-bottom-nav) z-10 -mx-4 border-t border-app bg-surface px-4 py-3 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted hidden sm:inline">
-                    Changes apply instantly across all pages and footer structured data.
-                  </span>
-                  <Button type="submit" variant="primary" loading={saving} className="w-full sm:w-auto">
-                    {!saving && <Save className="size-4 mr-1.5" aria-hidden />}
-                    {saving ? "Saving settings…" : "Save all settings"}
-                  </Button>
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <EditLockStatus editing={editing} changeCount={changes.length} />
+                  <EditLockActions
+                    editing={editing}
+                    dirty={changes.length > 0}
+                    saving={saving}
+                    onEdit={() => setEditing(true)}
+                    onDiscard={discard}
+                    saveLabel="Review & save"
+                  />
                 </div>
               </div>
             </>
           )}
+          <ReviewChangesDialog open={reviewOpen} onOpenChange={setReviewOpen} changes={changes} onConfirm={save} />
         </form>
       )}
     </div>

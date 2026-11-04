@@ -121,7 +121,7 @@ export function MediaModal({
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs animate-in fade-in-0 duration-200" />
-        <DialogPrimitive.Content className="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-4xl -translate-x-1/2 -translate-y-1/2 max-h-[85vh] flex flex-col rounded-xl border border-app bg-surface shadow-2xl overflow-hidden animate-in fade-in-0 zoom-in-95 duration-200">
+        <DialogPrimitive.Content className="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-4xl -translate-x-1/2 -translate-y-1/2 max-h-[min(85vh,calc(100dvh-2rem))] flex flex-col rounded-xl border border-app bg-surface shadow-2xl overflow-hidden animate-in fade-in-0 zoom-in-95 duration-200">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-app px-5 py-4 bg-surface-2/40">
             <div>

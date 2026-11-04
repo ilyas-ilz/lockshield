@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { api, ApiClientError } from "@/lib/admin/api-client";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,16 @@ import { Input, Field } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { PageHeader } from "@/components/shared/page-header";
 import { ErrorState } from "@/components/shared/states";
+import { diffFields } from "@/lib/admin/field-diff";
+import type { FieldConfig } from "@/lib/admin/field-types";
+import { EditLockActions, LockedFieldset, ReviewChangesDialog } from "@/components/admin/edit-lock";
+
+// Labels for the change review (only the fields this page can change).
+const REVIEW_FIELDS: FieldConfig[] = [
+  { name: "name", label: "Name", type: "text" },
+  { name: "role", label: "Role", type: "select" },
+  { name: "active", label: "Access active", type: "boolean" },
+];
 
 interface UserData {
   _id: string;
@@ -26,11 +36,23 @@ export default function EditUserPage() {
   const [user, setUser] = useState<UserData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState<UserData | null>(null);
+  const [editing, setEditing] = useState(false);
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const changes = useMemo(
+    () =>
+      user && saved
+        ? diffFields(REVIEW_FIELDS, saved as unknown as Record<string, unknown>, user as unknown as Record<string, unknown>)
+        : [],
+    [user, saved]
+  );
 
   const load = useCallback(async () => {
     setError(null);
     try {
-      setUser(await api.get<UserData>(`/api/users/${id}`));
+      const loaded = await api.get<UserData>(`/api/users/${id}`);
+      setUser(loaded);
+      setSaved(loaded);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load");
     }
@@ -40,8 +62,17 @@ export default function EditUserPage() {
     void load();
   }, [load]);
 
-  async function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!editing || !user) return;
+    if (changes.length === 0) {
+      toast.info("No changes to save");
+      return;
+    }
+    setReviewOpen(true);
+  }
+
+  async function save() {
     if (!user) return;
     setSaving(true);
     try {
@@ -79,6 +110,7 @@ export default function EditUserPage() {
         </Card>
       ) : (
         <form onSubmit={handleSubmit}>
+          <LockedFieldset locked={!editing} className="min-w-0">
           <Card>
             <CardContent className="space-y-5">
               <Field label="Name" htmlFor="name">
@@ -114,17 +146,29 @@ export default function EditUserPage() {
               </Field>
             </CardContent>
           </Card>
+          </LockedFieldset>
 
           <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-            <Button type="button" variant="secondary" onClick={() => router.push("/admin/users")}>
-              <ArrowLeft aria-hidden />
-              Cancel
-            </Button>
-            <Button type="submit" variant="primary" loading={saving}>
-              {!saving && <Save aria-hidden />}
-              {saving ? "Saving…" : "Save changes"}
-            </Button>
+            {!editing && (
+              <Button type="button" variant="secondary" onClick={() => router.push("/admin/users")}>
+                <ArrowLeft aria-hidden />
+                Back
+              </Button>
+            )}
+            <EditLockActions
+              editing={editing}
+              dirty={changes.length > 0}
+              saving={saving}
+              size="md"
+              onEdit={() => setEditing(true)}
+              onDiscard={() => {
+                setUser(saved);
+                setEditing(false);
+              }}
+              saveLabel="Review & save"
+            />
           </div>
+          <ReviewChangesDialog open={reviewOpen} onOpenChange={setReviewOpen} changes={changes} onConfirm={save} />
         </form>
       )}
     </div>

@@ -26,6 +26,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/input";
 import { PromptDialog } from "@/components/ui/prompt-dialog";
+import { useFieldsReadOnly } from "../edit-lock";
 import { MediaModal } from "./MediaModal";
 
 export interface RichTextEditorProps {
@@ -105,6 +106,12 @@ export function RichTextEditor({
       onChange(isEmpty ? undefined : json);
     },
   });
+
+  // A <fieldset disabled> can't reach contenteditable, so the edit lock is applied here.
+  const readOnly = useFieldsReadOnly();
+  React.useEffect(() => {
+    if (editor && editor.isEditable === readOnly) editor.setEditable(!readOnly, false); // false: no update event, so no phantom change
+  }, [editor, readOnly]);
 
   // Keep editor content in sync when value changes externally (e.g. form reset)
   React.useEffect(() => {

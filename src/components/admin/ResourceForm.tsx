@@ -12,6 +12,8 @@ import { api, ApiClientError } from "@/lib/admin/api-client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field } from "@/components/ui/input";
+import { diffFields } from "@/lib/admin/field-diff";
+import { EditLockActions, EditLockStatus, LockedFieldset, ReviewChangesDialog } from "./edit-lock";
 
 /**
  * Config-driven form used by every resource's new/edit screen.
@@ -31,17 +33,44 @@ export function ResourceForm({
   initialData?: Record<string, unknown>;
 }) {
   const router = useRouter();
-  const [formData, setFormData] = React.useState<Record<string, unknown>>(() =>
+  // Snapshot of the saved record: the baseline for the change review and Discard.
+  const [baseline] = React.useState<Record<string, unknown>>(() =>
     withFieldDefaults(config.fields, initialData ?? {})
   );
+  const [formData, setFormData] = React.useState<Record<string, unknown>>(baseline);
+  // Existing records open locked; new ones are editable straight away.
+  const [editing, setEditing] = React.useState(!id);
+  const [reviewOpen, setReviewOpen] = React.useState(false);
+  const [resetKey, setResetKey] = React.useState(0);
+  const changes = React.useMemo(
+    () => (id ? diffFields(config.fields, baseline, formData) : []),
+    [id, config.fields, baseline, formData]
+  );
+
+  function discard() {
+    setFormData(baseline);
+    setFieldErrors({});
+    setEditing(false);
+    setResetKey((k) => k + 1);
+  }
   const [saving, setSaving] = React.useState(false);
   const [fieldErrors, setFieldErrors] = React.useState<Record<string, string[]>>({});
 
   const mainFields = config.fields.filter((f) => !f.name.startsWith("seo."));
   const seoFields = config.fields.filter((f) => f.name.startsWith("seo."));
 
-  async function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!editing) return;
+    if (!id) return void save();
+    if (changes.length === 0) {
+      toast.info("No changes to save");
+      return;
+    }
+    setReviewOpen(true);
+  }
+
+  async function save() {
     setSaving(true);
     setFieldErrors({});
     // Optional single relations send undefined (not "") when "None" is
@@ -107,7 +136,11 @@ export function ResourceForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_21rem] lg:items-start">
+      <LockedFieldset
+        key={resetKey}
+        locked={!editing}
+        className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_21rem] lg:items-start"
+      >
         <Card className="border-app shadow-2xs">
           <CardContent className="space-y-5 p-6">{mainFields.map(renderField)}</CardContent>
         </Card>
@@ -125,26 +158,44 @@ export function ResourceForm({
             </CardContent>
           </Card>
         )}
-      </div>
+      </LockedFieldset>
 
       {/* Sticky action bar: always reachable on a long form, on any screen */}
       <div className="sticky bottom-(--admin-bottom-nav) z-20 -mx-4 border-t border-app bg-surface px-4 py-3 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 shadow-lg">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
-          <span className="text-xs text-muted hidden sm:inline">
-            {id ? `Editing ${singular(config.label)}` : `Creating new ${singular(config.label)}`}
+          <span className="hidden sm:inline">
+            {id ? (
+              <EditLockStatus editing={editing} changeCount={changes.length} />
+            ) : (
+              <span className="text-xs text-muted">Creating new {singular(config.label)}</span>
+            )}
           </span>
           <div className="flex gap-2.5 w-full sm:w-auto justify-end">
-            <Button type="button" variant="secondary" size="sm" onClick={() => router.push(`/admin/${config.key}`)}>
-              <ArrowLeft className="size-3.5" aria-hidden />
-              Cancel
-            </Button>
-            <Button type="submit" variant="primary" size="sm" loading={saving} className="shadow-xs">
-              {!saving && <Save className="size-3.5 mr-1" aria-hidden />}
-              {saving ? "Saving…" : id ? "Save changes" : `Create ${singular(config.label).toLowerCase()}`}
-            </Button>
+            {!editing || !id ? (
+              <Button type="button" variant="secondary" size="sm" onClick={() => router.push(`/admin/${config.key}`)}>
+                <ArrowLeft className="size-3.5" aria-hidden />
+                {id ? "Back" : "Cancel"}
+              </Button>
+            ) : null}
+            {id ? (
+              <EditLockActions
+                editing={editing}
+                dirty={changes.length > 0}
+                saving={saving}
+                onEdit={() => setEditing(true)}
+                onDiscard={discard}
+                saveLabel="Review & save"
+              />
+            ) : (
+              <Button type="submit" variant="primary" size="sm" loading={saving} className="shadow-xs">
+                {!saving && <Save className="size-3.5 mr-1" aria-hidden />}
+                {saving ? "Saving…" : `Create ${singular(config.label).toLowerCase()}`}
+              </Button>
+            )}
           </div>
         </div>
       </div>
+      <ReviewChangesDialog open={reviewOpen} onOpenChange={setReviewOpen} changes={changes} onConfirm={save} />
     </form>
   );
 }
