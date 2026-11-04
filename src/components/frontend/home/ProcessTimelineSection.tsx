@@ -99,7 +99,7 @@ export function ProcessTimelineSection() {
               </span>
 
               <div
-                className="relative flex-1 overflow-hidden rounded-2xl border border-[var(--marketing-line)] bg-white p-5 transition-all duration-300 hover:border-brand-500/35 hover:shadow-[0_18px_44px_rgba(224,27,36,0.12)] lg:mt-2"
+                className="relative flex-1 overflow-hidden rounded-2xl border border-[var(--marketing-line)] bg-white p-4 transition-all sm:p-5 duration-300 hover:border-brand-500/35 hover:shadow-[0_18px_44px_rgba(224,27,36,0.12)] lg:mt-2"
                 style={{
                   opacity: go ? 1 : 0,
                   transform: go ? "none" : "translateY(26px)",

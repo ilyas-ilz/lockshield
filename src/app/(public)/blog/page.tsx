@@ -75,7 +75,7 @@ async function BlogResults({ page: requestedPage }: { page: number }) {
 
   if (posts.length === 0) {
     return (
-      <Reveal className="mx-auto max-w-xl rounded-3xl border border-[var(--marketing-line)] bg-white p-10 text-center sm:p-16">
+      <Reveal className="mx-auto max-w-xl rounded-3xl border border-[var(--marketing-line)] bg-white px-5 py-10 text-center sm:p-16">
         <Flame className="mx-auto mb-4 size-12 text-brand-500" />
         <h3 className="font-tech text-lg font-bold uppercase text-navy-900 sm:text-xl">
           Articles Publishing Soon

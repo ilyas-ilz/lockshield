@@ -10,7 +10,7 @@ export default function CareerLoading() {
           {Array.from({ length: 5 }).map((_, i) => (
             <div
               key={i}
-              className="flex flex-col gap-4 rounded-3xl border border-[var(--marketing-line)] bg-white p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8"
+              className="flex flex-col gap-4 rounded-3xl border border-[var(--marketing-line)] bg-white p-4 sm:flex-row sm:items-center sm:justify-between sm:p-8"
             >
               <div className="space-y-3">
                 <Shimmer className="h-5 w-56 rounded-lg" />

@@ -130,7 +130,7 @@ async function ServiceResults({ requestedPage }: { requestedPage: number }) {
             <Reveal key={service.slug || idx} delayMs={(idx % 3) * 80}>
               <Link
                 href={`/services/${service.slug}`}
-                className="group flex h-full flex-col justify-between rounded-3xl border border-[var(--marketing-line)] bg-white p-6 transition-all duration-300 hover:border-brand-500 hover:shadow-xl sm:p-8"
+                className="group flex h-full flex-col justify-between rounded-3xl border border-[var(--marketing-line)] bg-white p-4 transition-all duration-300 hover:border-brand-500 hover:shadow-xl sm:p-8"
               >
                 <div>
                   <div className="mb-6 flex size-14 items-center justify-center rounded-2xl bg-brand-500/10 text-brand-500 transition-all group-hover:scale-110 group-hover:bg-brand-500 group-hover:text-white">

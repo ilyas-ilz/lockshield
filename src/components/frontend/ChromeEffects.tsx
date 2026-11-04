@@ -66,14 +66,14 @@ export function ChromeEffects({ whatsapp = "+971501234567" }: { whatsapp?: strin
 
   return (
     <>
-      <div className="pointer-events-none fixed inset-x-0 top-0 z-[60] h-[2px] bg-transparent" aria-hidden>
+      <div className="width-before-scroll-bar pointer-events-none fixed inset-x-0 top-0 z-[60] h-[2px] bg-transparent" aria-hidden>
         <div className="h-full origin-left bg-brand-500" style={{ transform: `scaleX(${progress})` }} />
       </div>
 
       {/* Bottom-right floating stack — one container, fixed 12px gap.
           Back-to-top sits above WhatsApp; when hidden it collapses
           (size-0, no gap contribution) so WhatsApp drops to the corner. */}
-      <div className="fixed right-4 z-50 flex flex-col items-center gap-3 [bottom:max(1rem,env(safe-area-inset-bottom))] sm:right-6 sm:[bottom:max(1.5rem,env(safe-area-inset-bottom))]">
+      <div className="width-before-scroll-bar fixed right-4 z-50 flex flex-col items-center gap-3 [bottom:max(1rem,env(safe-area-inset-bottom))] sm:right-6 sm:[bottom:max(1.5rem,env(safe-area-inset-bottom))]">
         <button
           type="button"
           aria-label="Back to top"

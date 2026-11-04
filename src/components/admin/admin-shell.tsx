@@ -78,7 +78,7 @@ export function AdminShell({
   return (
     // WHY the CSS var: the mobile bottom nav is fixed, so page padding and the
     // sticky save bars in forms both need to clear it; 0 on desktop.
-    <div className="font-admin min-h-dvh bg-app [--admin-bottom-nav:calc(3.5rem_+_1px_+_env(safe-area-inset-bottom))] lg:[--admin-bottom-nav:0px]">
+    <div className="font-admin min-h-dvh bg-app [--admin-bottom-nav:calc(4.25rem_+_2px_+_max(0.75rem,env(safe-area-inset-bottom)))] lg:[--admin-bottom-nav:0px]">
       <AdminSidebar
         pathname={pathname}
         user={user}

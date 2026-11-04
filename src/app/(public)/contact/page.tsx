@@ -63,7 +63,7 @@ export default async function ContactPage() {
         <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-12 lg:gap-12">
           {/* Left Contact Info Cards */}
           <div className="space-y-6 lg:col-span-5">
-            <Reveal className="space-y-6 rounded-3xl border border-[var(--marketing-line)] bg-white p-6 shadow-xs sm:p-8">
+            <Reveal className="space-y-6 rounded-3xl border border-[var(--marketing-line)] bg-white p-4 shadow-xs sm:p-8">
               <h2 className="font-tech text-xl font-bold uppercase tracking-tight text-navy-900 sm:text-2xl">
                 Head Office Dubai
               </h2>

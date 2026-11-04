@@ -38,15 +38,22 @@ export default async function DashboardPage() {
   });
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex items-center justify-between gap-3 sm:items-end sm:gap-4">
         <div className="min-w-0">
-          <h1 className="text-2xl font-semibold tracking-tight text-app sm:text-3xl">Dashboard</h1>
-          <p className="mt-1 text-sm text-muted">{today} · Website content, portfolio and customer enquiries.</p>
+          <h1 className="text-xl font-semibold tracking-tight text-app sm:text-3xl">Dashboard</h1>
+          <p className="mt-0.5 text-xs text-muted sm:mt-1 sm:text-sm">
+            {today}
+            <span className="hidden sm:inline"> · Website content, portfolio and customer enquiries.</span>
+          </p>
         </div>
-        <Button variant="secondary" asChild className="min-h-11 self-start sm:min-h-10 sm:self-auto">
-          <a href="/" target="_blank" rel="noopener noreferrer">
-            View site
+        <Button
+          variant="secondary"
+          asChild
+          className="size-11 shrink-0 p-0 sm:h-10 sm:w-auto sm:px-4"
+        >
+          <a href="/" target="_blank" rel="noopener noreferrer" aria-label="View site">
+            <span className="hidden sm:inline">View site</span>
             <ExternalLink aria-hidden />
           </a>
         </Button>

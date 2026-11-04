@@ -2,9 +2,11 @@
 
 import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { X, Send, ShieldCheck, CheckCircle2, Loader2 } from "lucide-react";
+import { X, Send, ShieldCheck, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { ServiceSelect } from "./ServiceSelect";
+import { QuoteSuccessMessage, SubmissionSuccessDialog } from "./SubmissionSuccessDialog";
+import { QUOTE_NEXT_STEPS } from "./success-copy";
 
 export interface QuoteModalProps {
   open: boolean;
@@ -14,7 +16,8 @@ export interface QuoteModalProps {
 
 export function QuoteModal({ open, onOpenChange, defaultService }: QuoteModalProps) {
   const [submitting, setSubmitting] = React.useState(false);
-  const [success, setSuccess] = React.useState(false);
+  // Who just submitted - drives the success popup's greeting; null = closed.
+  const [submitted, setSubmitted] = React.useState<{ name: string; phone: string } | null>(null);
 
   const [formData, setFormData] = React.useState({
     name: "",
@@ -67,20 +70,18 @@ export function QuoteModal({ open, onOpenChange, defaultService }: QuoteModalPro
         );
       }
 
-      setSuccess(true);
-      toast.success("Quote request received! Our engineering team will contact you shortly.");
-      setTimeout(() => {
-        setSuccess(false);
-        onOpenChange(false);
-        setFormData({
-          name: "",
-          email: "",
-          phone: "",
-          serviceInterest: defaultService || "",
-          message: "",
-          honeypot: "",
-        });
-      }, 2000);
+      // Swap the form popup for the success popup straight away (this
+      // component stays mounted, so the success dialog outlives the form one).
+      setSubmitted({ name: formData.name, phone: formData.phone });
+      onOpenChange(false);
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        serviceInterest: defaultService || "",
+        message: "",
+        honeypot: "",
+      });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to submit quote request");
     } finally {
@@ -89,43 +90,35 @@ export function QuoteModal({ open, onOpenChange, defaultService }: QuoteModalPro
   };
 
   return (
-    <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
-      <DialogPrimitive.Portal>
-        <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs animate-in fade-in-0 duration-200" />
-        <DialogPrimitive.Content className="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain rounded-2xl border border-gray-100 bg-white p-6 sm:p-8 shadow-2xl animate-in fade-in-0 zoom-in-95 duration-200">
-          <div className="flex items-start justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="flex size-10 items-center justify-center rounded-xl bg-[#e01b24]/10 text-[#e01b24]">
-                <ShieldCheck className="size-5" />
+    <>
+      <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
+        <DialogPrimitive.Portal>
+          <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs animate-in fade-in-0 duration-200" />
+          <DialogPrimitive.Content className="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain rounded-2xl border border-gray-100 bg-white p-6 sm:p-8 shadow-2xl animate-in fade-in-0 zoom-in-95 duration-200">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="flex size-10 items-center justify-center rounded-xl bg-[#e01b24]/10 text-[#e01b24]">
+                  <ShieldCheck className="size-5" />
+                </div>
+                <div>
+                  <DialogPrimitive.Title className="text-xl font-bold tracking-tight text-gray-900">
+                    Request a Free Quote
+                  </DialogPrimitive.Title>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    Civil Defence approved consultants & engineers
+                  </p>
+                </div>
               </div>
-              <div>
-                <DialogPrimitive.Title className="text-xl font-bold tracking-tight text-gray-900">
-                  Request a Free Quote
-                </DialogPrimitive.Title>
-                <p className="text-xs text-gray-500 mt-0.5">
-                  Civil Defence approved consultants & engineers
-                </p>
-              </div>
+              <DialogPrimitive.Close asChild>
+                <button
+                  type="button"
+                  className="rounded-lg p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
+                >
+                  <X className="size-5" />
+                </button>
+              </DialogPrimitive.Close>
             </div>
-            <DialogPrimitive.Close asChild>
-              <button
-                type="button"
-                className="rounded-lg p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
-              >
-                <X className="size-5" />
-              </button>
-            </DialogPrimitive.Close>
-          </div>
 
-          {success ? (
-            <div className="py-12 flex flex-col items-center justify-center text-center">
-              <CheckCircle2 className="size-14 text-emerald-500 mb-3 animate-bounce" />
-              <h3 className="text-lg font-bold text-gray-900">Thank You!</h3>
-              <p className="text-sm text-gray-600 mt-1 max-w-xs">
-                Your enquiry has been received. Our fire protection specialist will call you shortly.
-              </p>
-            </div>
-          ) : (
             <form onSubmit={handleSubmit} className="mt-6 space-y-4">
               {/* Honeypot - hidden from real users, catches bots */}
               <input
@@ -230,9 +223,17 @@ export function QuoteModal({ open, onOpenChange, defaultService }: QuoteModalPro
                 🔒 Your information is private and strictly used for quote quotation.
               </p>
             </form>
-          )}
-        </DialogPrimitive.Content>
-      </DialogPrimitive.Portal>
-    </DialogPrimitive.Root>
+          </DialogPrimitive.Content>
+        </DialogPrimitive.Portal>
+      </DialogPrimitive.Root>
+
+      <SubmissionSuccessDialog
+        open={submitted !== null}
+        onOpenChange={(isOpen) => !isOpen && setSubmitted(null)}
+        title="Request Received"
+        description={<QuoteSuccessMessage name={submitted?.name ?? ""} phone={submitted?.phone ?? ""} />}
+        steps={QUOTE_NEXT_STEPS}
+      />
+    </>
   );
 }

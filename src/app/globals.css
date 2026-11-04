@@ -62,7 +62,8 @@
   /* legacy single easing curve, used on every transition site-wide */
   --ease-brand: cubic-bezier(0.2, 0.8, 0.2, 1);
 
-  /* legacy .wrap container: max-width:1200px; padding:0 clamp(1rem,4vw,2.5rem).
+  /* legacy .wrap container: max-width:1200px; padding:0 clamp(1rem,4vw,2.5rem)
+     from sm up, 12px below sm.
      Capped at 1200px so the floating navbar never stretches edge-to-edge on
      large desktop monitors. */
   --wrap-width: 1200px;
@@ -230,7 +231,14 @@
   .wrap {
     max-width: var(--wrap-width);
     margin-inline: auto;
-    padding-inline: clamp(1rem, 4vw, 2.5rem);
+    /* WHY 12px on phones: cards add their own padding, so the old 16px
+       gutter + 24px card padding left only ~265px of text on a 360px screen. */
+    padding-inline: 0.75rem;
+  }
+  @media (min-width: 40rem) {
+    .wrap {
+      padding-inline: clamp(1rem, 4vw, 2.5rem);
+    }
   }
 
   /* Hide scrollbars on horizontal snap-carousels (projects, journey) while
@@ -628,6 +636,51 @@
     animation: sheetUp 0.32s var(--ease-brand) both;
   }
 
+  /* Form success popup (SubmissionSuccessDialog). Tailwind v4 centers with
+     the `translate` property, so animating `transform` here doesn't fight
+     the -translate-x/y-1/2 centering. */
+  @keyframes overlayIn {
+    from {
+      opacity: 0;
+    }
+  }
+  .overlay-in {
+    animation: overlayIn 0.2s ease-out both;
+  }
+  @keyframes popIn {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.95);
+    }
+  }
+  .pop-in {
+    animation: popIn 0.35s var(--ease-brand) both;
+  }
+  /* lucide Check path is ~23 units long; 24 hides it fully before drawing. */
+  @keyframes checkDraw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  .check-draw path {
+    stroke-dasharray: 24;
+    stroke-dashoffset: 24;
+    animation: checkDraw 0.45s var(--ease-brand) 0.25s forwards;
+  }
+  @keyframes successRing {
+    from {
+      transform: scale(0.85);
+      opacity: 0.7;
+    }
+    to {
+      transform: scale(1.7);
+      opacity: 0;
+    }
+  }
+  .success-ring {
+    animation: successRing 1.1s ease-out 0.3s both;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -646,9 +699,13 @@
     .drawer-item,
     .drawer-sheet,
     .sheet-up,
+    .pop-in,
     .hero-line > span {
       opacity: 1 !important;
       transform: none !important;
+    }
+    .check-draw path {
+      stroke-dashoffset: 0 !important;
     }
   }
 }

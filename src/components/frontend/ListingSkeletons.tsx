@@ -103,7 +103,7 @@ export function ServiceGridSkeleton() {
         {Array.from({ length: COUNT }, (_, i) => (
           <div
             key={i}
-            className="flex h-full flex-col justify-between rounded-3xl border border-[var(--marketing-line)] bg-white p-6 sm:p-8"
+            className="flex h-full flex-col justify-between rounded-3xl border border-[var(--marketing-line)] bg-white p-4 sm:p-8"
           >
             <div>
               <div className="animate-shimmer mb-6 size-14 rounded-2xl bg-ink/8" />

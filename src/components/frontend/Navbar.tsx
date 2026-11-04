@@ -137,7 +137,7 @@ export function Navbar({ phone = "+971 4 272 7333", siteName = "Lock Shield", so
           in globals.css: 72px mobile / 84px desktop): outer padding never
           changes on scroll - only the shadow/border deepen. Heroes clear it
           with their own top padding; only the hero may sit underneath. */}
-      <header className="fixed top-0 inset-x-0 z-40 py-2.5 sm:py-3">
+      <header className="width-before-scroll-bar fixed top-0 inset-x-0 z-40 py-2.5 sm:py-3">
         <div className="wrap">
           <div
             className={`glass-pill flex min-h-[52px] items-center justify-between gap-2 rounded-[26px] px-3 py-2 transition-shadow duration-300 sm:min-h-[60px] sm:rounded-[30px] sm:px-6 sm:py-2.5 ${

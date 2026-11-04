@@ -34,7 +34,7 @@ export function BlockRenderer({ blocks }: { blocks: BlockData[] | Record<string,
             return (
               <div
                 key={key}
-                className="rounded-3xl bg-[#0d1220] p-8 sm:p-12 text-white relative overflow-hidden"
+                className="rounded-3xl bg-[#0d1220] px-5 py-8 sm:p-12 text-white relative overflow-hidden"
               >
                 <div className="blueprint-grid-dark absolute inset-0 opacity-20 pointer-events-none" />
                 <div className="relative z-10 max-w-2xl space-y-4">
@@ -89,7 +89,7 @@ export function BlockRenderer({ blocks }: { blocks: BlockData[] | Record<string,
             return (
               <div key={key} className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {items.map((item, i: number) => (
-                  <div key={i} className="rounded-2xl border border-gray-200 bg-white p-6 text-center shadow-xs">
+                  <div key={i} className="rounded-2xl border border-gray-200 bg-white p-4 text-center sm:p-6 shadow-xs">
                     <p className="font-tech text-3xl sm:text-4xl font-extrabold text-[#e01b24]">
                       {item.value}
                     </p>
@@ -113,7 +113,7 @@ export function BlockRenderer({ blocks }: { blocks: BlockData[] | Record<string,
                 )}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {features.map((feat, i: number) => (
-                    <div key={i} className="rounded-2xl border border-gray-200 bg-white p-6 shadow-xs">
+                    <div key={i} className="rounded-2xl border border-gray-200 bg-white p-4 shadow-xs sm:p-6">
                       <div className="size-10 rounded-xl bg-[#e01b24]/10 text-[#e01b24] flex items-center justify-center mb-4">
                         <CheckCircle2 className="size-5" />
                       </div>
@@ -150,7 +150,7 @@ export function BlockRenderer({ blocks }: { blocks: BlockData[] | Record<string,
             return (
               <div
                 key={key}
-                className="rounded-3xl bg-gradient-to-r from-[#e01b24] to-[#b3121a] p-8 sm:p-12 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6"
+                className="rounded-3xl bg-gradient-to-r from-[#e01b24] to-[#b3121a] px-5 py-8 sm:p-12 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6"
               >
                 <div>
                   <h2 className="font-tech text-2xl sm:text-3xl font-bold uppercase tracking-tight text-white">

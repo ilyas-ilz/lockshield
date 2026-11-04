@@ -130,7 +130,7 @@ export function TestimonialsFaqSection({ faqs }: { faqs: FAQItem[] }) {
                 {TESTIMONIALS.map((t, i) => (
                   <div
                     key={t.company}
-                    className="col-start-1 row-start-1 flex flex-col rounded-2xl border border-[var(--marketing-line)] bg-white p-6 transition-[opacity,transform] duration-500 sm:p-7"
+                    className="col-start-1 row-start-1 flex flex-col rounded-2xl border border-[var(--marketing-line)] bg-white p-4 transition-[opacity,transform] duration-500 sm:p-7"
                     style={{
                       opacity: i === active ? 1 : 0,
                       transform: i === active ? "none" : "translateY(10px) scale(0.985)",

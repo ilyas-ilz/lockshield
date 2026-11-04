@@ -19,7 +19,7 @@ export default function AboutLoading() {
       <section className="section-y blueprint-grid bg-paper-soft">
         <div className="wrap grid grid-cols-2 gap-6 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="space-y-3 rounded-3xl border border-[var(--marketing-line)] bg-white p-6">
+            <div key={i} className="space-y-3 rounded-3xl border border-[var(--marketing-line)] bg-white p-4 sm:p-6">
               <Shimmer className="size-12 rounded-2xl" />
               <Shimmer className="h-4 w-24 rounded-md" />
               <Shimmer className="h-3 w-full rounded-md" />

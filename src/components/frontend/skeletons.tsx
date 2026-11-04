@@ -182,13 +182,13 @@ export function ArticlePageSkeleton({ withSidebar = true }: { withSidebar?: bool
 
           {withSidebar && (
             <aside className="space-y-4">
-              <div className="space-y-3 rounded-3xl border border-[var(--marketing-line)] bg-paper-soft p-6">
+              <div className="space-y-3 rounded-3xl border border-[var(--marketing-line)] bg-paper-soft p-4 sm:p-6">
                 <Shimmer className="h-4 w-32 rounded-md" />
                 {Array.from({ length: 4 }).map((_, i) => (
                   <Shimmer key={i} className="h-10 w-full rounded-xl" />
                 ))}
               </div>
-              <div className="space-y-3 rounded-3xl border border-[var(--marketing-line)] bg-paper-soft p-6">
+              <div className="space-y-3 rounded-3xl border border-[var(--marketing-line)] bg-paper-soft p-4 sm:p-6">
                 <Shimmer className="h-4 w-28 rounded-md" />
                 <Shimmer className="h-11 w-full rounded-full" />
               </div>

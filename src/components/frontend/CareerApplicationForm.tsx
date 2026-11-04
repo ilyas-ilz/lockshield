@@ -1,8 +1,10 @@
 "use client";
 
 import * as React from "react";
-import { Send, CheckCircle2, Loader2, X } from "lucide-react";
+import { Send, Loader2, X, Mail } from "lucide-react";
 import { toast } from "sonner";
+import { SubmissionSuccessDialog } from "./SubmissionSuccessDialog";
+import { firstName } from "./success-copy";
 
 interface CareerApplicationFormProps {
   jobTitle: string;
@@ -21,7 +23,9 @@ interface CareerApplicationFormProps {
  */
 export function CareerApplicationForm({ jobTitle, jobId, onClose }: CareerApplicationFormProps) {
   const [submitting, setSubmitting] = React.useState(false);
-  const [success, setSuccess] = React.useState(false);
+  // Applicant's name once submitted - drives the success popup; null = closed.
+  const [submittedName, setSubmittedName] = React.useState<string | null>(null);
+  const applicantFirst = firstName(submittedName ?? "");
   const [form, setForm] = React.useState({ name: "", email: "", phone: "", message: "", honeypot: "" });
 
   async function handleSubmit(e: React.FormEvent) {
@@ -48,8 +52,7 @@ export function CareerApplicationForm({ jobTitle, jobId, onClose }: CareerApplic
         }),
       });
       if (!res.ok) throw new Error("Submission failed");
-      setSuccess(true);
-      toast.success("Application received — our HR team will be in touch.");
+      setSubmittedName(form.name);
     } catch {
       toast.error("Could not send your application. Please email careers@lockshield.ae directly.");
     } finally {
@@ -58,7 +61,7 @@ export function CareerApplicationForm({ jobTitle, jobId, onClose }: CareerApplic
   }
 
   return (
-    <div className="mt-4 rounded-2xl border border-[var(--marketing-line)] bg-paper-soft p-5 sm:p-6">
+    <div className="mt-4 rounded-2xl border border-[var(--marketing-line)] bg-paper-soft p-4 sm:p-6">
       <div className="mb-4 flex items-center justify-between gap-3">
         <h4 className="text-sm font-bold text-navy-900">Apply for {jobTitle}</h4>
         <button
@@ -71,100 +74,112 @@ export function CareerApplicationForm({ jobTitle, jobId, onClose }: CareerApplic
         </button>
       </div>
 
-      {success ? (
-        <div className="flex flex-col items-center py-6 text-center">
-          <CheckCircle2 className="mb-2 size-10 text-emerald-500" />
-          <p className="text-sm font-semibold text-navy-900">Application received!</p>
-          <p className="mt-1 max-w-xs text-xs text-ink/55">
-            Please email your CV to <strong>careers@lockshield.ae</strong> referencing this role so our HR team can review it alongside your application.
+      <SubmissionSuccessDialog
+        open={submittedName !== null}
+        onOpenChange={(open) => {
+          if (open) return;
+          setSubmittedName(null);
+          onClose(); // application is done - collapse the inline form
+        }}
+        title="Application Received"
+        description={`${applicantFirst ? `Thanks, ${applicantFirst}. ` : ""}Our HR team will review your application and get in touch.`}
+      >
+        <div className="mt-6 flex items-start gap-3 rounded-2xl border border-brand-100 bg-brand-50 p-4 text-left">
+          <Mail className="mt-0.5 size-5 shrink-0 text-brand-500" />
+          <p className="text-sm text-gray-700">
+            <span className="font-semibold text-gray-900">One more step:</span> email your CV to{" "}
+            <a href="mailto:careers@lockshield.ae" className="font-semibold text-brand-500 underline-offset-2 hover:underline">
+              careers@lockshield.ae
+            </a>{" "}
+            referencing this role.
           </p>
         </div>
-      ) : (
-        <form onSubmit={handleSubmit} className="space-y-3">
-          {/* Honeypot - hidden from real users, catches bots */}
-          <input
-            type="text"
-            name="company"
-            value={form.honeypot}
-            onChange={(e) => setForm({ ...form, honeypot: e.target.value })}
-            className="hidden"
-            tabIndex={-1}
-            autoComplete="off"
-            aria-hidden="true"
-          />
+      </SubmissionSuccessDialog>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div>
-              <label htmlFor="career-name" className="mb-1 block text-xs font-semibold text-ink/70">
-                Full Name <span className="text-brand-500">*</span>
-              </label>
-              <input
-                id="career-name"
-                type="text"
-                required
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className="w-full min-h-11 rounded-xl border border-[var(--marketing-line)] bg-white px-3.5 py-2 text-sm text-ink focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
-              />
-            </div>
-            <div>
-              <label htmlFor="career-email" className="mb-1 block text-xs font-semibold text-ink/70">
-                Email <span className="text-brand-500">*</span>
-              </label>
-              <input
-                id="career-email"
-                type="email"
-                required
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                className="w-full min-h-11 rounded-xl border border-[var(--marketing-line)] bg-white px-3.5 py-2 text-sm text-ink focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
-              />
-            </div>
-          </div>
+      <form onSubmit={handleSubmit} className="space-y-3">
+        {/* Honeypot - hidden from real users, catches bots */}
+        <input
+          type="text"
+          name="company"
+          value={form.honeypot}
+          onChange={(e) => setForm({ ...form, honeypot: e.target.value })}
+          className="hidden"
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+        />
 
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
-            <label htmlFor="career-phone" className="mb-1 block text-xs font-semibold text-ink/70">Phone</label>
+            <label htmlFor="career-name" className="mb-1 block text-xs font-semibold text-ink/70">
+              Full Name <span className="text-brand-500">*</span>
+            </label>
             <input
-              id="career-phone"
-              type="tel"
-              value={form.phone}
-              onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              id="career-name"
+              type="text"
+              required
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
               className="w-full min-h-11 rounded-xl border border-[var(--marketing-line)] bg-white px-3.5 py-2 text-sm text-ink focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
             />
           </div>
-
           <div>
-            <label htmlFor="career-message" className="mb-1 block text-xs font-semibold text-ink/70">A few words about your experience</label>
-            <textarea
-              id="career-message"
-              rows={3}
-              value={form.message}
-              onChange={(e) => setForm({ ...form, message: e.target.value })}
-              className="w-full resize-none rounded-xl border border-[var(--marketing-line)] bg-white px-3.5 py-2 text-sm text-ink focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+            <label htmlFor="career-email" className="mb-1 block text-xs font-semibold text-ink/70">
+              Email <span className="text-brand-500">*</span>
+            </label>
+            <input
+              id="career-email"
+              type="email"
+              required
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              className="w-full min-h-11 rounded-xl border border-[var(--marketing-line)] bg-white px-3.5 py-2 text-sm text-ink focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
             />
           </div>
+        </div>
 
-          <p className="text-[11px] text-ink/50">
-            After submitting, email your CV to <strong>careers@lockshield.ae</strong> referencing this role.
-          </p>
+        <div>
+          <label htmlFor="career-phone" className="mb-1 block text-xs font-semibold text-ink/70">Phone</label>
+          <input
+            id="career-phone"
+            type="tel"
+            value={form.phone}
+            onChange={(e) => setForm({ ...form, phone: e.target.value })}
+            className="w-full min-h-11 rounded-xl border border-[var(--marketing-line)] bg-white px-3.5 py-2 text-sm text-ink focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+          />
+        </div>
 
-          <button
-            type="submit"
-            disabled={submitting}
-            className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full bg-brand-500 py-3 text-sm font-semibold text-white shadow-md shadow-brand-500/20 transition-all hover:bg-brand-600 active:scale-95 disabled:opacity-60 cursor-pointer"
-          >
-            {submitting ? (
-              <>
-                <Loader2 className="size-4 animate-spin" /> Submitting…
-              </>
-            ) : (
-              <>
-                <Send className="size-4" /> Submit Application
-              </>
-            )}
-          </button>
-        </form>
-      )}
+        <div>
+          <label htmlFor="career-message" className="mb-1 block text-xs font-semibold text-ink/70">A few words about your experience</label>
+          <textarea
+            id="career-message"
+            rows={3}
+            value={form.message}
+            onChange={(e) => setForm({ ...form, message: e.target.value })}
+            className="w-full resize-none rounded-xl border border-[var(--marketing-line)] bg-white px-3.5 py-2 text-sm text-ink focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+          />
+        </div>
+
+        <p className="text-[11px] text-ink/50">
+          After submitting, email your CV to <strong>careers@lockshield.ae</strong> referencing this role.
+        </p>
+
+        <button
+          type="submit"
+          disabled={submitting}
+          className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full bg-brand-500 py-3 text-sm font-semibold text-white shadow-md shadow-brand-500/20 transition-all hover:bg-brand-600 active:scale-95 disabled:opacity-60 cursor-pointer"
+        >
+          {submitting ? (
+            <>
+              <Loader2 className="size-4 animate-spin" /> Submitting…
+            </>
+          ) : (
+            <>
+              <Send className="size-4" /> Submit Application
+            </>
+          )}
+        </button>
+      </form>
     </div>
   );
 }

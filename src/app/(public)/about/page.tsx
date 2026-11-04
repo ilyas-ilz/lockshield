@@ -92,7 +92,7 @@ export default function AboutPage() {
       {/* Mission & Vision */}
       <Section className="blueprint-grid bg-paper-soft">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8">
-          <Reveal className="rounded-3xl border border-[var(--marketing-line)] bg-white p-6 shadow-sm transition-shadow hover:shadow-md sm:p-10">
+          <Reveal className="rounded-3xl border border-[var(--marketing-line)] bg-white p-4 shadow-sm transition-shadow hover:shadow-md sm:p-10">
             <div className="mb-6 flex size-14 items-center justify-center rounded-2xl bg-brand-500/10 text-brand-500">
               <Target className="size-7" />
             </div>
@@ -104,7 +104,7 @@ export default function AboutPage() {
             </p>
           </Reveal>
 
-          <Reveal delayMs={100} className="rounded-3xl border border-[var(--marketing-line)] bg-white p-6 shadow-sm transition-shadow hover:shadow-md sm:p-10">
+          <Reveal delayMs={100} className="rounded-3xl border border-[var(--marketing-line)] bg-white p-4 shadow-sm transition-shadow hover:shadow-md sm:p-10">
             <div className="mb-6 flex size-14 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-600">
               <Eye className="size-7" />
             </div>
@@ -122,7 +122,7 @@ export default function AboutPage() {
       <section className="relative overflow-hidden bg-ink py-14 sm:py-20">
         <div className="blueprint-grid-dark pointer-events-none absolute inset-0 opacity-20" />
         <div className="wrap relative z-10">
-          <Reveal className="flex flex-col items-center gap-6 rounded-[26px] p-8 text-center sm:gap-8 sm:p-12">
+          <Reveal className="flex flex-col items-center gap-6 rounded-[26px] px-5 py-8 text-center sm:gap-8 sm:p-12">
             <h2 className="font-tech text-[clamp(1.5rem,4.5vw,2.5rem)] font-bold uppercase leading-tight tracking-tight text-white">
               Need fire protection solutions for your building?
             </h2>

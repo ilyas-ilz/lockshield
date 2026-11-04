@@ -210,7 +210,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
               {blocks.length > 0 && <BlockRenderer blocks={blocks} />}
 
               {/* Civil Defence Compliance Guarantee Banner */}
-              <Reveal delayMs={100} className="flex flex-col items-center gap-5 rounded-3xl border border-[var(--marketing-line)] bg-paper-soft p-6 sm:flex-row sm:gap-6 sm:p-8">
+              <Reveal delayMs={100} className="flex flex-col items-center gap-5 rounded-3xl border border-[var(--marketing-line)] bg-paper-soft p-4 sm:flex-row sm:gap-6 sm:p-8">
                 <div className="flex size-16 shrink-0 items-center justify-center rounded-2xl bg-brand-500/10 text-brand-500">
                   <ShieldCheck className="size-8" />
                 </div>
@@ -233,7 +233,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
                 <QuickQuoteForm defaultService={title} />
 
                 {/* Other Services List */}
-                <div className="space-y-4 rounded-3xl border border-[var(--marketing-line)] bg-paper-soft p-6">
+                <div className="space-y-4 rounded-3xl border border-[var(--marketing-line)] bg-paper-soft p-4 sm:p-6">
                   <h3 className="font-tech text-sm font-bold uppercase tracking-wider text-navy-900">
                     Explore Other Services
                   </h3>

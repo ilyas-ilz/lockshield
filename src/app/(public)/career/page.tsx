@@ -53,7 +53,7 @@ export default async function CareerPage() {
             {items.length > 0 ? (
               <CareerJobList jobs={items} />
             ) : (
-              <div className="rounded-3xl border border-[var(--marketing-line)] bg-white p-6 text-center sm:p-10">
+              <div className="rounded-3xl border border-[var(--marketing-line)] bg-white p-4 text-center sm:p-10">
                 <div className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-brand-500/10 text-brand-500">
                   <Briefcase className="size-5" aria-hidden />
                 </div>
@@ -74,7 +74,7 @@ export default async function CareerPage() {
 
           <div className="lg:col-span-4">
             <Reveal className="space-y-4 lg:sticky lg:top-28">
-              <div className="space-y-4 rounded-3xl border border-[var(--marketing-line)] bg-white p-6 sm:p-8">
+              <div className="space-y-4 rounded-3xl border border-[var(--marketing-line)] bg-white p-4 sm:p-8">
                 <h3 className="font-tech text-base font-bold uppercase tracking-wide text-navy-900 sm:text-lg">
                   Why Work at Lock Shield?
                 </h3>
@@ -92,7 +92,7 @@ export default async function CareerPage() {
                   nowhere to go from this page. Hidden when there are no
                   openings, since the empty state already offers the form. */}
               {items.length > 0 && (
-                <div className="rounded-3xl border border-brand-500/20 bg-brand-500/5 p-6 sm:p-8">
+                <div className="rounded-3xl border border-brand-500/20 bg-brand-500/5 p-4 sm:p-8">
                   <h3 className="font-tech text-base font-bold uppercase tracking-wide text-navy-900 sm:text-lg">
                     Don&apos;t see your role?
                   </h3>

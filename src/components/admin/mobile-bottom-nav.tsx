@@ -19,40 +19,42 @@ export function MobileBottomNav({
   const onTab = BOTTOM_NAV_ITEMS.some((tab) => isNavActive(pathname, tab.href));
   const moreActive = menuOpen || !onTab;
 
+  // Each tab: an icon in a capsule that fills when active (pill indicator),
+  // label below. Press scales down slightly for tactile feedback.
   const itemClass = (active: boolean) =>
     cn(
-      "relative flex min-h-14 flex-col items-center justify-center gap-1 text-[10px] font-semibold transition-colors select-none",
-      "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--color-brand-500)]",
-      active
-        ? "text-[var(--color-brand-600)] dark:text-[var(--color-brand-400)]"
-        : "text-muted hover:text-foreground"
+      "group flex h-14 w-full flex-col items-center justify-center gap-0.5 rounded-2xl text-[10px] font-semibold tracking-wide select-none",
+      "transition-[color,transform] duration-200 ease-out active:scale-95 motion-reduce:transition-none motion-reduce:active:scale-100",
+      "focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--color-brand-500)]",
+      active ? "text-app" : "text-muted hover:text-app"
     );
 
-  const indicator = (active: boolean) =>
-    active && (
-      <span
-        className="absolute top-0 left-1/2 h-0.5 w-8 -translate-x-1/2 rounded-b-full bg-[var(--color-brand-500)]"
-        aria-hidden
-      />
+  const capsule = (active: boolean) =>
+    cn(
+      "relative flex h-8 w-14 items-center justify-center rounded-full transition-colors duration-200 motion-reduce:transition-none",
+      active
+        ? "bg-[var(--color-brand-50)] text-[var(--color-brand-600)] dark:bg-[var(--color-brand-500)]/15 dark:text-[var(--color-brand-300)]"
+        : "group-hover:bg-surface-2"
     );
 
   return (
+    // Floating frosted bar. Its height lives in --admin-bottom-nav (admin-shell);
+    // keep the two in sync: h-14 items + p-1.5 + 1px borders + bottom gap.
     <nav
       aria-label="Primary"
-      className="fixed inset-x-0 bottom-0 z-30 border-t border-app bg-surface pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_16px_-6px_rgba(0,0,0,0.08)] lg:hidden"
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-30 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:hidden"
     >
-      <ul className="mx-auto grid max-w-lg grid-cols-5">
+      <ul className="pointer-events-auto mx-auto grid max-w-md grid-cols-5 gap-0.5 rounded-[1.375rem] border border-app bg-surface/85 p-1.5 shadow-[0_16px_40px_-16px_rgba(13,18,32,0.45)] backdrop-blur-xl backdrop-saturate-150 dark:bg-surface/80 dark:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.8)]">
         {BOTTOM_NAV_ITEMS.map((tab) => {
           const active = isNavActive(pathname, tab.href);
           const badge = tab.href === "/admin/leads" && newLeadsCount > 0;
           return (
             <li key={tab.href}>
               <Link href={tab.href} aria-current={active ? "page" : undefined} className={itemClass(active)}>
-                {indicator(active)}
-                <span className="relative">
-                  <tab.icon className="size-5" aria-hidden />
+                <span className={capsule(active)}>
+                  <tab.icon className="size-5" strokeWidth={active ? 2.25 : 1.75} aria-hidden />
                   {badge && (
-                    <span className="absolute -top-1.5 -right-2.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--color-brand-500)] px-1 text-[9px] font-bold leading-none text-white ring-2 ring-[var(--surface)]">
+                    <span className="absolute -top-1 right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--color-brand-500)] px-1 text-[9px] font-bold leading-none text-white ring-2 ring-[var(--surface)]">
                       {newLeadsCount > 99 ? "99+" : newLeadsCount}
                     </span>
                   )}
@@ -69,10 +71,11 @@ export function MobileBottomNav({
             onClick={onOpenMenu}
             aria-haspopup="dialog"
             aria-expanded={menuOpen}
-            className={cn(itemClass(moreActive), "w-full")}
+            className={itemClass(moreActive)}
           >
-            {indicator(moreActive)}
-            <Menu className="size-5" aria-hidden />
+            <span className={capsule(moreActive)}>
+              <Menu className="size-5" strokeWidth={moreActive ? 2.25 : 1.75} aria-hidden />
+            </span>
             More
           </button>
         </li>

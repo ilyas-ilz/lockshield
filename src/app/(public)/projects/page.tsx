@@ -154,7 +154,7 @@ async function ProjectResults({
   return (
     <>
       {items.length === 0 ? (
-        <div className="mx-auto max-w-xl rounded-3xl border border-[var(--marketing-line)] bg-white p-10 text-center sm:p-16">
+        <div className="mx-auto max-w-xl rounded-3xl border border-[var(--marketing-line)] bg-white px-5 py-10 text-center sm:p-16">
           <h2 className="font-tech text-lg font-bold uppercase text-navy-900 sm:text-xl">
             No projects in this sector
           </h2>

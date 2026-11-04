@@ -33,7 +33,7 @@ export function CareerJobList({ jobs }: { jobs: JobOpening[] }) {
         return (
           <div
             key={job._id}
-            className="rounded-3xl border border-[var(--marketing-line)] bg-white p-5 shadow-xs transition-all hover:border-brand-500/50 hover:shadow-md sm:p-8"
+            className="rounded-3xl border border-[var(--marketing-line)] bg-white p-4 shadow-xs transition-all hover:border-brand-500/50 hover:shadow-md sm:p-8"
           >
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
