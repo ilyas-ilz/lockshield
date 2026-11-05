@@ -20,18 +20,22 @@ export function Footer({ settings }: { settings: Partial<ISettings> }) {
       <div className="blueprint-grid-dark pointer-events-none absolute inset-0 opacity-20" />
 
       <div className="wrap relative z-10">
-        {/* Mobile: centred stacked card (logo / blurb / contact). sm+: the
-            compact 3-column footer. */}
-        <div className="grid grid-cols-1 gap-6 border-b border-gray-800 pb-6 text-center sm:gap-4 sm:pb-4 sm:text-left lg:grid-cols-[1.4fr_1fr_1fr]">
+        {/* Mobile: compact and left-aligned - logo beside the blurb, contact
+            items wrapping inline (a centred one-item-per-row stack made the
+            footer ~500px tall on a phone). sm+: the compact 3-column footer. */}
+        {/* sm:grid-cols-2 is required: identity has sm:col-span-2, and with a
+            single explicit column the browser added an implicit auto column
+            that took all the width, squeezing Quick Links into a 0px column. */}
+        <div className="grid grid-cols-1 gap-4 border-b border-gray-800 pb-4 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr]">
           {/* Company identity */}
-          <div className="flex flex-col items-center space-y-2.5 sm:col-span-2 sm:items-start lg:col-span-1">
-            <Link href="/" className="group inline-flex items-center gap-2.5">
+          <div className="flex items-center gap-3 sm:col-span-2 sm:flex-col sm:items-start sm:gap-2.5 lg:col-span-1">
+            <Link href="/" className="group inline-flex shrink-0 items-center gap-2.5">
               <Image
                 src="/assets/images/logo-lockshield.webp"
                 alt="Lock Shield — Firefighting and Safety Equipment Installation LLC"
                 width={132}
                 height={100}
-                className="h-auto w-20 rounded-xl bg-white/92 p-1.5"
+                className="h-auto w-14 rounded-lg bg-white/92 p-1 sm:w-20 sm:rounded-xl sm:p-1.5"
               />
             </Link>
 
@@ -95,14 +99,14 @@ export function Footer({ settings }: { settings: Partial<ISettings> }) {
             </a>
           </nav>
 
-          {/* Contact Details & NAP — centred stack on mobile, inline
-              wrap from sm up. */}
+          {/* Contact Details & NAP — address on its own line, phones and
+              email wrap inline at every width. */}
           <div>
-            <h3 className="font-tech mb-2 text-sm font-bold uppercase tracking-wider text-white">Get in Touch</h3>
-            <ul className="flex flex-col items-center gap-2 text-sm sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5 sm:gap-y-1.5">
+            <h3 className="font-tech mb-1.5 text-sm font-bold uppercase tracking-wider text-white sm:mb-2">Get in Touch</h3>
+            <ul className="flex flex-wrap items-center gap-x-4 gap-y-0.5 text-sm sm:gap-x-5 sm:gap-y-1.5">
               {/* The address was the only row here with an icon but no
                   destination - phone and email were already actionable. */}
-              <li className="flex basis-full items-start justify-center gap-3 sm:justify-start">
+              <li className="flex basis-full items-start gap-2 sm:gap-3">
                 <MapPin className="mt-1 size-4 shrink-0 text-brand-500" />
                 <a
                   href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`}
@@ -114,14 +118,14 @@ export function Footer({ settings }: { settings: Partial<ISettings> }) {
                 </a>
               </li>
               {phones.map((phone) => (
-                <li key={phone} className="flex items-center gap-3">
+                <li key={phone} className="flex items-center gap-2 sm:gap-3">
                   <Phone className="size-4 shrink-0 text-brand-500" />
                   <a href={`tel:${phone.replace(/\s+/g, "")}`} className="min-h-8 py-1 transition-colors hover:text-white">
                     {formatPhoneDisplay(phone)}
                   </a>
                 </li>
               ))}
-              <li className="flex items-center gap-3">
+              <li className="flex items-center gap-2 sm:gap-3">
                 <Mail className="size-4 shrink-0 text-brand-500" />
                 <a href={`mailto:${email}`} className="min-h-8 py-1 transition-colors hover:text-white">
                   {email}
@@ -139,7 +143,9 @@ export function Footer({ settings }: { settings: Partial<ISettings> }) {
         {/* No "DCD Approved · ISO Certified · Serving UAE" strapline here - it
             restated the two trust badges sitting a few rows above it, in the
             same viewport. The badges carry that signal better. */}
-        <div className="pt-3 text-center text-xs leading-relaxed text-gray-500 sm:pt-2 sm:text-left">
+        {/* pr-16 on mobile: the floating WhatsApp button sits over the
+            bottom-right corner, so the line wraps before it instead of under it. */}
+        <div className="pr-16 pt-3 text-xs leading-relaxed text-gray-500 sm:pr-0 sm:pt-2">
           <p>
             © {currentYear} {settings.legalName || "LOCK SHIELD Firefighting and Safety Equipment Installation LLC"}. All
             rights reserved.
